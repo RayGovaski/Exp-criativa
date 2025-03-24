@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.fundo-rosa{
+  background-image: url("src/Assets/FundoRegistroAluno.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.registro-container-rosa {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+  width: 420px;
+  margin: 40px;
+  font-family: 'Fredoka', sans-serif;
+  
+}
+
+.registro-header-rosa {
+  background-color: #F27375;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
+.registro-form-rosa input {
+  border: 2px solid #F7AAAA ;
+  border-radius: 20px;
+  padding: 5px;
+  width: 100%;
+  outline: none;
+}
+
+.custom-button-rosa {
+  position: relative;
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  background-color: #F27375;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  box-shadow: -5px 5px 0px #F7AAAA;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  
+}
+
+.button-container-rosa {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-line2-rosa {
+  width: 70%;
+  height: 4px;
+  background-color: #F7AAAA;
+  margin-top: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.text-center-rosa{
+  color: #F27375;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 844px) {
+  .footer-line2-rosa {
+    width: 60%;
+  }
+}
+
+.label-rosa{
+  color: #F27375;
+  font-size: 18px;
+  font-weight: 500;
+  margin-left: 15px;
+}
+
+input[type="date"],
+input[type="text"],
+input[type="email"],
+input[type="password"]{
+  padding-left: 13px;
+}
+
+@media (max-width: 1100px) {
+  .fundo-rosa {
+    background-image: url("src/Assets/FundoRegistroAlunoCelularMedio.png"); 
+  }
+}
+
+@media (max-width: 600px) {
+  .fundo-rosa {
+    background-image: url("src/Assets/FundoRegistroAlunoCelular.png"); 
+  }
+}
+
+.custom-button-rosa {
+  transition: transform 0.3s ease-in-out;
+}
+
+.custom-button-rosa:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.fundo-menu{
+  background-image: url("src/Assets/FundoMenuRegistro.png");
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background: none;
+  font-family: 'Fredoka', sans-serif;
+}
+
+.content-wrapper {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.menu-title {
+  font-size: 2vw;
+  font-weight: 600;
+  color: #0A7D7E;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #76B5A0;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+.menu-text{
+  font-weight:600;
+}
+
+.menu-options {
+  display: flex;
+  gap: 3vw;
+  margin-top: 20px;
+}
+
+.menu-button {
+  width: 20vw;
+  height: 10vw;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.apoiador {
+  background-color: #0A7D7E;
+}
+
+.aluno {
+  background-color: #FF6F61;
+}
+
+.apoiador:hover {
+  background-color: #0A7D7E;
+  background-image: url("src/Assets/ImagemRegistroApoiador.png");
+}
+
+.aluno:hover {
+  background-color: #FF6F61;
+  background-image: url("src/Assets/ImagemRegistroAluno.png");
+}
+
+.menu-button:hover {
+  transform: rotateY(160deg);
+}
+
+.menu-button:hover .menu-text {
+  transform: rotateY(-160deg);
+  transform-style: preserve-3d;
+}
+
+.menu-button:hover .menu-icon {
+  transform: rotateY(-160deg);
+  transform-style: preserve-3d;
+}
+
+.menu-button:hover .menu-icon,
+.menu-button:hover span {
+  opacity: 0.5;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.menu-icon {
+  width: 5vw;
+  height: 5vw;
+  margin-bottom: 5px;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.menu-button span {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.menu-login {
+  margin-top: 20px;
+  font-size: 1.5vw;
+  color: #0A7D7E;
+}
+
+.menu-login a {
+  font-weight: bold;
+  color: #0A7D7E;
+  text-decoration: none;
+}
+
+.menu-login a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1010px) {
+  .menu-title {
+    font-size: 4vw;
+  }
+  
+  .menu-button {
+    width: 25vw;
+    height: 17vw;
+    font-size: 1.5rem;
+  }
+
+  .menu-icon {
+    width: 10vw;
+    height: 10vw;
+  }
+
+  .menu-login {
+    font-size: 3vw;
+  }
+
+  .menu-text{
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-title {
+    font-size: 6vw;
+  }
+  
+  .menu-button {
+    width: 60vw;
+    height: 28vw;
+    font-size: 3vw;
+  }
+
+  .menu-icon {
+    width: 15vw;
+    height: 15vw;
+  }
+
+  .menu-login {
+    font-size: 4vw;
+  }
+
+  .menu-text{
+    font-size: 4vw;
+  }
+}
+
+@media (max-width: 550px) {
+  .menu-title {
+    font-size: 8vw;
+  }
+  
+  .menu-button {
+    width: 70vw;
+    height: 40vw;
+    font-size: 3vw;
+  }
+
+  .menu-icon {
+    width: 15vw;
+    height: 15vw;
+  }
+
+  .menu-login {
+    font-size: 6vw;
+  }
+
+  .menu-text{
+    font-size: 6vw;
+  }
+}
+
+@media (max-width: 1100px) {
+  .fundo-menu {
+    background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png");
+  }
+}
+
+@media (max-width: 600px) {
+  .fundo-menu {
+    background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-options {
+    flex-direction: column; 
+    gap: 2vw;
+  }
+
+
+}

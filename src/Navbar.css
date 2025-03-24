@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.navbar {
+  background-image: url("src/Assets/FundoNavbar.png");
+  background-size: cover;
+  background-position: center;
+  padding: 0;
+  font-family: 'Fredoka', sans-serif;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+}
+
+.nav-item .nav-link {
+  font-weight: 600 !important;
+  color: #000;
+}
+
+.navbar-brand {
+  padding-left: 15px;
+}
+
+.navbar-logo {
+  height: 70px;
+  display: block;
+}
+
+.navbar-nav {
+  margin-left: auto;
+}
+
+.nav-item .nav-link {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  padding-right: 15px;
+}
+
+.profile-img {
+  height: 55px;
+  width: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.nav-item-custom, .nav-item-custom2, .nav-item-custom3, .nav-item-custom4 {
+  position: relative;
+  padding-bottom: 5px;
+  transition: transform 0.3s ease;
+}
+
+.nav-item-custom::after,
+.nav-item-custom2::after,
+.nav-item-custom3::after,
+.nav-item-custom4::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: transparent;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-item-custom:hover::after {
+  width: 100%;
+  background: linear-gradient(to right, #0F7D7E, #76B5A0);
+}
+
+.nav-item-custom2:hover::after {
+  width: 100%;
+  background: linear-gradient(to right, #76B5A0, #0F7D7E);
+}
+
+.nav-item-custom3:hover::after {
+  width: 100%;
+  background: linear-gradient(to right, #FF7575, #D33649);
+}
+
+.nav-item-custom4:hover::after {
+  width: 100%;
+  background: linear-gradient(to right, #D33649, #FF7575);
+}
+
+.nav-item-custom:hover,
+.nav-item-custom2:hover,
+.nav-item-custom3:hover,
+.nav-item-custom4:hover {
+  transform: scale(1.1);
+}

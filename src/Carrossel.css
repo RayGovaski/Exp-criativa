@@ -1,0 +1,291 @@
+/* Tamanho padrão do carrossel */
+.carousel img {
+  height: 500px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Ajuste da legenda */
+.carousel-caption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 85%;
+  max-width: 600px;
+  font-family: 'Fredoka', sans-serif;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+/* Ajuste do conteúdo */
+.caption-content {
+  width: 100%;
+  padding: 15px;
+}
+
+/* Melhorando tamanho do título */
+.caption-title {
+  font-size: 2.5vw;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* Melhorando tamanho do texto */
+.caption-text {
+  font-size: 1.5vw;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Botões ajustados para melhor espaçamento */
+.buttons-container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.custom-button-azul3 {
+  min-width: 100px;
+  max-width: 200px;
+  width: 15vw;
+  padding: 10px 15px;
+  font-size: 1.5vw;
+  font-weight: 600;
+  color: white;
+  background-color: #76B5A0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: -3px 3px 0px #0A7D7E;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-button-azul3:hover {
+  transform: scale(1.05);
+}
+
+.custom-button-rosa3 {
+  min-width: 100px;
+  max-width: 200px;
+  width: 15vw;
+  padding: 10px 15px;
+  font-size: 1.5vw;
+  font-weight: 600;
+  color: white;
+  background-color: #FF6B6B;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: -3px 3px 0px #D9534F;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-button-rosa3:hover {
+  transform: scale(1.05);
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+/* Tablets e telas médias */
+@media (max-width: 1024px) {
+  .carousel-caption {
+    width: 90%;
+    max-width: 500px;
+  }
+
+  .caption-title {
+    font-size: 3vw;
+  }
+
+  .caption-text {
+    font-size: 1.8vw;
+  }
+
+  .custom-button-azul3 {
+    width: 18vw;
+    font-size: 1.5vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 16vw;
+    font-size: 1.5vw;
+  }
+}
+
+@media (max-width: 850px) {
+  .carousel-caption {
+    width: 90%;
+    max-width: 500px;
+  }
+
+  .caption-title {
+    font-size: 4vw;
+  }
+
+  .caption-text {
+    font-size: 2.2vw;
+  }
+
+  .custom-button-azul3 {
+    width: 18vw;
+    font-size: 1.5vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 14vw;
+    font-size: 1.5vw;
+  }
+}
+
+/* Telas menores (até 750px) */
+@media (max-width: 750px) {
+  .carousel img {
+    height: 450px;
+  }
+
+  .carousel-caption {
+    width: 85%;
+    max-width: 450px;
+    top: 50%;
+  }
+
+  .caption-title {
+    font-size: 4vw;
+  }
+
+  .caption-text {
+    font-size: 2.2vw;
+  }
+
+  .custom-button-azul3 {
+    width: 22vw;
+    font-size: 2vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 22vw;
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 650px) {
+  .carousel img {
+    height: 450px;
+  }
+
+  .carousel-caption {
+    width: 85%;
+    max-width: 450px;
+    top: 50%;
+  }
+
+  .caption-title {
+    font-size: 4.5vw;
+  }
+
+  .caption-text {
+    font-size: 2.5vw;
+  }
+
+  .custom-button-azul3 {
+    width: 22vw;
+    font-size: 2vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 22vw;
+    font-size: 2vw;
+  }
+}
+
+/* Celulares pequenos */
+@media (max-width: 600px) {
+  .carousel img {
+    height: 400px;
+  }
+
+  .carousel-caption {
+    width: 90%;
+    max-width: 420px;
+    top: 50%;
+  }
+
+  .caption-title {
+    font-size: 4.5vw;
+  }
+
+  .caption-text {
+    font-size: 2.5vw;
+  }
+
+  .custom-button-azul3 {
+    width: 30vw;
+    font-size: 2.5vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 30vw;
+    font-size: 2.5vw;
+  }
+}
+
+/* Ajuste final para celulares muito pequenos */
+@media (max-width: 480px) {
+  .carousel img {
+    height: 350px;
+  }
+
+  .carousel-caption {
+    width: 95%;
+    max-width: 380px;
+  }
+
+  .caption-title {
+    font-size: 5vw;
+  }
+
+  .caption-text {
+    font-size: 4vw;
+  }
+
+  .custom-button-azul3 {
+    width: 35vw;
+    font-size: 3vw;
+  }
+
+  .custom-button-rosa3 {
+    width: 35vw;
+    font-size: 3vw;
+  }
+}
+
+/* Estiliza os indicadores do carrossel */
+.carousel-indicators [data-bs-target] {
+  width: 12px;   /* Faz os traços virarem bolinhas */
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ccc;  /* Cinza padrão */
+  border: none;
+  margin: 0 5px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Primeiro indicador ativo (cor amarela) */
+.carousel-indicators .active:nth-child(1) {
+  background-color: #0A7D7E;
+}
+
+/* Segundo indicador ativo (cor roxa) */
+.carousel-indicators .active:nth-child(2) {
+  background-color: #D9534F;
+}
+

@@ -114,3 +114,10 @@ input[type="password"]{
   transform: scale(1.1);
 }
 }
+.custom-button-azul {
+  transition: transform 0.3s ease-in-out;
+}
+
+.custom-button-azul:hover {
+  transform: scale(1.1);
+}

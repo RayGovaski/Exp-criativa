@@ -1,7 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Importe o Link
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+import Home from "./Carrossel";
 
 const Navbar = () => {
   return (
@@ -11,29 +13,47 @@ const Navbar = () => {
           <img src="src/Assets/logo.svg" alt="Logo" className="navbar-logo" />
         </a>
 
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <span className="navbar-toggler-icon"></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link nav-item-custom" href="#">Home</a>
+              <a className="nav-link nav-item-custom" href="/">
+                Home
+              </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom2" href="#">Sobre</a>
+              <a className="nav-link nav-item-custom2" href="#">
+                Sobre
+              </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom3" href="#">Apoie</a>
+              <a className="nav-link nav-item-custom3" href="#">
+                Apoie
+              </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom4" href="#">Contato</a>
+              <a className="nav-link nav-item-custom4" href="#">
+                Contato
+              </a>
             </li>
           </ul>
         </div>
 
         <div className="profile-container">
-          <img src="src/Assets/Perfil.svg" alt="Perfil" className="profile-img" />
+          <Link to="/menu-registro">
+            <img src="src/Assets/Perfil.svg" alt="Perfil" className="profile-img" />
+          </Link>
         </div>
       </div>
     </nav>

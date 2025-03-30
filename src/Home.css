@@ -1,0 +1,15 @@
+.home-container {
+  position: relative;
+}
+
+.cards-container {
+  position: relative;
+  margin-top: -40px;  /* Faz com que a parte superior dos cards invada o carrossel */
+  z-index: 10;  /* Mantém os cards na frente */
+}
+
+
+.carrossel-container {
+  position: relative;
+  z-index: 1; /* Fica por trás dos cards */
+}

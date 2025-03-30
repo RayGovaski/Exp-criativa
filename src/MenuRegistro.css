@@ -84,20 +84,6 @@
   background-image: url("src/Assets/ImagemRegistroAluno.png");
 }
 
-.menu-button:hover {
-  transform: rotateY(160deg);
-}
-
-.menu-button:hover .menu-text {
-  transform: rotateY(-160deg);
-  transform-style: preserve-3d;
-}
-
-.menu-button:hover .menu-icon {
-  transform: rotateY(-160deg);
-  transform-style: preserve-3d;
-}
-
 .menu-button:hover .menu-icon,
 .menu-button:hover span {
   opacity: 0.5;
@@ -224,6 +210,4 @@
     flex-direction: column; 
     gap: 2vw;
   }
-
-
 }

@@ -1,0 +1,106 @@
+.bg-teal {
+  background-color: #0A7D7E;
+}
+
+.bg-red {
+  background-color: #D9534F;
+}
+
+.container {
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.top {
+  height: 40px;
+  margin-bottom: -10px; 
+}
+
+.card {
+  border-radius: 50px; 
+  
+}
+
+.card-body {
+  font-family: 'Fredoka', sans-serif;
+}
+
+.card-body h2 {
+  color: rgb(0, 0, 0,);
+  font-size: 4vw; 
+  font-weight: 100; 
+}
+
+.card-body p {
+  font-family: 'Arial', sans-serif;
+  font-size: 1.2vw; 
+  font-weight: 600; 
+}
+
+.text-muted {
+  color: inherit !important;
+}
+
+.card-body h2 {
+  font-size: 4vw;
+}
+
+.card-body p {
+  font-size: 1vw;
+}
+
+
+@media (max-width: 925px) {
+
+  .card-body h2 {
+    font-size: 6vw;
+  }
+
+  .card-body p {
+    font-size: 1.5vw;
+  }
+}
+
+@media (max-width: 762px) {
+
+  .card-body h2 {
+    font-size: 7vw;
+  }
+
+  .card-body p {
+    font-size: 1.8vw;
+  }
+}
+
+@media (max-width: 578px) {
+
+  .card-body h2 {
+    font-size: 10vw;
+  }
+
+  .card-body p {
+    font-size: 2.5vw;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .card-body h2 {
+    font-size: 15vw;
+  }
+
+  .card-body p {
+    font-size: 4.3vw;
+  }
+} 
+
+@media (max-width: 330px) {
+
+  .card-body h2 {
+    font-size: 13vw;
+  }
+
+  .card-body p {
+    font-size: 4.8vw;
+  }
+} 

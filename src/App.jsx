@@ -7,7 +7,9 @@ import RegistroApoiador from "./RegistroApoiador.jsx";
 import RegistroAluno from "./RegistroAluno.jsx";
 import MenuRegistro from "./MenuRegistro.jsx";
 import Carrossel from "./Carrossel.jsx";  // Importe a página Home
+import Home from "./Home"; // Importando o componente Home
 import "./App.css";
+import Cards from "./Cards.jsx";
 
 const App = () => {
   return (
@@ -15,7 +17,7 @@ const App = () => {
       <div>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Carrossel />} /> {/* A rota correta */}
+          <Route path="/" element={<Home />} /> {/* A rota para a página Home */}
           <Route path="/registro-apoiador" element={<RegistroApoiador />} />
           <Route path="/registro-aluno" element={<RegistroAluno />} />
           <Route path="/menu-registro" element={<MenuRegistro />} />

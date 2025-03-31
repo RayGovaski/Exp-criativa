@@ -3,13 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Footer from "./Footer.jsx";
-import RegistroApoiador from "./RegistroApoiador.jsx";
-import RegistroAluno from "./RegistroAluno.jsx";
+import RegistroApoiador from "./Registros/RegistroApoiador.jsx";
+import RegistroAluno from "./Registros/RegistroAluno.jsx";
 import MenuRegistro from "./MenuRegistro.jsx";
-import Carrossel from "./Carrossel.jsx";  // Importe a página Home
 import Home from "./Home"; // Importando o componente Home
 import "./App.css";
-import Cards from "./Cards.jsx";
 
 const App = () => {
   return (

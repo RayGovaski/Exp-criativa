@@ -1,17 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Importe o Link
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
-import Home from "./Carrossel";
+
 
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light">
       <div className="container-fluid px-0">
-        <a className="navbar-brand me-3" href="#">
+        <Link to="/" className="navbar-brand me-3">
           <img src="src/Assets/logo.svg" alt="Logo" className="navbar-logo" />
-        </a>
+        </Link>
 
         <button
           className="navbar-toggler"
@@ -28,24 +28,24 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link nav-item-custom" href="/">
+              <Link className="nav-link nav-item-custom" to="/">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom2" href="#">
+              <Link className="nav-link nav-item-custom2" to="/sobre">
                 Sobre
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom3" href="#">
+              <Link className="nav-link nav-item-custom3" to="/apoie">
                 Apoie
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link nav-item-custom4" href="#">
+              <Link className="nav-link nav-item-custom4" to="/contato">
                 Contato
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

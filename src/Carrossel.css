@@ -95,7 +95,6 @@
 
 /* ========== RESPONSIVIDADE ========== */
 
-/* Tablets e telas médias */
 @media (max-width: 1024px) {
   .carousel-caption {
     width: 90%;
@@ -238,7 +237,6 @@
   }
 }
 
-/* Ajuste final para celulares muito pequenos */
 @media (max-width: 480px) {
   .carousel img {
     height: 350px;
@@ -268,24 +266,24 @@
   }
 }
 
-/* Estiliza os indicadores do carrossel */
+
 .carousel-indicators [data-bs-target] {
-  width: 12px;   /* Faz os traços virarem bolinhas */
+  width: 12px;   
   height: 12px;
   border-radius: 50%;
-  background-color: #ccc;  /* Cinza padrão */
+  background-color: #ccc;
   border: none;
   margin: 0 5px;
   margin-bottom: 15px;
   transition: background-color 0.3s ease-in-out;
 }
 
-/* Primeiro indicador ativo (cor amarela) */
+
 .carousel-indicators .active:nth-child(1) {
   background-color: #0A7D7E;
 }
 
-/* Segundo indicador ativo (cor roxa) */
+
 .carousel-indicators .active:nth-child(2) {
   background-color: #D9534F;
 }

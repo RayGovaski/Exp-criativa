@@ -111,27 +111,26 @@
 
 @media (max-width: 670px) {
   .content-container {
-    flex-direction: column; /* Muda a direção do layout para coluna em telas menores */
-    align-items: center; /* Alinha os elementos ao centro */
-    justify-content: center; /* Centraliza verticalmente */
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
   }
 
   .text-content {
-    width: 80%; /* Ajusta o tamanho do texto para telas menores */
-    text-align: center; /* Centraliza o texto */
+    width: 80%; 
+    text-align: center;
   }
 
   .button-container {
     width: 100%;
-    margin-top: 20px; /* Adiciona um espaço entre o texto e o botão */
+    margin-top: 20px; 
     display: flex;
-    justify-content: center; /* Centraliza o botão */
+    justify-content: center;
   }
 
   .quero-ajudar-button {
-    width: 30%; /* Ajusta o tamanho do botão para telas pequenas */
-    font-size: 3vw; /* Aumenta o tamanho do botão */
-  }
+    width: 30%;
+    font-size: 3vw; 
 }
 
 @media (max-width: 648px) {
@@ -231,4 +230,5 @@
   .text-content h1 {
     font-size: 1rem;
   }
+}
 }

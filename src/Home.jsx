@@ -1,8 +1,10 @@
 import React from "react";
 import Carrossel from "./Carrossel";
-import Cards from "./Cards";
+import Cards from "./Home/Cards";
 import "./Home.css"; // Arquivo CSS com os ajustes
-import LayoutHome from "./LayoutHome";
+import LayoutHome from "./Home/LayoutHome";
+import Sobre from "./Home/Sobre";
+
 
 const Home = () => {
   return (
@@ -14,6 +16,7 @@ const Home = () => {
         <Cards />
       </div>
       <LayoutHome />
+      <Sobre />
     </div>
   );
 };

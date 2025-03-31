@@ -7,7 +7,9 @@ const LayoutHome = () => {
       <div className="parallax-background"></div>
       <div className="content-container">
         <div className="text-content">
-          <h1>SUA CONTRIBUIÇÃO FAZ TODA A DIFERENÇA!</h1>
+          <div className="sobre-titulo2">
+            <h1 className="pipipi">SUA CONTRIBUIÇÃO FAZ TODA A DIFERENÇA!</h1> 
+          </div>
           <p>
             Com a sua doação, conseguimos oferecer mais aulas, comprar materiais
             e instrumentos, e proporcionar um futuro melhor para as crianças.

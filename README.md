@@ -7,7 +7,6 @@ O projeto Cores do Amanhã é um sistema de doações desenvolvido para uma ONG 
 <h3>Este sistema permite:</h3>
 
 - Cadastro de alunos e apoiadores frequentes.
-- Recebimento de doações de instrumentos musicais e contribuições financeiras.
 - Acesso facilitado através de uma landing page intuitiva e atrativa.
 
 <h2> ⚙️ Instruções de Instalação</h2>

@@ -4,6 +4,7 @@ import Cards from "./Home/Cards";
 import "./Home.css"; // Arquivo CSS com os ajustes
 import LayoutHome from "./Home/LayoutHome";
 import Sobre from "./Home/Sobre";
+import CardAssinaturas from "./CardAssinaturas";
 
 
 const Home = () => {
@@ -17,6 +18,7 @@ const Home = () => {
       </div>
       <LayoutHome />
       <Sobre />
+      <CardAssinaturas />
     </div>
   );
 };

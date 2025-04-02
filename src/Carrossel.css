@@ -120,171 +120,32 @@
   }
 }
 
-@media (max-width: 850px) {
-  .carousel-caption {
-    width: 90%;
-    max-width: 500px;
-  }
-
-  .caption-title {
-    font-size: 4vw;
-  }
-
-  .caption-text {
-    font-size: 2.2vw;
-  }
-
-  .custom-button-azul3 {
-    width: 18vw;
-    font-size: 1.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 14vw;
-    font-size: 1.5vw;
-  }
-}
-
-/* Telas menores (até 750px) */
-@media (max-width: 750px) {
+@media (min-width: 1650px) {
   .carousel img {
-    height: 450px;
+    height: 700px;
   }
 
   .carousel-caption {
-    width: 85%;
-    max-width: 450px;
-    top: 50%;
+    width: 70%;
+    max-width: 800px;
+    padding: 30px;
   }
 
   .caption-title {
-    font-size: 4vw;
-  }
-
-  .caption-text {
-    font-size: 2.2vw;
-  }
-
-  .custom-button-azul3 {
-    width: 22vw;
     font-size: 2vw;
   }
 
-  .custom-button-rosa3 {
-    width: 22vw;
-    font-size: 2vw;
-  }
-}
-
-@media (max-width: 650px) {
-  .carousel img {
-    height: 450px;
-  }
-
-  .carousel-caption {
-    width: 85%;
-    max-width: 450px;
-    top: 50%;
-  }
-
-  .caption-title {
-    font-size: 4.5vw;
-  }
-
   .caption-text {
-    font-size: 2.5vw;
+    font-size: 1.2vw;
   }
 
   .custom-button-azul3 {
-    width: 22vw;
-    font-size: 2vw;
+    width: 16vw;
+    font-size: 1.2vw;
   }
 
   .custom-button-rosa3 {
-    width: 22vw;
-    font-size: 2vw;
+    width: 12vw;
+    font-size: 1.2vw;
   }
 }
-
-/* Celulares pequenos */
-@media (max-width: 600px) {
-  .carousel img {
-    height: 400px;
-  }
-
-  .carousel-caption {
-    width: 90%;
-    max-width: 420px;
-    top: 50%;
-  }
-
-  .caption-title {
-    font-size: 4.5vw;
-  }
-
-  .caption-text {
-    font-size: 2.5vw;
-  }
-
-  .custom-button-azul3 {
-    width: 30vw;
-    font-size: 2.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 30vw;
-    font-size: 2.5vw;
-  }
-}
-
-@media (max-width: 480px) {
-  .carousel img {
-    height: 350px;
-  }
-
-  .carousel-caption {
-    width: 95%;
-    max-width: 380px;
-  }
-
-  .caption-title {
-    font-size: 5vw;
-  }
-
-  .caption-text {
-    font-size: 4vw;
-  }
-
-  .custom-button-azul3 {
-    width: 35vw;
-    font-size: 3vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 35vw;
-    font-size: 3vw;
-  }
-}
-
-
-.carousel-indicators [data-bs-target] {
-  width: 12px;   
-  height: 12px;
-  border-radius: 50%;
-  background-color: #ccc;
-  border: none;
-  margin: 0 5px;
-  margin-bottom: 15px;
-  transition: background-color 0.3s ease-in-out;
-}
-
-
-.carousel-indicators .active:nth-child(1) {
-  background-color: #0A7D7E;
-}
-
-
-.carousel-indicators .active:nth-child(2) {
-  background-color: #D9534F;
-}
-

@@ -1,0 +1,152 @@
+.subscription-card {
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease-in-out;
+  height: 100%; /* Faz com que todas as caixas tenham a mesma altura */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribui os elementos dentro do card */
+  font-family: 'Fredoka', sans-serif;
+  border-top-left-radius: 20px;  /* Adiciona borda arredondada no canto esquerdo superior */
+  border-top-right-radius: 20px;
+}
+
+.subscription-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.subscription-card h5 {
+  color: #000000;
+}
+
+.subscription-card h4 {
+  color: #000000;
+}
+
+.subscription-card ul {
+  padding-left: 0;
+}
+
+.subscription-card li {
+  list-style: none;
+  margin: 5px 0;
+}
+
+.subscription-card button {
+  border-radius: 20px;
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.equal-height {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.equal-height > div {
+  display: flex;
+}
+
+.subscription-card {
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease-in-out;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top-left-radius: 20px;  
+  border-top-right-radius: 20px;
+}
+
+.subscription-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.botao-assinaturas {
+  position: relative;
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  background-color: #0A7D7E;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  box-shadow: -5px 5px 0px #76B5A0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.botao-assinaturas:hover {
+  transform: scale(1.05);
+}
+
+.bg-azul {
+  background-color: #0A7D7E;
+  border-top-left-radius: 20px;  
+  border-top-right-radius: 20px;
+}
+
+.bg-azul-claro {
+  background-color: #74B59F;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.tamanho2{
+  width: 25px;
+  height: auto;
+}
+
+.titulo{
+  font-size: 2.2vw; 
+  font-weight: 500;
+  margin-bottom: 0px;
+}
+
+.subTitulo{
+  font-size: 1.1vw; 
+  font-weight: 500;
+}
+
+.preco{
+  margin-top: 0px;
+  font-size: 2.5vw; 
+  font-weight: 600;
+}
+
+.titulo-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  text-align: center;
+  width: 100%; 
+}
+
+.sobre-titulo3 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #0f766e;
+  margin-bottom: 16px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  font-family: 'Fredoka', sans-serif;
+
+}
+
+.sobre-titulo3::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 4px;
+  background-color: #6ab6a0;
+  margin: 8px auto 0;
+}
+
+
+
+
+

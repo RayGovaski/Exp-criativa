@@ -61,7 +61,7 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-.botao-assinaturas {
+.botao-assinaturas-primeiro {
   position: relative;
   display: inline-block;
   padding: 8px 18px;
@@ -75,6 +75,24 @@
   font-family: Arial, sans-serif;
   text-align: center;
   box-shadow: -5px 5px 0px #76B5A0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.botao-assinaturas-segundo {
+  position: relative;
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  background-color: #76B5A0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  box-shadow: -5px 5px 0px #0A7D7E;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -98,11 +116,12 @@
 .tamanho2{
   width: 25px;
   height: auto;
+  margin-right: 10px;
 }
 
 .titulo{
-  font-size: 2.2vw; 
-  font-weight: 500;
+  font-size: 3vw; 
+  font-weight: 600;
   margin-bottom: 0px;
 }
 
@@ -146,7 +165,96 @@
   margin: 8px auto 0;
 }
 
+/* Estilos para títulos, descrições, etc */
+.subscription-card .titulo {
+  font-size: 2rem;
+  margin-bottom: 0px;
+}
 
+.subscription-card .subTitulo {
+  font-size: 1.2rem;
+  margin-bottom: 0px;
+  font-weight: 400;
 
+}
 
+.subscription-card .preco {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
 
+.subscription-card ul li {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.subscription-card .small {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: 600;
+
+}
+/* Media Queries */
+/* Telas médias (tablets) */
+@media (max-width: 1280px) {
+  .subscription-card .titulo {
+    font-size: 2rem;
+  }
+  
+  .subscription-card .subTitulo {
+    font-size: 1rem;
+  }
+  
+  .subscription-card .preco {
+    font-size: 2rem;
+  }
+  
+  .subscription-card .small {
+    font-size: 0.95rem;
+  }
+  
+  .subscription-card ul li {
+    font-size: 1rem;
+  }
+  
+  .botao-assinaturas-primary,
+  .botao-assinaturas-secondary,
+  .botao-assinaturas {
+    font-size: 22px;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .subscription-card .titulo {
+    font-size: 1.7rem;
+  }
+  
+  .subscription-card .subTitulo {
+    font-size: 0.85rem;
+  }
+  
+  .subscription-card .preco {
+    font-size: 2rem;
+  }
+  
+  .subscription-card .small {
+    font-size: 0.8rem;
+  }
+  
+  .subscription-card ul li {
+    font-size: 0.9rem;
+  }
+  
+  .botao-assinaturas-primary,
+  .botao-assinaturas-secondary,
+  .botao-assinaturas {
+    font-size: 22px;
+    padding: 10px 20px;
+  }
+}
+
+.mudarTamanho{
+  padding: 10px;
+}

@@ -13,7 +13,8 @@ const plans = [
     ],
     description:
       "Com o Plano Semente, você planta esperança no futuro de muitas crianças! Sua doação ajuda a fornecer materiais essenciais para as aulas e garante a continuidade do nosso projeto.",
-    color: "bg-azul"
+    color: "bg-azul",
+    buttonStyle: "botao-assinaturas-primeiro"
   },
   {
     title: "Plano Melodia",
@@ -25,7 +26,8 @@ const plans = [
     ],
     description:
       "O Plano Melodia fortalece o ensino da música, garantindo que mais crianças tenham acesso a instrumentos e aulas, trazendo experiências que transformam vidas e abrem novas possibilidades no futuro!",
-    color: "bg-azul-claro"
+    color: "bg-azul-claro",
+    buttonStyle: "botao-assinaturas-segundo"
   },
   {
     title: "Plano Palco",
@@ -37,7 +39,8 @@ const plans = [
     ],
     description:
       "O Plano Palco apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!",
-    color: "bg-azul"
+    color: "bg-azul",
+    buttonStyle: "botao-assinaturas-primeiro"
   },
   {
     title: "Plano Estrela",
@@ -49,7 +52,8 @@ const plans = [
     ],
     description:
       "O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!",
-    color: "bg-azul-claro"
+    color: "bg-azul-claro",
+    buttonStyle: "botao-assinaturas-segundo"
   },
 ];
 
@@ -59,13 +63,13 @@ const SubscriptionPlans = () => {
       <div className="titulo-container">
         <h2 className="text-center mb-4 sobre-titulo3">Assinaturas</h2>
       </div>
-      <div className="row equal-height">
+      <div className="row pb-2 equal-height ">
         {plans.map((plan, index) => (
-          <div className="col-md-3 d-flex" key={index}>
+          <div className="col-md-6 col-lg-3 d-flex mudarTamanho" key={index}>
             <div className="card shadow-sm text-center border-0 subscription-card w-100 d-flex flex-column">
               <div className={`top ${plan.color}`} style={{ height: "40px" }}></div>
               <div className="card-body d-flex flex-column">
-                <h5 className="fw-bold titulo">{plan.title}</h5>
+                <h5 className=" titulo">{plan.title}</h5>
                 <small className="text-muted subTitulo">{plan.subtitle}</small>
                 <h4 className="preco">{plan.price}</h4>
                 <ul className="list-unstyled flex-grow-1">
@@ -78,7 +82,7 @@ const SubscriptionPlans = () => {
                 </ul>
                 <p className="small text-muted flex-grow-1">{plan.description}</p>
                 <div className="mt-auto">
-                  <button className="botao-assinaturas">Assinar</button>
+                  <button className={plan.buttonStyle}>Assinar</button>
                 </div>
               </div>
             </div>

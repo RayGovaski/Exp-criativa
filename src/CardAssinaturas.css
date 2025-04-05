@@ -1,18 +1,18 @@
 .subscription-card {
-  border-radius: 10px;
-  transition: box-shadow 0.3s ease-in-out;
-  height: 100%; /* Faz com que todas as caixas tenham a mesma altura */
+  border-radius: 20px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distribui os elementos dentro do card */
+  justify-content: space-between;
   font-family: 'Fredoka', sans-serif;
-  border-top-left-radius: 20px;  /* Adiciona borda arredondada no canto esquerdo superior */
-  border-top-right-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 .subscription-card:hover {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
 }
+
 
 .subscription-card h5 {
   color: #000000;
@@ -58,8 +58,9 @@
 }
 
 .subscription-card:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
+
 
 .botao-assinaturas-primeiro {
   position: relative;
@@ -165,7 +166,7 @@
   margin: 8px auto 0;
 }
 
-/* Estilos para títulos, descrições, etc */
+
 .subscription-card .titulo {
   font-size: 2rem;
   margin-bottom: 0px;
@@ -195,8 +196,7 @@
   font-weight: 600;
 
 }
-/* Media Queries */
-/* Telas médias (tablets) */
+
 @media (max-width: 1280px) {
   .subscription-card .titulo {
     font-size: 2rem;

@@ -13,27 +13,27 @@ const RegistroAluno = () => {
         <form className="registro-form-rosa p-3">
           <div className="mb-2">
             <label className="label-rosa">Nome completo:</label>
-            <input type="text" />
+            <input type="text" name="nome"/>
           </div>
           <div className="mb-2">
             <label className="label-rosa">Data de nascimento:</label>
-            <input type="date" />
+            <input type="date" name="data_nascimento"/>
           </div>
           <div className="mb-2">
             <label className="label-rosa">Nome do Responsável:</label>
-            <input type="text" />
+            <input type="text" name="responsavel"/>
           </div>
           <div className="mb-2">
             <label className="label-rosa">Telefone do Responsável:</label>
-            <input type="text" />
+            <input type="text" name="telefone"/>
           </div>
           <div className="mb-2">
             <label className="label-rosa">Email do Responsável:</label>
-            <input type="email" />
+            <input type="email" name="email"/>
           </div>
           <div className="mb-2">
             <label className="label-rosa">Senha:</label>
-            <input type="password" />
+            <input type="password" name="senha"/>         
           </div>
           <div className="mb-2">
             <label className="label-rosa">Confirmar senha:</label>

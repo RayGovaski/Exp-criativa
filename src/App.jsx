@@ -6,6 +6,7 @@ import Footer from "./Footer.jsx";
 import RegistroApoiador from "./Registros/RegistroApoiador.jsx";
 import RegistroAluno from "./Registros/RegistroAluno.jsx";
 import MenuRegistro from "./MenuRegistro.jsx";
+import AdministraAlunos from "./Administrador/AdministraAlunos";
 import Home from "./Home"; // Importando o componente Home
 import "./App.css";
 
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/registro-apoiador" element={<RegistroApoiador />} />
           <Route path="/registro-aluno" element={<RegistroAluno />} />
           <Route path="/menu-registro" element={<MenuRegistro />} />
+          <Route path="/administrador" element={<AdministraAlunos />}></Route>
         </Routes>
         <Footer />
       </div>

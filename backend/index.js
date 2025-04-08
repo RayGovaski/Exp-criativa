@@ -44,3 +44,28 @@ app.post("/alunos", (req, res) => {
         return res.json(data);
     })
 })
+
+app.get("/apoiador", (req, res) => { 
+    const sql = "SELECT * FROM apoiador";
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    })
+})  
+
+app.post("/apoiador", (req, res) => { 
+    const sql = "INSERT INTO apoiador (`nome`, `cpf`, `email`, `senha`, `data_nascimento`, `telefone`) VALUES (?)";
+    const values = [
+        req.body.nome,
+        req.body.cpf,
+        req.body.email,
+        req.body.senha,
+        req.body.data_nascimento,
+        req.body.telefone
+    ];
+    db.query(sql, [values], (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    })
+})
+

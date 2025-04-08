@@ -2,7 +2,7 @@ import React from "react";
 import "./RegistroAluno.css";
 import { useState } from 'react'
 import axios from 'axios' 
-import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 
 const Add = () => {
@@ -17,7 +17,7 @@ const Add = () => {
   });
   const handleChange = (e) => { 
   setAlunos({...alunos, [e.target.name]: e.target.value}); 
-}
+  }
 
   const handleClick = async e => {
   try {
@@ -26,7 +26,7 @@ const Add = () => {
   } catch (err) {
     console.log(err)
   }
-}
+  }
 
   return (
     <div className="d-flex justify-content-center align-items-center fundo-rosa" style={{ minHeight: "100vh" }}>
@@ -66,7 +66,7 @@ const Add = () => {
             <input type="password" />
           </div>
           <div className="button-container-rosa">
-            <button type="submit" className="custom-button-rosa" onClick={handleClick}>Registrar</button>
+            <button type="submit" className="custom-button-rosa" onClick={handleClick}> <Link to = "/">Registrar</Link></button>
           </div>
         </form>
       </div>

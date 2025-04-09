@@ -45,6 +45,16 @@ app.post("/alunos", (req, res) => {
     })
 })
 
+app.delete("/alunos/:id", (req, res) => {
+    console.log("Tentando deletar o aluno com ID:", req.params.id); // <-- aqui
+    const sql = "DELETE FROM alunos WHERE `id` = ?"; 
+    db.query(sql, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data);
+    });
+});
+
+
 app.get("/apoiador", (req, res) => { 
     const sql = "SELECT * FROM apoiador";
     db.query(sql, (err, data) => {

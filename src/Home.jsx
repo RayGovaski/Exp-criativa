@@ -6,6 +6,9 @@ import LayoutHome from "./Home/LayoutHome";
 import Sobre from "./Home/Sobre";
 import CardAssinaturas from "./CardAssinaturas";
 import Perguntas from "./Home/Perguntas"
+import CarrosselCriancas from "./Home/CarrosselCriancas"
+import Doacoes from "./Home/Doacoes";
+
 
 const Home = () => {
   return (
@@ -20,6 +23,9 @@ const Home = () => {
       <Sobre />
       <CardAssinaturas />
      <Perguntas />
+     <CarrosselCriancas />
+    <Doacoes />
+    
 
     </div>
   );

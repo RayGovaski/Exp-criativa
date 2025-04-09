@@ -12,10 +12,10 @@ const cardsData = [
 const Cards = () => {
   return (
     <div className="container py-4">
-      <div className="row g-4">
+      <div className="row g-4 cards-grid">
         {cardsData.map((card) => (
-          <div key={card.id} className="col-12 col-sm-6 col-lg-3 d-flex justify-content-center">
-            <div className="card shadow-sm text-center" style={{ width: "250px", borderRadius: "20px", overflow: "hidden", border: "none" }}>
+          <div key={card.id} className="col-6 col-lg-3 custom-col d-flex justify-content-center">
+            <div className="card sombra-card text-center" style={{ width: "250px", borderRadius: "20px", overflow: "hidden", border: "none" }}>
               <div className={`top ${card.color}`} style={{ height: "40px" }}></div>
               <div className="card-body">
                 <h2 className="fw-bold">{card.percent}</h2>

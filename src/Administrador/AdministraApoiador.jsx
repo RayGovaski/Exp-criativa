@@ -19,6 +19,16 @@ const Apoiador = () => {
         fetchAllApoiador();
       }, []);
 
+      const handleDelete = async (id) => { 
+        try {
+          await axios.delete(`http://localhost:8000/apoiador/${id}`); 
+          window.location.reload();
+        } catch (err) {
+          console.log(err)
+        }
+      };
+
+
 
   return (
     <div>
@@ -33,6 +43,7 @@ const Apoiador = () => {
             <p>{apoiador.telefone}</p>
             <p>{apoiador.data_nascimento}</p>
             <p>{apoiador.responsavel}</p>
+            <button className='delete' onClick={() => handleDelete(apoiador.id)}>Deletar</button>
           </div>
         ))}
       </div>

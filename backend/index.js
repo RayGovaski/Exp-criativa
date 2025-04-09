@@ -45,6 +45,15 @@ app.post("/alunos", (req, res) => {
     })
 })
 
+app.delete("/alunos/:id", (req, res) => {
+    const sql = "DELETE FROM alunos WHERE `id` = ?"; 
+    db.query(sql, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data);
+    });
+});
+
+
 app.get("/apoiador", (req, res) => { 
     const sql = "SELECT * FROM apoiador";
     db.query(sql, (err, data) => {
@@ -68,4 +77,12 @@ app.post("/apoiador", (req, res) => {
         return res.json(data);
     })
 })
+
+app.delete("/apoiador/:id", (req, res) => {
+    const sql = "DELETE FROM apoiador WHERE `id` = ?"; 
+    db.query(sql, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data);
+    });
+});
 

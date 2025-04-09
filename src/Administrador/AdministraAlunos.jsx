@@ -6,12 +6,12 @@ import "./AdministraAlunos.css";
 
 
 const Alunos = () => {
-    const [alunos, setAlunos] = useState([]); // useState para armazenar os alunos
+    const [alunos, setAlunos] = useState([]); 
 
     useEffect(() => {
         const fetchAllAlunos = async () => {
           try {
-            const res = await axios.get("http://localhost:8000/alunos"); // get para o backend
+            const res = await axios.get("http://localhost:8000/alunos"); 
             setAlunos(res.data); 
           } catch (err) {
             console.log(err)
@@ -19,6 +19,15 @@ const Alunos = () => {
         };
         fetchAllAlunos();
       }, []);
+
+      const handleDelete = async (id) => { 
+        try {
+          await axios.delete(`http://localhost:8000/alunos/${id}`); 
+          window.location.reload();
+        } catch (err) {
+          console.log(err)
+        }
+      };
 
 
   return (
@@ -34,6 +43,8 @@ const Alunos = () => {
             <p>{aluno.telefone}</p>
             <p>{aluno.data_nascimento}</p>
             <p>{aluno.responsavel}</p>
+
+            <button className='delete' onClick={() => handleDelete(aluno.id)}>Deletar</button>
           </div>
         ))}
       </div>

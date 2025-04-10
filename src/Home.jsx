@@ -8,6 +8,7 @@ import CardAssinaturas from "./CardAssinaturas";
 import Perguntas from "./Home/Perguntas"
 import CarrosselCriancas from "./Home/CarrosselCriancas"
 import Doacoes from "./Home/Doacoes";
+import Contato from "./Home/Contato";
 
 
 const Home = () => {
@@ -22,11 +23,10 @@ const Home = () => {
       <LayoutHome />
       <Sobre />
       <CardAssinaturas />
-     <Perguntas />
-     <CarrosselCriancas />
-    <Doacoes />
-    
-
+      <Perguntas />
+      <CarrosselCriancas />
+      <Doacoes />
+      <Contato />
     </div>
   );
 };

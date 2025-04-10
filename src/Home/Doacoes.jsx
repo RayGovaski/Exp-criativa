@@ -48,7 +48,7 @@ const Doacoes = ({ doacoes = doacoesMock }) => {
       <div className="footer-line2"></div>
       <p className="fw-semibold mb-4">Ajude a transformar vidas apoiando uma dessas iniciativas!</p>
       
-      <Row className="g-4">
+      <Row className="g-4 justify-content-center">
         {doacoes.map((item) => (
           <Col key={item.id} md={5} lg={3}>
             <Card className="sombra-card2 card-largo h-100 position-relative">

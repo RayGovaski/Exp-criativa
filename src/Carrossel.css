@@ -31,242 +31,62 @@
 
 /* Melhorando tamanho do título */
 .caption-title {
-  font-size: 2.5vw;
+  font-size: 32px;
   font-weight: bold;
   color: #333;
   margin-bottom: 12px;
+  line-height: 1.2;
 }
 
 /* Melhorando tamanho do texto */
 .caption-text {
-  font-size: 1.5vw;
+  font-size: 18px;
   color: #333;
   margin-bottom: 15px;
+  line-height: 1.4;
 }
 
 /* Botões ajustados para melhor espaçamento */
 .buttons-container {
   display: flex;
-  gap: 12px;
+  gap: 15px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-.custom-button-azul3 {
-  min-width: 100px;
-  max-width: 200px;
-  width: 15vw;
-  padding: 10px 15px;
-  font-size: 1.3vw;
+/* Estilo base comum para ambos os botões */
+.custom-button-azul3,
+.custom-button-rosa3 {
+  width: 180px;
+  padding: 10px 20px;
+  font-size: 16px;
   font-weight: 600;
   color: white;
-  background-color: #76B5A0;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   text-align: center;
-  box-shadow: -3px 3px 0px #0A7D7E;
   transition: all 0.2s ease-in-out;
+  white-space: nowrap;
 }
 
-.custom-button-azul3:hover {
-  transform: scale(1.05);
+/* Estilos específicos por cor */
+.custom-button-azul3 {
+  background-color: #76B5A0;
+  box-shadow: -3px 3px 0px #0A7D7E;
 }
 
 .custom-button-rosa3 {
-  min-width: 100px;
-  max-width: 200px;
-  width: 15vw;
-  padding: 10px 15px;
-  font-size: 1.5vw;
-  font-weight: 600;
-  color: white;
   background-color: #FF6B6B;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  text-align: center;
   box-shadow: -3px 3px 0px #D9534F;
-  transition: all 0.2s ease-in-out;
 }
 
+.custom-button-azul3:hover,
 .custom-button-rosa3:hover {
   transform: scale(1.05);
 }
 
-/* ========== RESPONSIVIDADE ========== */
-
-@media (max-width: 1024px) {
-  .carousel-caption {
-    width: 90%;
-    max-width: 500px;
-  }
-
-  .caption-title {
-    font-size: 3vw;
-  }
-
-  .caption-text {
-    font-size: 1.8vw;
-  }
-
-  .custom-button-azul3 {
-    width: 18vw;
-    font-size: 1.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 16vw;
-    font-size: 1.5vw;
-  }
-}
-
-@media (max-width: 850px) {
-  .carousel-caption {
-    width: 90%;
-    max-width: 500px;
-  }
-
-  .caption-title {
-    font-size: 4vw;
-  }
-
-  .caption-text {
-    font-size: 2.2vw;
-  }
-
-  .custom-button-azul3 {
-    width: 18vw;
-    font-size: 1.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 14vw;
-    font-size: 1.5vw;
-  }
-}
-
-/* Telas menores (até 750px) */
-@media (max-width: 750px) {
-  .carousel img {
-    height: 450px;
-  }
-
-  .carousel-caption {
-    width: 85%;
-    max-width: 450px;
-    top: 50%;
-  }
-
-  .caption-title {
-    font-size: 4vw;
-  }
-
-  .caption-text {
-    font-size: 2.2vw;
-  }
-
-  .custom-button-azul3 {
-    width: 22vw;
-    font-size: 2vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 22vw;
-    font-size: 2vw;
-  }
-}
-
-@media (max-width: 650px) {
-  .carousel img {
-    height: 450px;
-  }
-
-  .carousel-caption {
-    width: 85%;
-    max-width: 450px;
-    top: 50%;
-  }
-
-  .caption-title {
-    font-size: 4.5vw;
-  }
-
-  .caption-text {
-    font-size: 2.5vw;
-  }
-
-  .custom-button-azul3 {
-    width: 22vw;
-    font-size: 2vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 22vw;
-    font-size: 2vw;
-  }
-}
-
-/* Celulares pequenos */
-@media (max-width: 600px) {
-  .carousel img {
-    height: 400px;
-  }
-
-  .carousel-caption {
-    width: 90%;
-    max-width: 420px;
-    top: 50%;
-  }
-
-  .caption-title {
-    font-size: 4.5vw;
-  }
-
-  .caption-text {
-    font-size: 2.5vw;
-  }
-
-  .custom-button-azul3 {
-    width: 30vw;
-    font-size: 2.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 30vw;
-    font-size: 2.5vw;
-  }
-}
-
-@media (max-width: 480px) {
-  .carousel img {
-    height: 350px;
-  }
-
-  .carousel-caption {
-    width: 95%;
-    max-width: 380px;
-  }
-
-  .caption-title {
-    font-size: 5vw;
-  }
-
-  .caption-text {
-    font-size: 4vw;
-  }
-
-  .custom-button-azul3 {
-    width: 35vw;
-    font-size: 3vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 35vw;
-    font-size: 3vw;
-  }
-}
-
-
+/* Estilização dos indicadores */
 .carousel-indicators [data-bs-target] {
   width: 12px;   
   height: 12px;
@@ -278,11 +98,9 @@
   transition: background-color 0.3s ease-in-out;
 }
 
-
 .carousel-indicators .active:nth-child(1) {
   background-color: #0A7D7E;
 }
-
 
 .carousel-indicators .active:nth-child(2) {
   background-color: #D9534F;
@@ -290,31 +108,7 @@
 
 /* ========== RESPONSIVIDADE ========== */
 
-@media (max-width: 1024px) {
-  .carousel-caption {
-    width: 90%;
-    max-width: 500px;
-  }
-
-  .caption-title {
-    font-size: 3vw;
-  }
-
-  .caption-text {
-    font-size: 1.8vw;
-  }
-
-  .custom-button-azul3 {
-    width: 18vw;
-    font-size: 1.5vw;
-  }
-
-  .custom-button-rosa3 {
-    width: 16vw;
-    font-size: 1.5vw;
-  }
-}
-
+/* Telas grandes e desktops */
 @media (min-width: 1650px) {
   .carousel img {
     height: 700px;
@@ -327,20 +121,191 @@
   }
 
   .caption-title {
-    font-size: 2vw;
+    font-size: 42px;
   }
 
   .caption-text {
-    font-size: 1.2vw;
+    font-size: 22px;
   }
 
-  .custom-button-azul3 {
-    width: 16vw;
-    font-size: 1.2vw;
-  }
-
+  .custom-button-azul3,
   .custom-button-rosa3 {
-    width: 12vw;
-    font-size: 1.2vw;
+    width: 200px;
+    font-size: 18px;
+  }
+}
+
+/* Desktops médios */
+@media (max-width: 1200px) {
+  .carousel-caption {
+    width: 80%;
+    max-width: 650px;
+  }
+
+  .caption-title {
+    font-size: 30px;
+  }
+
+  .caption-text {
+    font-size: 17px;
+  }
+  
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 180px;
+  }
+}
+
+/* Tablets e desktops pequenos */
+@media (max-width: 992px) {
+  .carousel img {
+    height: 450px;
+  }
+
+  .carousel-caption {
+    width: 85%;
+    max-width: 550px;
+  }
+
+  .caption-title {
+    font-size: 28px;
+  }
+
+  .caption-text {
+    font-size: 16px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 170px;
+    font-size: 15px;
+  }
+}
+
+/* Tablets e dispositivos médios */
+@media (max-width: 768px) {
+  .carousel img {
+    height: 400px;
+  }
+
+  .carousel-caption {
+    width: 90%;
+    max-width: 500px;
+    padding: 15px;
+  }
+
+  .caption-title {
+    font-size: 24px;
+  }
+
+  .caption-text {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 160px;
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Celulares grandes */
+@media (max-width: 576px) {
+  .carousel img {
+    height: 350px;
+  }
+
+  .carousel-caption {
+    width: 95%;
+    max-width: 400px;
+    padding: 10px;
+  }
+
+  .caption-content {
+    padding: 10px;
+  }
+
+  .caption-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .caption-text {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .buttons-container {
+    gap: 10px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 150px;
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Celulares pequenos */
+@media (max-width: 480px) {
+  .carousel img {
+    height: 320px;
+  }
+
+  .carousel-caption {
+    width: 95%;
+    padding: 8px;
+  }
+
+  .caption-content {
+    padding: 6px;
+  }
+
+  .caption-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .caption-text {
+    font-size: 12px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 160px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Celulares muito pequenos */
+@media (max-width: 360px) {
+  .carousel img {
+    height: 280px;
+  }
+  
+  .caption-title {
+    font-size: 16px;
+  }
+  
+  .caption-text {
+    font-size: 11px;
+  }
+  
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 140px;
+    font-size: 12px;
   }
 }

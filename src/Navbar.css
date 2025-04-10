@@ -8,6 +8,8 @@
   font-family: 'Fredoka', sans-serif;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   position: fixed;
+  width: 100%;
+  z-index: 1000;
 }
 
 .nav-item .nav-link {
@@ -37,6 +39,7 @@
   display: flex;
   align-items: center;
   padding-right: 15px;
+  position: relative;
 }
 
 .profile-img {
@@ -93,4 +96,65 @@
 .nav-item-custom3:hover,
 .nav-item-custom4:hover {
   transform: scale(1.1);
+}
+
+/* Estilos dos dropdowns */
+.profile-dropdown-container {
+  position: relative;
+}
+
+.profile-dropdown-menu,
+.dropdown-menu-custom {
+  position: absolute;
+  background-color: #b5d6cb; /* Cor amarela para os dropdowns */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 160px;
+  z-index: 1000;
+  padding: 10px 0;
+  margin-top: 5px;
+  right: 0;
+}
+
+.dropdown-menu-custom {
+  top: 100%;
+  left: 0;
+}
+
+.dropdown-item-custom {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item-custom:hover {
+  background-color: #81b8a5; /* Amarelo mais escuro no hover */
+  color: #ffffff;
+}
+
+/* Para os dropdowns aparecerem ao clicar */
+.show {
+  display: block;
+}
+
+/* Ajustes para responsividade */
+@media (max-width: 991px) {
+  .profile-dropdown-menu {
+    right: 15px;
+  }
+  
+  .dropdown-menu-custom {
+    position: static;
+    background-color: #f8f9fa;
+    box-shadow: none;
+    border: none;
+    width: 100%;
+  }
+  
+  .navbar-nav .dropdown {
+    position: static;
+  }
 }

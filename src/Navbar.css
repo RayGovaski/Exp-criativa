@@ -54,7 +54,13 @@
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
+  transition: transform 0.3s ease;
 }
+
+.profile-img:hover {
+  transform: scale(1.05); 
+}
+
 
 .nav-item-custom, .nav-item-custom2, .nav-item-custom3, .nav-item-custom4 {
   position: relative;

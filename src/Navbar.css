@@ -12,6 +12,12 @@
   z-index: 1000;
 }
 
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .nav-item .nav-link {
   font-weight: 600 !important;
   color: #000;
@@ -22,7 +28,7 @@
 }
 
 .navbar-logo {
-  height: 70px;
+  height: 60px;
   display: block;
 }
 
@@ -106,7 +112,7 @@
 .profile-dropdown-menu,
 .dropdown-menu-custom {
   position: absolute;
-  background-color: #b5d6cb; /* Cor amarela para os dropdowns */
+  background-color: #b5d6cb;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   min-width: 160px;
@@ -131,7 +137,7 @@
 }
 
 .dropdown-item-custom:hover {
-  background-color: #81b8a5; /* Amarelo mais escuro no hover */
+  background-color: #81b8a5;
   color: #ffffff;
 }
 
@@ -140,21 +146,149 @@
   display: block;
 }
 
+/* Sidebar para Mobile */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background-color: #a1cabb;
+  background-size: cover;
+  background-position: center;
+  z-index: 1050;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  padding: 20px 0;
+  font-family: 'Fredoka', sans-serif;
+}
+
+/* Quando o sidebar está aberto */
+.sidebar-open {
+  left: 0;
+}
+
+/* Overlay que cobre a tela quando o sidebar está aberto */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+/* Cabeçalho do sidebar */
+.sidebar-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-close {
+  font-size: 30px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Nav do sidebar */
+.sidebar-nav {
+  list-style: none;
+  padding: 20px 0;
+  margin: 0;
+}
+
+.sidebar-item {
+  margin-bottom: 5px;
+}
+
+
+.sidebar-link {
+  display: block;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #fff;
+}
+
+/* Estilo para o dropdown ativo na sidebar */
+.sidebar-link.active-dropdown {
+  background-color: #91b5a8
+  ;
+  color: #fff;
+}
+
+/* Dropdown dentro do sidebar */
+.sidebar-dropdown {
+  padding-left: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 400;
+  transition: background-color 0.2s;
+}
+
+.sidebar-dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
 /* Ajustes para responsividade */
 @media (max-width: 991px) {
   .profile-dropdown-menu {
     right: 15px;
   }
   
-  .dropdown-menu-custom {
-    position: static;
-    background-color: #f8f9fa;
-    box-shadow: none;
+  .navbar-toggler {
+    padding: 0.25rem;
     border: none;
-    width: 100%;
   }
   
-  .navbar-nav .dropdown {
-    position: static;
+  .navbar-brand.mx-auto {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
+}
+
+/* ADICIONADO: Media query para telas menores que 470px */
+@media (max-width: 469px) {
+  /* Ajustes adicionais para garantir que o layout fique correto */
+  .navbar-container {
+    padding: 0 10px;
+  }
+  
+  .navbar-brand.mx-auto {
+    margin-left: -15px; /* Ajuste fino para o logo centralizado */
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-img {
+  height: 40x;
+  width: auto;
+  padding-top: 1vw;
+  padding-bottom: 1vw;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
 }

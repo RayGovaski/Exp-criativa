@@ -10,8 +10,6 @@ import AdministraAlunos from "./Administrador/AdministraAlunos";
 import AdministraApoiador from "./Administrador/AdministraApoiador";
 import Home from "./Home";
 import Login from "./Login/Login";
-import Preloader from "./Preloader";
-import SVGFilters from "./SVGFilters"; // Importa os filtros SVG
 import "./App.css";
 
 const App = () => {

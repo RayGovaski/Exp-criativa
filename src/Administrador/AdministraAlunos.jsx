@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import axios from 'axios' 
 import "./AdministraAlunos.css";
+import { Link } from 'react-router-dom';
 
 
 const Alunos = () => {
@@ -45,6 +46,7 @@ const Alunos = () => {
             <p>{aluno.responsavel}</p>
 
             <button className='delete' onClick={() => handleDelete(aluno.id)}>Deletar</button>
+            <button className='update'> <Link to={`/update-aluno/${aluno.id}`}> Editar </Link> </button>
           </div>
         ))}
       </div>

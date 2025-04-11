@@ -11,6 +11,7 @@ import AdministraApoiador from "./Administrador/AdministraApoiador";
 import Home from "./Home";
 import Login from "./Login/Login";
 import "./App.css";
+import UpdateAlunos from "./Administrador/UpdateAlunos";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
           <Route path="/menu-registro" element={<MenuRegistro />} />
           <Route path="/adm-apoiador" element={<AdministraApoiador />} />
           <Route path="/adm-aluno" element={<AdministraAlunos />} />
+          <Route path="/update-aluno/:id" element={<UpdateAlunos />} />
         </Routes>
         <Footer />
       </div>

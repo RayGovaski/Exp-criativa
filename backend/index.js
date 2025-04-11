@@ -53,6 +53,24 @@ app.delete("/alunos/:id", (req, res) => {
     });
 });
 
+app.put("/alunos/:id", (req, res) => { // put para o backend
+    const sql = "UPDATE alunos SET `nome` = ?, `data_nascimento` = ?, `responsavel` = ?, `telefone` = ?, `email` = ?, `senha` = ? WHERE `id` = ?";
+    const values = [
+        req.body.nome,
+        req.body.data_nascimento,
+        req.body.responsavel,
+        req.body.telefone,
+        req.body.email,
+        req.body.senha
+
+    ];
+    db.query(sql, [...values, req.params.id], (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    })
+})
+
+
 
 app.get("/apoiador", (req, res) => { 
     const sql = "SELECT * FROM apoiador";

@@ -12,10 +12,13 @@
   "dependencies": {
     "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
+    "gsap": "^3.12.7",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^6.30.0"
+    "react-router-dom": "^6.30.0",
+    "react-router-hash-link": "^2.4.3",
+    "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

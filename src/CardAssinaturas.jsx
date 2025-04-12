@@ -1,6 +1,7 @@
   import React from "react";
   import "bootstrap/dist/css/bootstrap.min.css";
   import "./CardAssinaturas.css";
+  import { Link } from "react-router-dom";
 
   const plans = [
     {
@@ -59,7 +60,7 @@
 
   const SubscriptionPlans = () => {
     return (
-      <div className="container my-5">
+      <div id="assinaturas" className="container my-5">
         <div className="titulo-container">
           <h2 className="text-center mb-4 sobre-titulo3">Assinaturas</h2>
         </div>

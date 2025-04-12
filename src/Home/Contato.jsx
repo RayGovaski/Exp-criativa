@@ -4,7 +4,7 @@ import "./Contato.css";
 
 const Contato = () => {
   return (
-    <div className="contato-section">
+    <div id="contato" className="contato-section">
       <div className="contato-content"> 
       <Container className="contato-container mudarissoaqui">
         <Row>

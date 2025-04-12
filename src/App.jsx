@@ -17,7 +17,6 @@ const App = () => {
   return (
     <Router>
       <div>
-        {/*<SVGFilters /> {/* Adiciona os filtros SVG ao DOM <Preloader />*/}
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />

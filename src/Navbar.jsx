@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+/*import { Link } from "react-router-dom";*/
+import { HashLink as Link } from "react-router-hash-link";
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
@@ -65,7 +66,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="sidebar-item">
-            <Link to="/sobre" className="sidebar-link" onClick={closeSidebar}>
+            <Link to="/#sobre" className="sidebar-link" onClick={closeSidebar}>
               Sobre
             </Link>
           </li>
@@ -88,7 +89,7 @@ const Navbar = () => {
             )}
           </li>
           <li className="sidebar-item">
-            <Link to="/contato" className="sidebar-link" onClick={closeSidebar}>
+            <Link to="/#contato" className="sidebar-link" onClick={closeSidebar}>
               Contato
             </Link>
           </li>
@@ -122,7 +123,7 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom2" to="/sobre">
+                <Link className="nav-link nav-item-custom2" to="/#sobre">
                   Sobre
                 </Link>
               </li>
@@ -146,7 +147,7 @@ const Navbar = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/contato">
+                <Link className="nav-link nav-item-custom4" to="/#contato">
                   Contato
                 </Link>
               </li>

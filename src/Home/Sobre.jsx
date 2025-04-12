@@ -4,7 +4,7 @@ import "./Sobre.css";
 
 const Sobre = () => {
   return (
-    <div className="container sobre-container">
+    <div id="sobre" className="container sobre-container">
       <h2 className="sobre-titulo">Sobre nós</h2>
       
 

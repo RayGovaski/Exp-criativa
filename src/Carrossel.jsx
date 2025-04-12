@@ -2,6 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Carrossel.css";
 import { Carousel } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Carrossel = () => {
     return (
@@ -35,7 +36,9 @@ const Carrossel = () => {
                             Inscreva-se aqui e venha aprender brincando!
                         </p>
                         <div className="buttons-container">
-                            <button className="custom-button-rosa3">Inscreva-se</button>
+                            <Link to="/menu-registro" className="custom-button-rosa3">
+                                Inscreva-se
+                            </Link>
                         </div>
                     </div>
                 </Carousel.Caption>

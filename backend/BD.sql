@@ -30,7 +30,7 @@ CREATE TABLE Aluno (
     email VARCHAR(100) UNIQUE,
     senha VARCHAR(255) NOT NULL,
     necessidades_especiais TEXT,
-    foto VARCHAR(255),
+    foto LONGBLOB,
     data_matricula DATETIME DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT 1,
     responsavel_id INTEGER,
@@ -55,7 +55,7 @@ CREATE TABLE Professor (
     data_contratacao DATE,
     tipo_contrato VARCHAR(50),
     salario DECIMAL(10,2),
-    foto VARCHAR(255),
+    foto LONGBLOB,
     ativo BOOLEAN DEFAULT 1
 );
 
@@ -118,7 +118,7 @@ CREATE TABLE Apoiador (
     senha VARCHAR(255) NOT NULL,
     plano_nome VARCHAR(50),
     data_adesao DATE,
-    foto VARCHAR(255),
+    foto LONGBLOB,
     notificacoes BOOLEAN DEFAULT 1,
     FOREIGN KEY (plano_nome) REFERENCES Plano(nome)
 );
@@ -168,7 +168,7 @@ CREATE TABLE Voluntario (
     data_entrada DATE,                         
     disponibilidade TEXT,                      
     habilidades TEXT,                           
-    foto VARCHAR(255),                        
+    foto LONGBLOB,                        
     ativo BOOLEAN DEFAULT 1, 
     FOREIGN KEY (funcao_nome) REFERENCES Funcao(nome)
 );

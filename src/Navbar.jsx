@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,6 +9,10 @@ const Navbar = () => {
   const [showDoarDropdown, setShowDoarDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Create refs to detect clicks outside the dropdowns
+  const profileDropdownRef = useRef(null);
+  const doarDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -18,8 +22,42 @@ const Navbar = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
     
+    // Add event listener for clicks on the document
+    const handleClickOutside = (event) => {
+      // Close profile dropdown when clicking outside
+      if (profileDropdownRef.current && 
+          !profileDropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+      
+      // Close doar dropdown when clicking outside
+      if (doarDropdownRef.current && 
+          !doarDropdownRef.current.contains(event.target)) {
+        setShowDoarDropdown(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close dropdowns when route changes
+  useEffect(() => {
+    const closeDropdowns = () => {
+      setShowProfileDropdown(false);
+      setShowDoarDropdown(false);
+    };
+    
+    // Listen for route changes (this is a simplified approach)
+    window.addEventListener('hashchange', closeDropdowns);
+    
+    return () => {
+      window.removeEventListener('hashchange', closeDropdowns);
     };
   }, []);
 
@@ -39,9 +77,14 @@ const Navbar = () => {
     setShowProfileDropdown(false);
   };
 
-
   const closeSidebar = () => {
     setSidebarOpen(false);
+  };
+  
+  // New function to close all dropdowns
+  const closeAllDropdowns = () => {
+    setShowProfileDropdown(false);
+    setShowDoarDropdown(false);
   };
 
   return (
@@ -118,7 +161,7 @@ const Navbar = () => {
                   Sobre
                 </Link>
               </li>
-              <li className="nav-item dropdown">
+              <li className="nav-item dropdown" ref={doarDropdownRef}>
                 <Link 
                   className="nav-link nav-item-custom3" 
                   onClick={toggleDoarDropdown}
@@ -128,24 +171,32 @@ const Navbar = () => {
                 </Link>
                 {showDoarDropdown && (
                   <div className="dropdown-menu-custom show">
-                    <Link to="/assinaturas" className="dropdown-item-custom">
+                    <Link 
+                      to="/assinaturas" 
+                      className="dropdown-item-custom" 
+                      onClick={closeAllDropdowns}
+                    >
                       Assinaturas
                     </Link>
-                    <Link to="/doar" className="dropdown-item-custom">
+                    <Link 
+                      to="/doar" 
+                      className="dropdown-item-custom" 
+                      onClick={closeAllDropdowns}
+                    >
                       Doar para causa
                     </Link>
                   </div>
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/perfil">
+                <Link className="nav-link nav-item-custom4" to="/#contato">
                   Contato
                 </Link>
               </li>
             </ul>
           </div>
           
-          <div className="profile-container">
+          <div className="profile-container" ref={profileDropdownRef}>
             <div className="profile-dropdown-container">
               <img 
                 src="src/Assets/Perfil.svg" 
@@ -155,10 +206,18 @@ const Navbar = () => {
               />
               {showProfileDropdown && (
                 <div className="profile-dropdown-menu show">
-                  <Link to="/login" className="dropdown-item-custom">
+                  <Link 
+                    to="/login" 
+                    className="dropdown-item-custom" 
+                    onClick={closeAllDropdowns}
+                  >
                     Login
                   </Link>
-                  <Link to="/menu-registro" className="dropdown-item-custom">
+                  <Link 
+                    to="/menu-registro" 
+                    className="dropdown-item-custom" 
+                    onClick={closeAllDropdowns}
+                  >
                     Registro
                   </Link>
                 </div>

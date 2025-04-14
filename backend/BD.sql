@@ -31,7 +31,7 @@ CREATE TABLE Aluno (
     senha VARCHAR(255) NOT NULL,
     necessidades_especiais TEXT,
     foto VARCHAR(255),
-    data_matricula DATE DEFAULT CURRENT_DATE,
+    data_matricula DATETIME DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT 1,
     responsavel_id INTEGER,
     FOREIGN KEY (responsavel_id) REFERENCES Responsavel(id)
@@ -68,7 +68,7 @@ CREATE TABLE Turma (
     descricao TEXT,
     nivel VARCHAR(50),
     data_inicio DATE,
-    data_termino DATE,
+    data_termino DATE
 );
 
 CREATE TABLE Professor_Turma (
@@ -189,3 +189,5 @@ CREATE TABLE Administrador (
     nome VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL
 );
+
+

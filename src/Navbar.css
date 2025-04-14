@@ -110,7 +110,7 @@
   transform: scale(1.1);
 }
 
-/* Estilos dos dropdowns */
+
 .profile-dropdown-container {
   position: relative;
 }
@@ -147,12 +147,10 @@
   color: #ffffff;
 }
 
-/* Para os dropdowns aparecerem ao clicar */
 .show {
   display: block;
 }
 
-/* Sidebar para Mobile */
 .sidebar {
   position: fixed;
   top: 0;
@@ -170,12 +168,10 @@
   font-family: 'Fredoka', sans-serif;
 }
 
-/* Quando o sidebar está aberto */
 .sidebar-open {
   left: 0;
 }
 
-/* Overlay que cobre a tela quando o sidebar está aberto */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -186,7 +182,6 @@
   z-index: 1040;
 }
 
-/* Cabeçalho do sidebar */
 .sidebar-header {
   display: flex;
   justify-content: flex-end;
@@ -200,7 +195,6 @@
   cursor: pointer;
 }
 
-/* Nav do sidebar */
 .sidebar-nav {
   list-style: none;
   padding: 20px 0;
@@ -226,14 +220,12 @@
   color: #fff;
 }
 
-/* Estilo para o dropdown ativo na sidebar */
 .sidebar-link.active-dropdown {
   background-color: #91b5a8
   ;
   color: #fff;
 }
 
-/* Dropdown dentro do sidebar */
 .sidebar-dropdown {
   padding-left: 20px;
   background-color: rgba(0, 0, 0, 0.1);
@@ -257,7 +249,6 @@
   cursor: pointer;
 }
 
-/* Ajustes para responsividade */
 @media (max-width: 991px) {
   .profile-dropdown-menu {
     right: 15px;
@@ -275,26 +266,14 @@
   }
 }
 
-/* ADICIONADO: Media query para telas menores que 470px */
 @media (max-width: 469px) {
-  /* Ajustes adicionais para garantir que o layout fique correto */
   .navbar-container {
     padding: 0 10px;
   }
   
   .navbar-brand.mx-auto {
-    margin-left: -15px; /* Ajuste fino para o logo centralizado */
+    margin-left: -15px;
   }
 }
 
-@media (max-width: 560px) {
-  .profile-img {
-  height: 40x;
-  width: auto;
-  padding-top: 1vw;
-  padding-bottom: 1vw;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-}
+

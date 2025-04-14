@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* Estilos gerais */
+.custom-button-azul {
+  background-color: #0A7D7E;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-family: 'Fredoka', sans-serif!important;
+}
+
+.custom-button-azul:hover {
+  background-color: #076666;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-azul:disabled {
+  background-color: #076666;
+  transform: none;
+}
+
+.custom-button-outline {
+  color: #0A7D7E;
+  border-color: #0A7D7E;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.custom-button-outline:hover {
+  background-color: #f0f9f9;
+  color: #076666;
+  border-color: #076666;
+  transform: translateY(-2px);
+}
+
+.label-azul {
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+/* Estilos para o cabeçalho do modal */
+.registro-header-azul {
+  background-color: #076666;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Estilos para o modal */
+.modal-atualizar .modal-content {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-atualizar .form-control:focus {
+  border-color: #0A7D7E;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+/* Estilo para os radio buttons */
+.radio-custom-azul .form-check-input:checked {
+  background-color: #0A7D7E;
+  border-color: #0A7D7E;
+}
+
+.radio-custom-azul .form-check-input:focus {
+  border-color: #0A7D7E;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+/* Novos estilos para corrigir a imagem de perfil */
+.profile-image-container {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Estilo para o input de arquivo personalizado */
+.custom-file-input label {
+  cursor: pointer;
+  color: #0A7D7E;
+  border-color: #0A7D7E;
+  transition: all 0.2s;
+}
+
+.custom-file-input label:hover {
+  background-color: #f0f9f9;
+  color: #076666;
+  border-color: #076666;
+}
+
+.btn-outline-secondary:active{
+  background-color:#446464 !important;
+}
+
+@media (max-width: 767px) {
+  .btn-detalhes, .custom-button-azul {
+      padding: 10px 32px;
+      font-size: 12px !important;
+      font-weight: 600;
+  }
+}

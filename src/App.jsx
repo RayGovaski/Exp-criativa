@@ -10,8 +10,9 @@ import AdministraAlunos from "./Administrador/AdministraAlunos";
 import AdministraApoiador from "./Administrador/AdministraApoiador";
 import Home from "./Home";
 import Login from "./Login/Login";
-import "./App.css";
+import Perfil from "./Perfil/Perfil";
 import UpdateAlunos from "./Administrador/UpdateAlunos";
+import "./App.css";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/adm-apoiador" element={<AdministraApoiador />} />
           <Route path="/adm-aluno" element={<AdministraAlunos />} />
           <Route path="/update-aluno/:id" element={<UpdateAlunos />} />
+          <Route path="/perfil" element={<Perfil />} />
         </Routes>
         <Footer />
       </div>

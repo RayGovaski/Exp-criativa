@@ -1,11 +1,10 @@
-/* Tamanho padrão do carrossel */
+
 .carousel img {
   height: 500px;
   object-fit: cover;
   width: 100%;
 }
 
-/* Ajuste da legenda */
 .carousel-caption {
   position: absolute;
   top: 50%;
@@ -23,13 +22,11 @@
   backdrop-filter: blur(5px);
 }
 
-/* Ajuste do conteúdo */
 .caption-content {
   width: 100%;
   padding: 15px;
 }
 
-/* Melhorando tamanho do título */
 .caption-title {
   font-size: 32px;
   font-weight: bold;
@@ -38,7 +35,6 @@
   line-height: 1.2;
 }
 
-/* Melhorando tamanho do texto */
 .caption-text {
   font-size: 18px;
   color: #333;
@@ -46,7 +42,6 @@
   line-height: 1.4;
 }
 
-/* Botões ajustados para melhor espaçamento */
 .buttons-container {
   display: flex;
   gap: 15px;
@@ -54,7 +49,6 @@
   flex-wrap: wrap;
 }
 
-/* Estilo base comum para ambos os botões */
 .custom-button-azul3,
 .custom-button-rosa3 {
   width: 180px;
@@ -70,7 +64,6 @@
   white-space: nowrap;
 }
 
-/* Estilos específicos por cor */
 .custom-button-azul3 {
   background-color: #76B5A0;
   box-shadow: -3px 3px 0px #0A7D7E;
@@ -86,7 +79,6 @@
   transform: scale(1.05);
 }
 
-/* Estilização dos indicadores */
 .carousel-indicators [data-bs-target] {
   width: 12px;   
   height: 12px;
@@ -106,9 +98,6 @@
   background-color: #D9534F;
 }
 
-/* ========== RESPONSIVIDADE ========== */
-
-/* Telas grandes e desktops */
 @media (min-width: 1650px) {
   .carousel img {
     height: 700px;
@@ -135,7 +124,6 @@
   }
 }
 
-/* Desktops médios */
 @media (max-width: 1200px) {
   .carousel-caption {
     width: 80%;
@@ -156,7 +144,6 @@
   }
 }
 
-/* Tablets e desktops pequenos */
 @media (max-width: 992px) {
   .carousel img {
     height: 450px;
@@ -182,7 +169,6 @@
   }
 }
 
-/* Tablets e dispositivos médios */
 @media (max-width: 768px) {
   .carousel img {
     height: 400px;
@@ -211,7 +197,6 @@
   }
 }
 
-/* Celulares grandes */
 @media (max-width: 576px) {
   .carousel img {
     height: 350px;
@@ -249,7 +234,6 @@
   }
 }
 
-/* Celulares pequenos */
 @media (max-width: 480px) {
   .carousel img {
     height: 320px;
@@ -289,7 +273,6 @@
   }
 }
 
-/* Celulares muito pequenos */
 @media (max-width: 360px) {
   .carousel img {
     height: 280px;

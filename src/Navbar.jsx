@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-/*import { Link } from "react-router-dom";*/
 import { HashLink as Link } from "react-router-hash-link";
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -11,13 +10,12 @@ const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detecta quando a tela é mobile
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 992);
     };
     
-    handleResize(); // Verifica no carregamento inicial
+    handleResize();
     window.addEventListener('resize', handleResize);
     
     return () => {
@@ -37,24 +35,21 @@ const Navbar = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
-    // Fecha os outros dropdowns quando abre a sidebar
     setShowDoarDropdown(false);
     setShowProfileDropdown(false);
   };
 
-  // Fecha a sidebar ao clicar em um link
+
   const closeSidebar = () => {
     setSidebarOpen(false);
   };
 
   return (
     <>
-      {/* Overlay que cobre a tela quando o sidebar está aberto */}
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={toggleSidebar}></div>
       )}
       
-      {/* Sidebar para dispositivos móveis */}
       <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <span className="sidebar-close" onClick={toggleSidebar}>×</span>
@@ -96,10 +91,8 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {/* Navbar principal */}
       <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container-fluid navbar-container">
-          {/* Hamburger em mobile */}
           <button
             className="navbar-toggler border-0"
             type="button"
@@ -109,12 +102,10 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          {/* Logo no centro em mobile, normal em desktop */}
           <Link to="/" className={`navbar-brand ${isMobile ? 'mx-auto' : 'me-3'}`}>
             <img src="src/Assets/logo.svg" alt="Logo" className="navbar-logo" />
           </Link>
 
-          {/* Menu normal para desktop */}
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item">
@@ -147,14 +138,13 @@ const Navbar = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/#contato">
+                <Link className="nav-link nav-item-custom4" to="/perfil">
                   Contato
                 </Link>
               </li>
             </ul>
           </div>
-
-          {/* Foto de perfil sempre à direita */}
+          
           <div className="profile-container">
             <div className="profile-dropdown-container">
               <img 

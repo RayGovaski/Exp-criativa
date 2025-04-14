@@ -1,15 +1,15 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Importando useNavigate
+import { useNavigate } from "react-router-dom";
 import "./MenuRegistro.css";
 
 const MenuRegistro = () => {
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate(); 
 
   const handleRegistroTipo = (tipo) => {
     if (tipo === "apoiador") {
-      navigate("/registro-apoiador"); // Navega para a rota de registro de apoiador
+      navigate("/registro-apoiador"); 
     } else if (tipo === "aluno") {
-      navigate("/registro-aluno"); // Navega para a rota de registro de aluno
+      navigate("/registro-aluno");
     }
   };
 

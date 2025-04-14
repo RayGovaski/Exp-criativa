@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 const Carrossel = () => {
     return (
         <Carousel className="w-100 mx-auto" interval={3000} controls={true} indicators={true}>
-            {/* Primeiro Slide */}
             <Carousel.Item>
                 <img src="src/Assets/CarrosselPrincipal.png" className="d-block w-100" alt="Imagem 1" />
                 <Carousel.Caption>
@@ -25,7 +24,7 @@ const Carrossel = () => {
                 </Carousel.Caption>
             </Carousel.Item>
 
-            {/* Segundo Slide (com novo estilo) */}
+        
             <Carousel.Item>
                 <img src="src/Assets/CarrosselPrincipal2.png" className="d-block w-100" alt="Imagem 2" />
                 <Carousel.Caption>

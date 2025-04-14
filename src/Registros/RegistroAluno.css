@@ -40,7 +40,7 @@
   padding: 8px 18px;
   font-size: 20px;
   font-weight: bold;
-  color: white;
+  color: white!important;
   background-color: #F27375;
   border: none;
   border-radius: 50px;
@@ -114,3 +114,7 @@ input[type="password"]{
 .custom-button-rosa:hover {
   transform: scale(1.1);
 }
+
+
+
+

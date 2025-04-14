@@ -1,7 +1,7 @@
 import React from "react";
 import Carrossel from "./Carrossel";
 import Cards from "./Home/Cards";
-import "./Home.css"; // Arquivo CSS com os ajustes
+import "./Home.css";
 import LayoutHome from "./Home/LayoutHome";
 import Sobre from "./Home/Sobre";
 import CardAssinaturas from "./CardAssinaturas";
@@ -26,7 +26,7 @@ const Home = () => {
       <Perguntas />
       <CarrosselCriancas />
       <Doacoes />
-      <Contato />
+      <Contato /> 
     </div>
   );
 };

@@ -13,7 +13,6 @@
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
 }
 
-
 .subscription-card h5 {
   color: #000000;
 }
@@ -60,7 +59,6 @@
 .subscription-card:hover {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
-
 
 .botao-assinaturas-primeiro {
   position: relative;

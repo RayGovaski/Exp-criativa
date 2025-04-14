@@ -66,7 +66,7 @@ const Add = () => {
             <input type="password" />
           </div>
           <div className="button-container-rosa">
-            <button type="submit" className="custom-button-rosa" onClick={handleClick}> <Link to = "/">Registrar</Link></button>
+            <Link to = "/"> <button type="submit" className="custom-button-rosa" onClick={handleClick}> Registrar</button></Link>
           </div>
         </form>
       </div>

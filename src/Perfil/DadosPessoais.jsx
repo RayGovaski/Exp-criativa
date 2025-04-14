@@ -159,7 +159,7 @@ const DadosPessoais = () => {
                   Escolher Foto
                 </label>
               </div>
-              <Button className="custom-button-azul">Salvar Foto</Button>
+              <Button className="custom-button-azul5">Salvar Foto</Button>
             </div>
           </div>
           
@@ -199,7 +199,7 @@ const DadosPessoais = () => {
         </div>
         
         <div className="text-end">
-          <Button className="custom-button-azul" onClick={handleAbrirModal}>
+          <Button className="custom-button-azul5" onClick={handleAbrirModal}>
             Atualizar Dados
           </Button>
         </div>
@@ -253,7 +253,7 @@ const DadosPessoais = () => {
             Cancelar
           </Button>
           <Button 
-            className="custom-button-azul px-4" 
+            className="custom-button-azul5 px-4" 
             onClick={handleSubmitAtualizacao}
             disabled={!campoParaAtualizar}
           >

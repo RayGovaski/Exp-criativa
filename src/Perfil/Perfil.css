@@ -26,13 +26,13 @@
   font-weight: 500;
 }
 
-.custom-button-azul {
+.custom-button-azul6 {
   background-color: #0A7D7E;
   border: none;
   transition: all 0.2s;
 }
 
-.custom-button-azul:hover {
+.custom-button-azul6:hover {
   background-color: #076666;
   transform: translateY(-2px);
 }
@@ -90,7 +90,7 @@
     font-size: 14px;
   }
   
-  .btn-detalhes, .custom-button-azul {
+  .btn-detalhes, .custom-button-azul6 {
     padding: 4px 8px;
     font-size: 12px;
   }

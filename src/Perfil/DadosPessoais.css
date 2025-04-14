@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
 
 /* Estilos gerais */
-.custom-button-azul {
+.custom-button-azul5 {
   background-color: #0A7D7E;
   border: none;
   transition: all 0.2s;
@@ -10,13 +10,13 @@
   font-family: 'Fredoka', sans-serif!important;
 }
 
-.custom-button-azul:hover {
+.custom-button-azul5:hover {
   background-color: #076666;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.custom-button-azul:disabled {
+.custom-button-azul5:disabled {
   background-color: #076666;
   transform: none;
 }
@@ -110,7 +110,7 @@
 }
 
 @media (max-width: 767px) {
-  .btn-detalhes, .custom-button-azul {
+  .btn-detalhes, .custom-button-azul5 {
       padding: 10px 32px;
       font-size: 12px !important;
       font-weight: 600;

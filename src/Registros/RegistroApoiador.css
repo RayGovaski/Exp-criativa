@@ -14,7 +14,6 @@
   width: 420px;
   margin: 40px;
   font-family: 'Fredoka', sans-serif;
-  
 }
 
 .registro-header-azul {
@@ -27,7 +26,7 @@
 }
 
 .registro-form-azul input {
-  border: 2px solid #76B5A0 ;
+  border: 2px solid #76B5A0;
   border-radius: 20px;
   padding: 5px;
   width: 100%;
@@ -50,7 +49,11 @@
   box-shadow: -5px 5px 0px #76B5A0;
   margin-top: 10px;
   margin-bottom: 10px;
-  
+  transition: transform 0.3s ease-in-out;
+}
+
+.custom-button-azul:hover {
+  transform: scale(1.1);
 }
 
 .button-container-azul {
@@ -75,11 +78,6 @@
   text-align: center;
 }
 
-@media (max-width: 844px) {
-  .footer-line2-azul {
-    width: 60%; 
-}
-
 .label-azul{
   color: #0A7D7E;
   font-size: 18px;
@@ -94,9 +92,107 @@ input[type="password"]{
   padding-left: 13px;
 }
 
+.file-input-wrapper2 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+  border: 2px solid #76B5A0;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 3px;
+}
+
+.file-input-container {
+  position: relative;
+  padding: 5px 5px;
+}
+
+.file-input-azul {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.file-input-button2 {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #76B5A0;
+  color: white;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 15px;
+  box-shadow: -2px 2px 0px rgba(10, 125, 126, 0.5);
+  transition: all 0.2s ease;
+}
+
+.file-input-button:hover {
+  background-color: #0A7D7E;
+  transform: scale(1.03);
+}
+
+.file-name-display {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.preview-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.preview-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #76B5A0;
+}
+
+.registro-form-azul {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.registro-form-azul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.registro-form-azul::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.registro-form-azul::-webkit-scrollbar-thumb {
+  background: #76B5A0;
+  border-radius: 10px;
+}
+
+.registro-form-azul::-webkit-scrollbar-thumb:hover {
+  background: #0A7D7E;
+}
+
 @media (max-width: 1100px) {
   .fundo-azul {
     background-image: url("src/Assets/FundoRegistroApoiadorCelularMedio.png"); 
+  }
+  
+  .footer-line2-azul {
+    width: 60%; 
   }
 }
 
@@ -106,18 +202,39 @@ input[type="password"]{
   }
 }
 
-.custom-button-azul {
-  transition: transform 0.3s ease-in-out;
+.checkbox-wrapper {
+  margin-left: 15px;
 }
 
-.custom-button-azul:hover {
-  transform: scale(1.1);
-}
-}
-.custom-button-azul {
-  transition: transform 0.3s ease-in-out;
+.checkbox-container {
+  flex: 1;
 }
 
-.custom-button-azul:hover {
-  transform: scale(1.1);
+.label-container {
+  flex: 3;
 }
+
+.custom-checkbox {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer;
+  accent-color: #0A7D7E;
+  border: 1px solid #0A7D7E;
+}
+
+.custom-checkbox:checked {
+  accent-color: #0A7D7E;
+  border-color: #0A7D7E;
+}
+
+.custom-checkbox:focus {
+  outline-color: #0A7D7E;
+  box-shadow: 0 0 0 0.2rem rgba(10, 125, 126, 0.25);
+}
+
+.notification-label {
+  color: #0A7D7E;
+  margin-left: 8px;
+}
+
+

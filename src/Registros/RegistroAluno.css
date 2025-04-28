@@ -14,7 +14,6 @@
   width: 420px;
   margin: 40px;
   font-family: 'Fredoka', sans-serif;
-  
 }
 
 .registro-header-rosa {
@@ -115,6 +114,171 @@ input[type="password"]{
   transform: scale(1.1);
 }
 
+.steps-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+}
 
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #F7AAAA;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
 
+.step.active {
+  background-color: #F27375;
+  transform: scale(1.1);
+}
+
+.step-line {
+  height: 3px;
+  width: 50px;
+  background-color: #F7AAAA;
+  margin: 0 10px;
+}
+
+.file-input-rosa {
+  border: 2px solid #F7AAAA;
+  border-radius: 20px;
+  padding: 5px;
+  width: 100%;
+  outline: none;
+}
+
+.select-rosa {
+  border: 2px solid #F7AAAA;
+  border-radius: 20px;
+  padding: 5px;
+  width: 100%;
+  outline: none;
+  background-color: white;
+}
+
+.textarea-rosa {
+  border: 2px solid #F7AAAA;
+  border-radius: 20px;
+  padding: 10px;
+  width: 100%;
+  min-height: 80px;
+  outline: none;
+  resize: vertical;
+}
+
+.secondary-button-rosa {
+  position: relative;
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #F27375 !important;
+  background-color: white;
+  border: 2px solid #F27375;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  box-shadow: -3px 3px 0px #F7AAAA;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 15px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.secondary-button-rosa:hover {
+  transform: scale(1.1);
+}
+
+.button-container-rosa {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.registro-form-rosa {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.registro-form-rosa::-webkit-scrollbar {
+  width: 8px;
+}
+
+.registro-form-rosa::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.registro-form-rosa::-webkit-scrollbar-thumb {
+  background: #F7AAAA;
+  border-radius: 10px;
+}
+
+.registro-form-rosa::-webkit-scrollbar-thumb:hover {
+  background: #F27375;
+}
+
+.file-input-container {
+  position: relative;
+  padding: 5px 5px;
+}
+
+.file-input-rosa {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.file-input-button {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #F7AAAA;
+  color: white;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 15px;
+  box-shadow: -2px 2px 0px rgba(242, 115, 117, 0.5);
+  transition: all 0.2s ease;
+}
+
+.file-input-button:hover {
+  background-color: #F27375;
+  transform: scale(1.03);
+}
+
+.file-name-display {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+  border: 2px solid #F7AAAA;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 3px;
+}
 

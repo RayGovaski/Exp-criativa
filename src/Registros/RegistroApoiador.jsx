@@ -9,6 +9,7 @@ const RegistroApoiador = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [senhaMatch, setSenhaMatch] = useState(true);
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [fileName, setFileName] = useState("Nenhum arquivo selecionado");
   
   const [apoiador, setApoiador] = useState({ 
     nome: "",
@@ -29,7 +30,8 @@ const RegistroApoiador = () => {
     } else if (type === 'file') {
       if (files.length > 0) {
         setApoiador({...apoiador, [name]: files[0]});
-        // Preview da imagem
+        setFileName(files[0].name);
+
         const reader = new FileReader();
         reader.onload = (e) => {
           setPreviewImage(e.target.result);
@@ -49,13 +51,11 @@ const RegistroApoiador = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     
-    // Verificar se senhas coincidem
     if (apoiador.senha !== confirmarSenha) {
       setSenhaMatch(false);
       return;
     }
     
-    // Criar FormData para enviar a foto
     const formData = new FormData();
     for (const key in apoiador) {
       formData.append(key, apoiador[key]);
@@ -73,16 +73,36 @@ const RegistroApoiador = () => {
     }
   };
   
-  const handleFotoClick = () => {
-    fileInputRef.current.click();
-  };
-
-  // Estilo customizado para o checkbox pequeno
-  const checkboxStyle = {
-    width: '16px',
-    height: '16px',
-    marginRight: '8px',
-    cursor: 'pointer'
+  
+  const FileInput = ({ name, label, onChange }) => {
+    return (
+      <div className="mb-3">
+        <label className="label-azul">{label}</label>
+        <div className="file-input-wrapper2">
+          <div className="file-input-container">
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              name={name} 
+              onChange={onChange}
+              className="file-input-azul"
+              accept="image/*"
+            />
+            <div className="file-input-button2">Escolher Arquivo</div>
+          </div>
+          <span className="file-name-display">{fileName}</span>
+        </div>
+        {previewImage && (
+          <div className="preview-container mt-2">
+            <img 
+              src={previewImage} 
+              alt="Preview" 
+              className="preview-image" 
+            />
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -179,51 +199,31 @@ const RegistroApoiador = () => {
             )}
           </div>
           
-          <div className="mb-3">
-            <label className="label-azul d-block">Foto:</label>
-            <div className="d-flex align-items-center mb-2">
-              {previewImage && (
-                <div className="me-3">
-                  <img 
-                    src={previewImage} 
-                    alt="Preview" 
-                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '50%' }} 
-                  />
-                </div>
-              )}
-              <div className="button-container-azul" style={{margin: 0}}>
-                <button 
-                  type="button"
-                  className="custom-button-azul"
-                  onClick={handleFotoClick}
-                  style={{fontSize: '16px'}}
-                >
-                  Selecionar foto
-                </button>
-              </div>
+          <FileInput 
+            name="foto"
+            label="Foto:"
+            onChange={handleChange}
+          />
+          
+          <div className="d-flex align-items-center mb-3 checkbox-wrapper">
+            <div className="checkbox-container">
               <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleChange} 
-                name="foto" 
-                className="d-none"
-                accept="image/*"
+                type="checkbox" 
+                id="receberNotificacoes"
+                name="receberNotificacoes"
+                checked={apoiador.receberNotificacoes}
+                onChange={handleChange}
+                className="custom-checkbox"
               />
             </div>
-          </div>
-          
-          <div className="mb-3 d-flex align-items-center" style={{marginLeft: '15px'}}>
-            <input 
-              type="checkbox" 
-              id="receberNotificacoes"
-              name="receberNotificacoes"
-              checked={apoiador.receberNotificacoes}
-              onChange={handleChange}
-              style={checkboxStyle}
-            />
-            <label htmlFor="receberNotificacoes" style={{color: '#0A7D7E', cursor: 'pointer'}}>
-              Desejo receber notificações por email
-            </label>
+            <div className="label-container">
+              <label 
+                htmlFor="receberNotificacoes" 
+                className="notification-label"
+              >
+                quero receber notificação
+              </label>
+            </div>
           </div>
           
           <div className="button-container-azul">

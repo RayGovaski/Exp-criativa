@@ -43,11 +43,11 @@ app.post("/alunos", (req, res) => {
         req.body.sexo,
         req.body.data_nascimento,
         req.body.nacionalidade,
+        req.body.responsavel_id,         
         req.body.telefone,
         req.body.email,
         req.body.senha,
-        req.body.necessidades_especiais,
-        req.body.responsavel_id
+        req.body.necessidades_especiais
     ];
     db.query(sql, [values], (err, data) => {
         if (err) return res.json(err);
@@ -56,7 +56,7 @@ app.post("/alunos", (req, res) => {
 })
 
 app.put("/alunos/:id", validate(alunoSchema), (req, res) => {
-    const sql = `UPDATE Aluno SET 
+    const sql = `UPDATE Alunos SET 
         nome = ?, cpf = ?, rg = ?, sexo = ?, data_nascimento = ?, nacionalidade = ?, telefone = ?, 
         email = ?, senha = ?, necessidades_especiais = ?, responsavel_id = ?
         WHERE id = ?`;
@@ -99,7 +99,7 @@ app.get("/apoiador", (req, res) => {
 })  
 
 app.post("/apoiador", (req, res) => { 
-    const sql = "INSERT INTO Apoiador (`nome`, `cpf`, `email`, `senha`, `data_nascimento`, `telefone` VALUES (?)";
+    const sql = "INSERT INTO Apoiador (`nome`, `cpf`, `email`, `senha`, `data_nascimento`, `telefone`) VALUES (?)";
     const values = [
         req.body.nome,
         req.body.cpf,

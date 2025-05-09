@@ -1,3 +1,14 @@
+-- Tabela de Endereco
+CREATE TABLE Endereco (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    logradouro VARCHAR(100) NOT NULL,
+    numero_residencia INT NOT NULL,
+    cep CHAR(8) NOT NULL,
+    cidade VARCHAR(100),
+    estado VARCHAR(50),
+    pais VARCHAR(50)
+);
+
 -- Tabela de responsáveis pelos alunos
 CREATE TABLE Responsavel (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -7,14 +18,13 @@ CREATE TABLE Responsavel (
     data_nascimento DATE NOT NULL,
     telefone VARCHAR(15) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    logradouro VARCHAR(100) NOT NULL,
-    numero_residencia INTEGER NOT NULL,
-    cep CHAR(8) NOT NULL,
     grau_parentesco VARCHAR(50),
     profissao VARCHAR(100),
     renda_familiar DECIMAL(10,2),
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    ativo BOOLEAN DEFAULT 1
+    ativo BOOLEAN DEFAULT 1,
+    endereco_id INT,
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
 );
 
 -- Tabela de alunos
@@ -34,7 +44,9 @@ CREATE TABLE Aluno (
     data_matricula DATETIME DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT 1,
     responsavel_id INTEGER,
-    FOREIGN KEY (responsavel_id) REFERENCES Responsavel(id)
+    endereco_id INT,
+    FOREIGN KEY (responsavel_id) REFERENCES Responsavel(id),
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
 );
 
 -- Tabela de professores
@@ -44,9 +56,6 @@ CREATE TABLE Professor (
     nome VARCHAR(100) NOT NULL,
     sexo ENUM('M', 'F', 'Outro'),
     data_nascimento DATE NOT NULL,
-    logradouro VARCHAR(100),
-    numero_residencia INTEGER,
-    cep CHAR(8),
     telefone VARCHAR(15),
     email VARCHAR(100) UNIQUE,
     nacionalidade VARCHAR(50),
@@ -56,7 +65,9 @@ CREATE TABLE Professor (
     tipo_contrato VARCHAR(50),
     salario DECIMAL(10,2),
     foto LONGBLOB,
-    ativo BOOLEAN DEFAULT 1
+    ativo BOOLEAN DEFAULT 1,
+    endereco_id INT,
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
 );
 
 -- Tabela de turmas
@@ -158,19 +169,18 @@ CREATE TABLE Voluntario (
     cpf CHAR(11) UNIQUE NOT NULL,
     nome VARCHAR(100) NOT NULL,
     data_nascimento DATE NOT NULL,
-    logradouro VARCHAR(100),
-    numero_residencia INTEGER,
-    cep CHAR(8),
     telefone VARCHAR(15),
     email VARCHAR(100) UNIQUE,
     nacionalidade VARCHAR(50),
     funcao_nome VARCHAR(50),
     data_entrada DATE,                         
     disponibilidade TEXT,                      
-    habilidades TEXT,                           
+    habilidades TEXT,                            
     foto LONGBLOB,                        
-    ativo BOOLEAN DEFAULT 1, 
-    FOREIGN KEY (funcao_nome) REFERENCES Funcao(nome)
+    ativo BOOLEAN DEFAULT 1,
+    endereco_id INT,
+    FOREIGN KEY (funcao_nome) REFERENCES Funcao(nome),
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
 );
 
 -- Tabela de contatos gerais
@@ -189,5 +199,3 @@ CREATE TABLE Administrador (
     nome VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL
 );
-
-

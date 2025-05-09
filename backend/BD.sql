@@ -72,7 +72,8 @@ CREATE TABLE Professor (
 
 -- Tabela de turmas
 CREATE TABLE Turma (
-    nome VARCHAR(50) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
     capacidade INTEGER CHECK (capacidade > 0),
     hora_inicio TIME NOT NULL,
     hora_termino TIME NOT NULL,
@@ -83,6 +84,7 @@ CREATE TABLE Turma (
 );
 
 CREATE TABLE Professor_Turma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     professor_id INTEGER,
     turma_nome VARCHAR(50),
     PRIMARY KEY (turma_nome, professor_id),
@@ -91,6 +93,7 @@ CREATE TABLE Professor_Turma (
 );
 
 CREATE TABLE Aluno_Turma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     aluno_id INTEGER,
     turma_nome VARCHAR(50),
     PRIMARY KEY (turma_nome, aluno_id),
@@ -100,6 +103,7 @@ CREATE TABLE Aluno_Turma (
 
 -- Tabela de controle de presença
 CREATE TABLE Controle_Presenca (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     turma_nome VARCHAR(50),
     data DATE,
     professor_id INTEGER,
@@ -113,7 +117,8 @@ CREATE TABLE Controle_Presenca (
 
 -- Tabela de planos de apoio
 CREATE TABLE Plano (
-    nome VARCHAR(50) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
     preco DECIMAL(10,2) NOT NULL,
     descricao TEXT
 );
@@ -148,6 +153,7 @@ CREATE TABLE Doacao (
 );
 
 CREATE TABLE Apoiador_Doacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     apoiador_id INTEGER,
     doacao_id INTEGER,
     PRIMARY KEY (apoiador_id, doacao_id),
@@ -157,7 +163,8 @@ CREATE TABLE Apoiador_Doacao (
 
 -- Tabela de funções de voluntários
 CREATE TABLE Funcao (
-    nome VARCHAR(50) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
     descricao TEXT,
     carga_horaria_semanal INT,
     tipo ENUM('Fixa', 'Eventual') DEFAULT 'Fixa'

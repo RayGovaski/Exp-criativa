@@ -1,344 +1,178 @@
 import express from "express";
 import mysql from "mysql";
 import cors from "cors";
-import { alunoSchema } from "./validations/aluno.js";
-import { validate } from "./middlewares/validate.js";
-import { professorSchema } from "./validations/professor.js";
-import { responsavelSchema } from "./validations/responsavel.js";
-import { voluntarioSchema } from "./validations/voluntario.js";
+import multer from "multer";
+import path from "path";
+import bcrypt from "bcrypt";
+import fs from "fs";
 
 const app = express();
 app.use(cors());
-app.use(express.json());    
+app.use(express.json());
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadsDir = './uploads';
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir);
+    }
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Apenas imagens são permitidas'));
+    }
+  }
+});
 
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "1234",
-    database: "cores_do_amanha",
+    password: "A992176566kemi_",
+    database: "exp_criativa",
 });
 
-app.get("/", (req, res) => {
-    res.json("Hello");
-})
-
-app.listen(8000, () => { 
-    console.log("Server is running on port 8000");
+// Test database connection
+db.connect((err) => {
+    if (err) {
+        console.error('❌ Error connecting to MySQL database:', err);
+        return;
+    }
+    console.log('✅ Connected to MySQL database successfully!');
 });
 
-app.get("/alunos", (req, res) => { 
-    const sql = "SELECT * FROM Alunos";
-    db.query(sql, (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
-    })
-})  
+// Root route
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'API is running successfully',
+        endpoints: [
+            'GET /apoiadores - List all apoiadores',
+            'GET /test-db - Test database connection',
+            'POST /apoiador - Create new apoiador'
+        ]
+    });
+});
 
-app.post("/alunos", (req, res) => { 
-    const sql = "INSERT INTO Alunos (`nome`, `cpf`, `rg`,`sexo`,`data_nascimento`,`nacionalidade`, `responsavel_id`, `telefone`, `email`, `senha`,`necessidades_especiais`) VALUES (?)";
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.rg,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.nacionalidade,
-        req.body.responsavel_id,         
-        req.body.telefone,
-        req.body.email,
-        req.body.senha,
-        req.body.necessidades_especiais
-    ];
-    db.query(sql, [values], (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
-    })
-})
+// Test database connection route
+app.get('/test-db', (req, res) => {
+    db.query('SELECT 1 + 1 AS solution', (err, results) => {
+        if (err) {
+            console.error('Database query error:', err);
+            return res.status(500).json({ error: 'Database error', message: err.message });
+        }
+        return res.json({ 
+            message: 'Database connection successful',
+            data: results[0].solution
+        });
+    });
+});
 
-app.put("/alunos/:id", validate(alunoSchema), (req, res) => {
-    const sql = `UPDATE Alunos SET 
-        nome = ?, cpf = ?, rg = ?, sexo = ?, data_nascimento = ?, nacionalidade = ?, telefone = ?, 
-        email = ?, senha = ?, necessidades_especiais = ?, responsavel_id = ?
-        WHERE id = ?`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.rg,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.nacionalidade,
-        req.body.telefone,
-        req.body.email,
-        req.body.senha,
-        req.body.necessidades_especiais,
-        req.body.responsavel_id
-    ];
-
-    db.query(sql, [...values, req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
+// Get all apoiadores
+app.get('/apoiadores', (req, res) => {
+    const q = "SELECT id, cpf, nome, data_nascimento, telefone, email, plano_nome, data_adesao, notificacoes FROM Apoiador";
+    
+    db.query(q, (err, data) => {
+        if (err) {
+            console.error("Error fetching apoiadores:", err);
+            return res.status(500).json({ error: "Database error", message: err.message });
+        }
         return res.json(data);
     });
 });
 
-app.delete("/alunos/:id", (req, res) => {
-    const sql = "DELETE FROM Alunos WHERE `id` = ?"; 
-    db.query(sql, [req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-
-app.get("/apoiador", (req, res) => { 
-    const sql = "SELECT * FROM Apoiador";
-    db.query(sql, (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
-    })
-})  
-
-app.post("/apoiador", (req, res) => { 
-    const sql = "INSERT INTO Apoiador (`nome`, `cpf`, `email`, `senha`, `data_nascimento`, `telefone`) VALUES (?)";
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.email,
-        req.body.senha,
-        req.body.data_nascimento,
-        req.body.telefone,
-        req.body.plano_nome,
-        req.body.notificacoes ?? true
-    ];
-    db.query(sql, [values], (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
-    })
-})
-
-app.delete("/apoiador/:id", (req, res) => {
-    const sql = "DELETE FROM Apoiador WHERE `id` = ?"; 
-    db.query(sql, [req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.get("/responsaveis", (req, res) => {
-    const sql = "SELECT * FROM Responsavel";
-    db.query(sql, (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.post("/responsaveis", validate(responsavelSchema), (req, res) => {
-    const sql = `INSERT INTO Responsavel 
-        (nome, cpf, sexo, data_nascimento, telefone, email, logradouro, numero_residencia, cep, grau_parentesco, profissao, renda_familiar)
-        VALUES (?)`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.telefone,
-        req.body.email,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.grau_parentesco,
-        req.body.profissao,
-        req.body.renda_familiar
-    ];
-
-    db.query(sql, [values], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.status(201).json(data);
-    });
-});
-
-app.put("/responsaveis/:id", validate(responsavelSchema), (req, res) => {
-    const sql = `UPDATE Responsavel SET 
-        nome = ?, cpf = ?, sexo = ?, data_nascimento = ?, telefone = ?, email = ?, 
-        logradouro = ?, numero_residencia = ?, cep = ?, grau_parentesco = ?, profissao = ?, renda_familiar = ?
-        WHERE id = ?`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.telefone,
-        req.body.email,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.grau_parentesco,
-        req.body.profissao,
-        req.body.renda_familiar
-    ];
-
-    db.query(sql, [...values, req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.delete("/responsaveis/:id", (req, res) => {
-    const sql = "DELETE FROM Responsavel WHERE id = ?";
-    db.query(sql, [req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json({ msg: "Responsável removido com sucesso" });
-    });
-});
-
-app.get("/professores", (req, res) => {
-    const sql = "SELECT * FROM Professor";
-    db.query(sql, (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.post("/professores", validate(professorSchema), (req, res) => {
-    const sql = `INSERT INTO Professor 
-        (nome, cpf, sexo, data_nascimento, logradouro, numero_residencia, cep, telefone, email, nacionalidade, graduacao, curriculo, data_contratacao, tipo_contrato, salario)
-        VALUES (?)`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.telefone,
-        req.body.email,
-        req.body.nacionalidade,
-        req.body.graduacao,
-        req.body.curriculo,
-        req.body.data_contratacao,
-        req.body.tipo_contrato,
-        req.body.salario
-    ];
-
-    db.query(sql, [values], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.status(201).json(data);
-    });
-});
-
-app.put("/professores/:id", validate(professorSchema), (req, res) => {
-    const sql = `UPDATE Professor SET 
-        nome = ?, cpf = ?, sexo = ?, data_nascimento = ?, logradouro = ?, numero_residencia = ?, cep = ?, 
-        telefone = ?, email = ?, nacionalidade = ?, graduacao = ?, curriculo = ?, data_contratacao = ?, tipo_contrato = ?, salario = ?
-        WHERE id = ?`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.sexo,
-        req.body.data_nascimento,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.telefone,
-        req.body.email,
-        req.body.nacionalidade,
-        req.body.graduacao,
-        req.body.curriculo,
-        req.body.data_contratacao,
-        req.body.tipo_contrato,
-        req.body.salario
-    ];
-
-    db.query(sql, [...values, req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.delete("/professores/:id", (req, res) => {
-    const sql = "DELETE FROM Professor WHERE id = ?";
-    db.query(sql, [req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json({ msg: "Professor removido com sucesso" });
-    });
-});
-
-app.get("/voluntarios", (req, res) => {
-    const sql = "SELECT * FROM Voluntario";
-    db.query(sql, (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.post("/voluntarios", validate(voluntarioSchema), (req, res) => {
-    const sql = `INSERT INTO Voluntario 
-        (nome, cpf, data_nascimento, logradouro, numero_residencia, cep, telefone, email, nacionalidade, funcao_nome, data_entrada, disponibilidade, habilidades)
-        VALUES (?)`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.data_nascimento,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.telefone,
-        req.body.email,
-        req.body.nacionalidade,
-        req.body.funcao_nome,
-        req.body.data_entrada,
-        req.body.disponibilidade,
-        req.body.habilidades
-    ];
-
-    db.query(sql, [values], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.status(201).json(data);
-    });
-});
-
-app.put("/voluntarios/:id", validate(voluntarioSchema), (req, res) => {
-    const sql = `UPDATE voluntario SET 
-        nome = ?, cpf = ?, data_nascimento = ?, logradouro = ?, numero_residencia = ?, cep = ?, 
-        telefone = ?, email = ?, nacionalidade = ?, funcao_nome = ?, data_entrada = ?, disponibilidade = ?, habilidades = ?
-        WHERE id = ?`;
-
-    const values = [
-        req.body.nome,
-        req.body.cpf,
-        req.body.data_nascimento,
-        req.body.logradouro,
-        req.body.numero_residencia,
-        req.body.cep,
-        req.body.telefone,
-        req.body.email,
-        req.body.nacionalidade,
-        req.body.funcao_nome,
-        req.body.data_entrada,
-        req.body.disponibilidade,
-        req.body.habilidades
-    ];
-
-    db.query(sql, [...values, req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json(data);
-    });
-});
-
-app.delete("/voluntarios/:id", (req, res) => {
-    const sql = "DELETE FROM Voluntario WHERE id = ?";
-    db.query(sql, [req.params.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.json({ msg: "Voluntário removido com sucesso" });
-    });
+// Create apoiador endpoint
+app.post('/apoiador', upload.single('foto'), async (req, res) => {
+    try {
+        // Format data from request body
+        const { nome, cpf, email, senha, data_nascimento, telefone, receberNotificacoes } = req.body;
+        
+        // CPF validation - remove non-numeric characters
+        const cleanCpf = cpf.replace(/\D/g, '');
+        if (cleanCpf.length !== 11) {
+            return res.status(400).json({ error: "CPF inválido" });
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Email inválido" });
+        }
+        
+        // Password hashing
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(senha, salt);
+        
+        let foto = null;
+        if (req.file) {
+            // Read the file and convert to buffer
+            foto = fs.readFileSync(req.file.path);
+            // Remove the temporary file
+            fs.unlinkSync(req.file.path);
+        }
+        
+        // Clean telephone number - remove non-numeric characters except +
+        const cleanTelefone = telefone.replace(/[^\d+]/g, '');
+        
+        // Format date to MySQL format (YYYY-MM-DD)
+        const formattedDate = new Date(data_nascimento).toISOString().split('T')[0];
+        
+        // Insert into database
+        const q = `
+            INSERT INTO Apoiador (cpf, nome, data_nascimento, telefone, email, senha, foto, notificacoes) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        db.query(
+            q, 
+            [cleanCpf, nome, formattedDate, cleanTelefone, email, hashedPassword, foto, receberNotificacoes ? 1 : 0], 
+            (err, data) => {
+                if (err) {
+                    console.error("Error creating apoiador:", err);
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        if (err.sqlMessage.includes('cpf')) {
+                            return res.status(409).json({ error: "CPF já cadastrado" });
+                        } else if (err.sqlMessage.includes('email')) {
+                            return res.status(409).json({ error: "Email já cadastrado" });
+                        }
+                    }
+                    return res.status(500).json({ error: "Database error", message: err.message });
+                }
+                
+                return res.status(201).json({ 
+                    id: data.insertId,
+                    message: "Apoiador cadastrado com sucesso!" 
+                });
+            }
+        );
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Server error", message: error.message });
+    }
 });
 
 app.listen(8000, () => {
     console.log("🚀 Servidor rodando na porta 8000");
+});
+
+// Proper error handling for database disconnections
+process.on('SIGINT', () => {
+    db.end((err) => {
+        console.log('MySQL connection closed');
+        process.exit(err ? 1 : 0);
+    });
 });

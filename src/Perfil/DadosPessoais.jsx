@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { Card, Image, Button, Modal, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Card, Image, Button, Modal, Form, Alert } from 'react-bootstrap';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import './DadosPessoais.css';
 
 const DadosPessoais = () => {
+  const { user, token, updateAuthData, logout } = useAuth();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [imagem, setImagem] = useState(null);
+  const [imagemFile, setImagemFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [campoParaAtualizar, setCampoParaAtualizar] = useState("");
   const [formDados, setFormDados] = useState({
@@ -11,22 +19,49 @@ const DadosPessoais = () => {
     novaSenha: "",
     confirmarSenha: "",
     novoEmail: "",
-    novoTelefone: "",
-    novoCpf: ""
+    novoTelefone: ""
   });
+  const [updateSuccess, setUpdateSuccess] = useState("");
+  const [updateError, setUpdateError] = useState("");
   
-  const dadosUsuario = {
-    nome: 'Maria Silva',
-    cpf: '123.456.789-00',
-    data_nascimento: '2007-05-15',
-    telefone: '(11) 98765-4321',
-    email: 'maria.silva@email.com',
-    fotoPerfil: 'https://via.placeholder.com/150'
-  };
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:8000/apoiador/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUserData(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Falha ao carregar dados do usuário. Por favor, recarregue a página.");
+        setLoading(false);
+      }
+    };
+    
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
 
   const handleImagemChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file type
+      if (!file.type.match('image.*')) {
+        alert('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('O tamanho da imagem não pode exceder 5MB.');
+        return;
+      }
+      
+      setImagemFile(file);
       setImagem(URL.createObjectURL(file));
     }
   };
@@ -46,20 +81,166 @@ const DadosPessoais = () => {
       novaSenha: "",
       confirmarSenha: "",
       novoEmail: "",
-      novoTelefone: "",
-      novoCpf: ""
+      novoTelefone: ""
     });
+    setUpdateSuccess("");
+    setUpdateError("");
   };
 
   const handleFecharModal = () => {
     setShowModal(false);
   };
 
-  const handleSubmitAtualizacao = () => {
-    console.log("Campo para atualizar:", campoParaAtualizar);
-    console.log("Dados do formulário:", formDados);
+  const handleSalvarFoto = async () => {
+    if (!imagemFile) return;
     
-    setShowModal(false);
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('foto', imagemFile);
+      
+      // Fix the endpoint URL to match the backend API
+      const response = await axios.put(
+        'http://localhost:8000/apoiador/update-foto',
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      if (response.status === 200) {
+        // Refresh user data after successful upload
+        const userResponse = await axios.get('http://localhost:8000/apoiador/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setUserData(userResponse.data);
+        
+        // Clear the temporary file
+        setImagem(null);
+        setImagemFile(null);
+        
+        // Show success message
+        alert('Foto atualizada com sucesso!');
+      }
+    } catch (error) {
+      console.error("Error updating profile photo:", error);
+      let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
+      
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmitAtualizacao = async () => {
+    setUpdateSuccess("");
+    setUpdateError("");
+    
+    try {
+      let endpoint = '';
+      let data = {};
+      
+      switch (campoParaAtualizar) {
+        case "senha":
+          if (formDados.novaSenha !== formDados.confirmarSenha) {
+            setUpdateError("As senhas não coincidem.");
+            return;
+          }
+          if (formDados.novaSenha.length < 6) {
+            setUpdateError("A senha deve ter pelo menos 6 caracteres.");
+            return;
+          }
+          endpoint = 'http://localhost:8000/apoiador/update-senha';
+          data = {
+            senhaAtual: formDados.senhaAtual,
+            novaSenha: formDados.novaSenha
+          };
+          break;
+        case "email":
+          if (!formDados.novoEmail) {
+            setUpdateError("Email não pode estar vazio.");
+            return;
+          }
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(formDados.novoEmail)) {
+            setUpdateError("Email inválido.");
+            return;
+          }
+          endpoint = 'http://localhost:8000/apoiador/update-email';
+          data = { email: formDados.novoEmail };
+          break;
+        case "telefone":
+          if (!formDados.novoTelefone) {
+            setUpdateError("Telefone não pode estar vazio.");
+            return;
+          }
+          endpoint = 'http://localhost:8000/apoiador/update-telefone';
+          data = { telefone: formDados.novoTelefone };
+          break;
+        default:
+          setUpdateError("Selecione o que deseja atualizar.");
+          return;
+      }
+      
+      const response = await axios.put(endpoint, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+   
+      setUserData(prevData => {
+        const updatedData = { ...prevData };
+        
+        if (campoParaAtualizar === "email") {
+          updatedData.email = formDados.novoEmail;
+          if (response.data.token) {
+            if (typeof updateAuthData === 'function') {
+              updateAuthData(response.data.token);
+            }
+          }
+        } else if (campoParaAtualizar === "telefone") {
+          updatedData.telefone = formDados.novoTelefone;
+        }
+        
+        return updatedData;
+      });
+      
+      setUpdateSuccess(`${campoParaAtualizar.charAt(0).toUpperCase() + campoParaAtualizar.slice(1)} atualizado com sucesso!`);
+      
+      // Reset form fields after successful update
+      setFormDados({
+        senhaAtual: "",
+        novaSenha: "",
+        confirmarSenha: "",
+        novoEmail: "",
+        novoTelefone: ""
+      });
+      
+      // Close modal after a short delay to show success message
+      setTimeout(() => {
+        setShowModal(false);
+      }, 1500);
+      
+    } catch (error) {
+      console.error("Error updating data:", error);
+      let errorMessage = "Erro ao atualizar dados. Tente novamente.";
+      
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setUpdateError(errorMessage);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   const renderFormularioAtualizacao = () => {
@@ -107,6 +288,7 @@ const DadosPessoais = () => {
               name="novoEmail"
               value={formDados.novoEmail}
               onChange={handleInputChange}
+              placeholder="exemplo@email.com"
             />
           </Form.Group>
         );
@@ -119,6 +301,7 @@ const DadosPessoais = () => {
               name="novoTelefone"
               value={formDados.novoTelefone}
               onChange={handleInputChange}
+              placeholder="(XX) XXXXX-XXXX"
             />
           </Form.Group>
         );
@@ -130,6 +313,56 @@ const DadosPessoais = () => {
     }
   };
 
+  // Function to determine the image source
+  const getProfileImageSrc = () => {
+    if (imagem) {
+      return imagem;
+    } else if (userData && userData.foto) {
+      if (typeof userData.foto === 'string') {
+        if (userData.foto.startsWith('data:image')) {
+          return userData.foto;
+        } else {
+          return `data:image/jpeg;base64,${userData.foto}`;
+        }
+      } else {
+
+        const binary = Array.from(new Uint8Array(userData.foto))
+          .map(byte => String.fromCharCode(byte))
+          .join('');
+        return `data:image/jpeg;base64,${btoa(binary)}`;
+      }
+    } else {
+      
+      return 'https://via.placeholder.com/150';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Carregando...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger" role="alert">
+        {error}
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="alert alert-warning" role="alert">
+        Dados do usuário não disponíveis. Por favor, faça login novamente.
+      </div>
+    );
+  }
+
   return (
     <>
       <Card className="mb-4 shadow-sm p-4">
@@ -138,15 +371,13 @@ const DadosPessoais = () => {
         <div className="row mb-4">
           <div className="col-md-4 text-center">
             <div className="d-flex flex-column align-items-center">
-              {/* Aqui está o container da imagem com estilo corrigido */}
               <div className="profile-image-container mb-3">
                 <Image
-                  src={imagem || dadosUsuario.fotoPerfil}
+                  src={getProfileImageSrc()}
                   roundedCircle
                   className="profile-image"
                 />
               </div>
-              {/* Input de arquivo estilizado */}
               <div className="custom-file-input mb-3">
                 <input 
                   type="file" 
@@ -159,36 +390,44 @@ const DadosPessoais = () => {
                   Escolher Foto
                 </label>
               </div>
-              <Button className="custom-button-azul5">Salvar Foto</Button>
+              <Button 
+                className="custom-button-azul5" 
+                onClick={handleSalvarFoto}
+                disabled={!imagemFile || uploading}
+              >
+                {uploading ? 'Enviando...' : 'Salvar Foto'}
+              </Button>
             </div>
           </div>
           
           <div className="col-md-8">
             <div className="mb-3">
               <h6 className="label-azul">Nome completo</h6>
-              <p className="form-control border bg-light">{dadosUsuario.nome}</p>
+              <p className="form-control border bg-light">{userData.nome}</p>
             </div>
 
             <div className="mb-3">
               <h6 className="label-azul">CPF</h6>
-              <p className="form-control border bg-light">{dadosUsuario.cpf}</p>
+              <p className="form-control border bg-light">{userData.cpf}</p>
             </div>
 
             <div className="mb-3">
               <h6 className="label-azul">Data de nascimento</h6>
               <p className="form-control border bg-light">
-                {new Date(dadosUsuario.data_nascimento).toLocaleDateString('pt-BR')}
+                {userData.data_nascimento 
+                  ? new Date(userData.data_nascimento).toLocaleDateString('pt-BR')
+                  : 'Não informado'}
               </p>
             </div>
 
             <div className="mb-3">
               <h6 className="label-azul">Telefone</h6>
-              <p className="form-control border bg-light">{dadosUsuario.telefone}</p>
+              <p className="form-control border bg-light">{userData.telefone || 'Não informado'}</p>
             </div>
 
             <div className="mb-3">
               <h6 className="label-azul">Email</h6>
-              <p className="form-control border bg-light">{dadosUsuario.email}</p>
+              <p className="form-control border bg-light">{userData.email}</p>
             </div>
             
             <div className="mb-3">
@@ -199,6 +438,9 @@ const DadosPessoais = () => {
         </div>
         
         <div className="text-end">
+          <Button className="custom-button-azul5" onClick={handleLogout}>
+            Sair
+          </Button>
           <Button className="custom-button-azul5" onClick={handleAbrirModal}>
             Atualizar Dados
           </Button>
@@ -211,6 +453,18 @@ const DadosPessoais = () => {
           <Modal.Title className="text-white">Atualizar Dados</Modal.Title>
         </div>
         <Modal.Body className="py-4">
+          {updateSuccess && (
+            <Alert variant="success" className="mb-4">
+              {updateSuccess}
+            </Alert>
+          )}
+          
+          {updateError && (
+            <Alert variant="danger" className="mb-4">
+              {updateError}
+            </Alert>
+          )}
+          
           <Form>
             <Form.Group className="mb-4">
               <Form.Label className="label-azul fw-bold">O que você deseja atualizar?</Form.Label>

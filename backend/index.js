@@ -1,3 +1,4 @@
+//index.js
 import express from "express";
 import mysql from "mysql";
 import cors from "cors";
@@ -5,10 +6,15 @@ import multer from "multer";
 import path from "path";
 import bcrypt from "bcrypt";
 import fs from "fs";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_secure_jwt_key_change_this_in_production";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+dotenv.config();
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -165,6 +171,113 @@ app.post('/apoiador', upload.single('foto'), async (req, res) => {
     }
 });
 
+
+// Login endpoint
+app.post('/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+        
+        if (!email || !senha) {
+            return res.status(400).json({ error: "Email e senha são obrigatórios" });
+        }
+
+        // Query the database for the user with this email
+        const q = "SELECT * FROM Apoiador WHERE email = ?";
+        
+        db.query(q, [email], async (err, data) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ error: "Database error", message: err.message });
+            }
+            
+            // Check if user exists
+            if (data.length === 0) {
+                return res.status(401).json({ error: "Email ou senha inválidos" });
+            }
+            
+            const user = data[0];
+            
+            // Compare the provided password with the stored hash
+            const isPasswordValid = await bcrypt.compare(senha, user.senha);
+            
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: "Email ou senha inválidos" });
+            }
+            
+            // Create JWT token
+            const token = jwt.sign(
+                { 
+                    id: user.id, 
+                    email: user.email,
+                    nome: user.nome,
+                    role: 'apoiador' // You can add roles if needed
+                },
+                JWT_SECRET,
+                { expiresIn: '24h' } // Token expires in 24 hours
+            );
+            
+            // Return user info and token (don't include sensitive info like password)
+            return res.status(200).json({
+                message: "Login realizado com sucesso!",
+                user: {
+                    id: user.id,
+                    nome: user.nome,
+                    email: user.email
+                },
+                token
+            });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Server error", message: error.message });
+    }
+});
+
+// Middleware to verify JWT token
+export const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
+    }
+    
+    // Format should be: "Bearer TOKEN"
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ error: "Formato de token inválido" });
+    }
+    
+    try {
+        const verified = jwt.verify(token, JWT_SECRET);
+        req.user = verified;
+        next(); // Proceed to the next middleware/function
+    } catch (error) {
+        console.error("Token verification error:", error);
+        return res.status(401).json({ error: "Token inválido ou expirado" });
+    }
+};
+
+// Example of a protected route
+app.get('/apoiador/profile', verifyToken, (req, res) => {
+    // The verifyToken middleware will add the user object to the request
+    const userId = req.user.id;
+    
+    const q = "SELECT id, cpf, nome, data_nascimento, telefone, email, plano_nome, data_adesao, notificacoes FROM Apoiador WHERE id = ?";
+    
+    db.query(q, [userId], (err, data) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Database error", message: err.message });
+        }
+        
+        if (data.length === 0) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+        
+        return res.status(200).json(data[0]);
+    });
+});
+
 app.listen(8000, () => {
     console.log("🚀 Servidor rodando na porta 8000");
 });
@@ -175,4 +288,168 @@ process.on('SIGINT', () => {
         console.log('MySQL connection closed');
         process.exit(err ? 1 : 0);
     });
+});
+
+
+// Update password
+app.put('/apoiador/update-senha', verifyToken, async (req, res) => {
+    try {
+        const { senhaAtual, novaSenha } = req.body;
+        const userId = req.user.id;
+        
+        if (!senhaAtual || !novaSenha) {
+            return res.status(400).json({ error: "Senha atual e nova senha são obrigatórias" });
+        }
+        
+        // Get current user data with password
+        const q = "SELECT * FROM Apoiador WHERE id = ?";
+        db.query(q, [userId], async (err, data) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+            }
+            
+            if (data.length === 0) {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+            
+            const user = data[0];
+            
+            // Verify current password
+            const isPasswordValid = await bcrypt.compare(senhaAtual, user.senha);
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: "Senha atual incorreta" });
+            }
+            
+            // Hash new password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(novaSenha, salt);
+            
+            // Update password
+            const updateQuery = "UPDATE Apoiador SET senha = ? WHERE id = ?";
+            db.query(updateQuery, [hashedPassword, userId], (err, result) => {
+                if (err) {
+                    console.error("Error updating password:", err);
+                    return res.status(500).json({ error: "Erro ao atualizar senha", message: err.message });
+                }
+                
+                return res.status(200).json({ message: "Senha atualizada com sucesso" });
+            });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Erro no servidor", message: error.message });
+    }
+});
+
+// Update email
+app.put('/apoiador/update-email', verifyToken, (req, res) => {
+    try {
+        const { email } = req.body;
+        const userId = req.user.id;
+        
+        if (!email) {
+            return res.status(400).json({ error: "Email é obrigatório" });
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Email inválido" });
+        }
+        
+        // Update email
+        const q = "UPDATE Apoiador SET email = ? WHERE id = ?";
+        db.query(q, [email, userId], (err, result) => {
+            if (err) {
+                console.error("Error updating email:", err);
+                
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(409).json({ error: "Este email já está em uso" });
+                }
+                
+                return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+            }
+            
+            // Update token with new email
+            const token = jwt.sign(
+                { 
+                    id: userId, 
+                    email: email,
+                    nome: req.user.nome,
+                    role: 'apoiador'
+                },
+                JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+            
+            return res.status(200).json({ 
+                message: "Email atualizado com sucesso",
+                token
+            });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Erro no servidor", message: error.message });
+    }
+});
+
+// Update phone
+app.put('/apoiador/update-telefone', verifyToken, (req, res) => {
+    try {
+        const { telefone } = req.body;
+        const userId = req.user.id;
+        
+        if (!telefone) {
+            return res.status(400).json({ error: "Telefone é obrigatório" });
+        }
+        
+        // Clean telephone number - remove non-numeric characters except +
+        const cleanTelefone = telefone.replace(/[^\d+]/g, '');
+        
+        // Update phone
+        const q = "UPDATE Apoiador SET telefone = ? WHERE id = ?";
+        db.query(q, [cleanTelefone, userId], (err, result) => {
+            if (err) {
+                console.error("Error updating phone:", err);
+                return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+            }
+            
+            return res.status(200).json({ message: "Telefone atualizado com sucesso" });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Erro no servidor", message: error.message });
+    }
+});
+
+// Update profile photo
+app.put('/apoiador/update-foto', verifyToken, upload.single('foto'), (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        if (!req.file) {
+            return res.status(400).json({ error: "Nenhuma foto enviada" });
+        }
+        
+        // Read file as buffer
+        const foto = fs.readFileSync(req.file.path);
+        
+        // Remove temporary file
+        fs.unlinkSync(req.file.path);
+        
+        // Update photo in database
+        const q = "UPDATE Apoiador SET foto = ? WHERE id = ?";
+        db.query(q, [foto, userId], (err, result) => {
+            if (err) {
+                console.error("Error updating photo:", err);
+                return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+            }
+            
+            return res.status(200).json({ message: "Foto atualizada com sucesso" });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Erro no servidor", message: error.message });
+    }
 });

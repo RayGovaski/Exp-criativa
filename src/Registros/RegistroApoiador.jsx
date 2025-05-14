@@ -10,6 +10,8 @@ const RegistroApoiador = () => {
   const [senhaMatch, setSenhaMatch] = useState(true);
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [fileName, setFileName] = useState("Nenhum arquivo selecionado");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   
   const [apoiador, setApoiador] = useState({ 
     nome: "",
@@ -48,31 +50,55 @@ const RegistroApoiador = () => {
     setSenhaMatch(apoiador.senha === e.target.value);
   };
 
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Reset error state
+    setError(null);
+    
+    // Validate passwords match
     if (apoiador.senha !== confirmarSenha) {
       setSenhaMatch(false);
       return;
     }
     
+    // Form validation
+    if (!apoiador.nome || !apoiador.cpf || !apoiador.email || !apoiador.senha || !apoiador.data_nascimento) {
+      setError("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+    
+    // Create FormData object to send multipart form data (including file)
     const formData = new FormData();
     for (const key in apoiador) {
       formData.append(key, apoiador[key]);
     }
     
+    setIsLoading(true);
+    
     try {
-      await axios.post("http://localhost:8000/apoiador", formData, {
+      const response = await axios.post("http://localhost:8000/apoiador", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      navigate("/");
+      
+      // On successful registration, navigate to login
+      alert("Cadastro realizado com sucesso! Faça o login para continuar.");
+      navigate("/login");
     } catch (err) {
-      console.log(err);
+      console.error("Erro ao cadastrar:", err);
+      
+      // Handle known error responses
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
-  
   
   const FileInput = ({ name, label, onChange }) => {
     return (
@@ -114,7 +140,21 @@ const RegistroApoiador = () => {
           <h3 className="text-center-azul">Registro de Apoiador</h3>
           <div className="footer-line2-azul"></div>
         </div>
-        <form className="registro-form-azul p-3">
+        
+        {error && (
+          <div className="alert-error" style={{ 
+            color: 'white', 
+            backgroundColor: '#ff6b6b', 
+            padding: '10px', 
+            margin: '10px 15px 0', 
+            borderRadius: '5px',
+            textAlign: 'center'
+          }}>
+            {error}
+          </div>
+        )}
+        
+        <form className="registro-form-azul p-3" onSubmit={handleSubmit}>
           <div className="mb-2">
             <label className="label-azul">Nome completo:</label>
             <input 
@@ -230,10 +270,9 @@ const RegistroApoiador = () => {
             <button 
               type="submit" 
               className="custom-button-azul" 
-              onClick={handleClick}
-              disabled={!senhaMatch}
+              disabled={!senhaMatch || isLoading}
             >
-              Registrar
+              {isLoading ? 'Registrando...' : 'Registrar'}
             </button> 
           </div>
           

@@ -9,6 +9,7 @@ import DeletarConta from "./DeletarConta";
 import "./Perfil.css";
 import "./GerenciarAssinatura.css";
 
+
 const Perfil = () => {
   const [secaoAtiva, setSecaoAtiva] = useState("dados");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

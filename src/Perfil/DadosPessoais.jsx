@@ -46,31 +46,45 @@ const DadosPessoais = () => {
     }
   }, [token]);
 
+  // Function to handle image change
   const handleImagemChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Check file type
-      if (!file.type.match('image.*')) {
-        alert('Por favor, selecione apenas arquivos de imagem.');
-        return;
-      }
-      
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('O tamanho da imagem não pode exceder 5MB.');
-        return;
-      }
-      
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       setImagemFile(file);
-      setImagem(URL.createObjectURL(file));
+      
+      // Create a preview URL for the image
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagem(event.target.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
+  // Function to get the profile image source
+  const getProfileImageSrc = () => {
+    // If there's a temporary image being uploaded, show that first
+    if (imagem) {
+      return imagem;
+    }
+    
+    // If the user has an ID and there's a photo path or photo blob in userData
+    if (userData && userData.id) {
+      // Return the URL to fetch the image from the server
+      return `http://localhost:8000/apoiador/foto/${userData.id}?${new Date().getTime()}`; // Add timestamp to prevent caching
+    }
+    
+    // Default placeholder image if no image is available
+    return 'https://via.placeholder.com/150?text=Perfil';
+  };
+
+  // Function to handle form input changes
   const handleInputChange = (e) => {
-    setFormDados({
-      ...formDados,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormDados(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
   const handleAbrirModal = () => {
@@ -313,30 +327,6 @@ const DadosPessoais = () => {
     }
   };
 
-  // Function to determine the image source
-  const getProfileImageSrc = () => {
-    if (imagem) {
-      return imagem;
-    } else if (userData && userData.foto) {
-      if (typeof userData.foto === 'string') {
-        if (userData.foto.startsWith('data:image')) {
-          return userData.foto;
-        } else {
-          return `data:image/jpeg;base64,${userData.foto}`;
-        }
-      } else {
-
-        const binary = Array.from(new Uint8Array(userData.foto))
-          .map(byte => String.fromCharCode(byte))
-          .join('');
-        return `data:image/jpeg;base64,${btoa(binary)}`;
-      }
-    } else {
-      
-      return 'https://via.placeholder.com/150';
-    }
-  };
-
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
@@ -376,6 +366,11 @@ const DadosPessoais = () => {
                   src={getProfileImageSrc()}
                   roundedCircle
                   className="profile-image"
+                  alt="Foto de perfil"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150?text=Perfil';
+                  }}
                 />
               </div>
               <div className="custom-file-input mb-3">

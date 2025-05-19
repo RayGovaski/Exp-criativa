@@ -21,7 +21,8 @@ const RegistroApoiador = () => {
     data_nascimento: "",
     telefone: "",
     foto: null,
-    receberNotificacoes: false
+    receberNotificacoes: false,
+    plano_nome: "" // Adicionando campo plano_nome para compatibilidade com sua tabela
   });
 
   const handleChange = (e) => {
@@ -70,9 +71,18 @@ const RegistroApoiador = () => {
     
     // Create FormData object to send multipart form data (including file)
     const formData = new FormData();
-    for (const key in apoiador) {
-      formData.append(key, apoiador[key]);
-    }
+    
+    // Adicionar cada campo ao FormData
+    Object.keys(apoiador).forEach(key => {
+      // Se for o campo foto, adicione apenas se existir
+      if (key === 'foto') {
+        if (apoiador[key]) {
+          formData.append(key, apoiador[key]);
+        }
+      } else {
+        formData.append(key, apoiador[key]);
+      }
+    });
     
     setIsLoading(true);
     
@@ -154,7 +164,7 @@ const RegistroApoiador = () => {
           </div>
         )}
         
-        <form className="registro-form-azul p-3" onSubmit={handleSubmit}>
+        <form className="registro-form-azul p-3" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="mb-2">
             <label className="label-azul">Nome completo:</label>
             <input 

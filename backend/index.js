@@ -15,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 dotenv.config();
+app.use('/uploads', express.static('uploads')); 
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -105,7 +106,7 @@ app.get('/apoiadores', (req, res) => {
 app.post('/apoiador', upload.single('foto'), async (req, res) => {
     try {
         // Format data from request body
-        const { nome, cpf, email, senha, data_nascimento, telefone, receberNotificacoes } = req.body;
+        const { nome, cpf, email, senha, data_nascimento, telefone, receberNotificacoes, plano_nome } = req.body;
         
         // CPF validation - remove non-numeric characters
         const cleanCpf = cpf.replace(/\D/g, '');
@@ -123,12 +124,11 @@ app.post('/apoiador', upload.single('foto'), async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(senha, salt);
         
-        let foto = null;
+        // Gerenciar arquivo de foto
+        let fotoPath = null;
         if (req.file) {
-            // Read the file and convert to buffer
-            foto = fs.readFileSync(req.file.path);
-            // Remove the temporary file
-            fs.unlinkSync(req.file.path);
+            // Salvar o caminho do arquivo em vez do arquivo em si
+            fotoPath = req.file.path;
         }
         
         // Clean telephone number - remove non-numeric characters except +
@@ -137,15 +137,18 @@ app.post('/apoiador', upload.single('foto'), async (req, res) => {
         // Format date to MySQL format (YYYY-MM-DD)
         const formattedDate = new Date(data_nascimento).toISOString().split('T')[0];
         
-        // Insert into database
+        // Insert into database - adaptado para a estrutura existente da tabela
         const q = `
-            INSERT INTO Apoiador (cpf, nome, data_nascimento, telefone, email, senha, foto, notificacoes) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Apoiador (cpf, nome, data_nascimento, telefone, email, senha, foto_path, notificacoes, plano_nome) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
+        
+        // Preparar campos opcionais
+        const notificacoesValue = receberNotificacoes ? 1 : 0;
         
         db.query(
             q, 
-            [cleanCpf, nome, formattedDate, cleanTelefone, email, hashedPassword, foto, receberNotificacoes ? 1 : 0], 
+            [cleanCpf, nome, formattedDate, cleanTelefone, email, hashedPassword, fotoPath, notificacoesValue, plano_nome || null], 
             (err, data) => {
                 if (err) {
                     console.error("Error creating apoiador:", err);
@@ -172,6 +175,7 @@ app.post('/apoiador', upload.single('foto'), async (req, res) => {
 });
 
 
+
 // Login endpoint
 app.post('/login', async (req, res) => {
     try {
@@ -180,8 +184,6 @@ app.post('/login', async (req, res) => {
         if (!email || !senha) {
             return res.status(400).json({ error: "Email e senha são obrigatórios" });
         }
-
-        // Query the database for the user with this email
         const q = "SELECT * FROM Apoiador WHERE email = ?";
         
         db.query(q, [email], async (err, data) => {
@@ -189,34 +191,30 @@ app.post('/login', async (req, res) => {
                 console.error("Database error:", err);
                 return res.status(500).json({ error: "Database error", message: err.message });
             }
-            
-            // Check if user exists
+      
             if (data.length === 0) {
                 return res.status(401).json({ error: "Email ou senha inválidos" });
             }
             
             const user = data[0];
             
-            // Compare the provided password with the stored hash
             const isPasswordValid = await bcrypt.compare(senha, user.senha);
             
             if (!isPasswordValid) {
                 return res.status(401).json({ error: "Email ou senha inválidos" });
             }
             
-            // Create JWT token
             const token = jwt.sign(
                 { 
                     id: user.id, 
                     email: user.email,
                     nome: user.nome,
-                    role: 'apoiador' // You can add roles if needed
+                    role: 'apoiador' 
                 },
                 JWT_SECRET,
-                { expiresIn: '24h' } // Token expires in 24 hours
+                { expiresIn: '24h' } 
             );
             
-            // Return user info and token (don't include sensitive info like password)
             return res.status(200).json({
                 message: "Login realizado com sucesso!",
                 user: {
@@ -241,7 +239,6 @@ export const verifyToken = (req, res, next) => {
         return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
     }
     
-    // Format should be: "Bearer TOKEN"
     const token = authHeader.split(' ')[1];
     if (!token) {
         return res.status(401).json({ error: "Formato de token inválido" });
@@ -250,7 +247,7 @@ export const verifyToken = (req, res, next) => {
     try {
         const verified = jwt.verify(token, JWT_SECRET);
         req.user = verified;
-        next(); // Proceed to the next middleware/function
+        next(); 
     } catch (error) {
         console.error("Token verification error:", error);
         return res.status(401).json({ error: "Token inválido ou expirado" });
@@ -452,4 +449,41 @@ app.put('/apoiador/update-foto', verifyToken, upload.single('foto'), (req, res) 
         console.error("Server error:", error);
         return res.status(500).json({ error: "Erro no servidor", message: error.message });
     }
+});
+
+// Rota para obter a imagem do apoiador
+app.get('/apoiador/foto/:id', (req, res) => {
+    const id = req.params.id;
+    
+    db.query('SELECT foto_path, foto FROM Apoiador WHERE id = ?', [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: "Erro ao buscar a foto" });
+        }
+        
+        if (result.length === 0) {
+            return res.status(404).json({ error: "Apoiador não encontrado" });
+        }
+        
+        // Verificar primeiro se existe um caminho para a foto
+        if (result[0].foto_path) {
+            const fotoPath = result[0].foto_path;
+            
+            // Verificar se o arquivo existe
+            if (fs.existsSync(fotoPath)) {
+                return res.sendFile(path.resolve(fotoPath));
+            }
+        }
+        
+        // Se não houver caminho ou o arquivo não existir, tentar usar o BLOB
+        if (result[0].foto) {
+            res.writeHead(200, {
+                'Content-Type': 'image/jpeg', // ou determine o tipo de imagem dinamicamente
+                'Content-Length': result[0].foto.length
+            });
+            return res.end(result[0].foto);
+        }
+        
+        // Se nem caminho nem BLOB estiverem disponíveis
+        return res.status(404).json({ error: "Imagem não encontrada" });
+    });
 });

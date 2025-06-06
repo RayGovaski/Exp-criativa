@@ -120,6 +120,7 @@ CREATE TABLE Apoiador (
     data_adesao DATE,
     foto LONGBLOB,
     notificacoes BOOLEAN DEFAULT 1,
+    foto_path VARCHAR(255) NULL,
     FOREIGN KEY (plano_nome) REFERENCES Plano(nome)
 );
 

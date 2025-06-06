@@ -43,7 +43,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, senha) => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8000/login', { email, senha });
+      // 🔧 FIXED: Changed from /login to /auth/login
+      const response = await axios.post('http://localhost:8000/auth/login', { email, senha });
       
       const { token, user } = response.data;
       

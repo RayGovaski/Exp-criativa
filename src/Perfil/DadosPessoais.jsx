@@ -65,18 +65,18 @@ const DadosPessoais = () => {
   const getProfileImageSrc = () => {
     // If there's a temporary image being uploaded, show that first
     if (imagem) {
-      return imagem;
+        return imagem;
     }
     
-    // If the user has an ID and there's a photo path or photo blob in userData
+    // If the user has an ID, try to fetch from server
     if (userData && userData.id) {
-      // Return the URL to fetch the image from the server
-      return `http://localhost:8000/apoiador/foto/${userData.id}?${new Date().getTime()}`; // Add timestamp to prevent caching
+        // Add timestamp to prevent caching issues
+        return `http://localhost:8000/apoiador/foto/${userData.id}?t=${new Date().getTime()}`;
     }
     
     // Default placeholder image if no image is available
     return 'https://via.placeholder.com/150?text=Perfil';
-  };
+};
 
   // Function to handle form input changes
   const handleInputChange = (e) => {
@@ -105,54 +105,85 @@ const DadosPessoais = () => {
     setShowModal(false);
   };
 
-  const handleSalvarFoto = async () => {
-    if (!imagemFile) return;
+  
+const handleSalvarFoto = async () => {
+    if (!imagemFile) {
+        alert('Por favor, selecione uma foto primeiro.');
+        return;
+    }
     
     try {
-      setUploading(true);
-      const formData = new FormData();
-      formData.append('foto', imagemFile);
-      
-      // Fix the endpoint URL to match the backend API
-      const response = await axios.put(
-        'http://localhost:8000/apoiador/update-foto',
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
+        setUploading(true);
+        console.log('Uploading file:', imagemFile); // Debug log
+        
+        const formData = new FormData();
+        formData.append('foto', imagemFile);
+        
+        // Log formData contents for debugging
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
         }
-      );
-      
-      if (response.status === 200) {
-        // Refresh user data after successful upload
-        const userResponse = await axios.get('http://localhost:8000/apoiador/profile', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
         
-        setUserData(userResponse.data);
+        const response = await axios.put(
+            'http://localhost:8000/apoiador/update-foto',
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
         
-        // Clear the temporary file
-        setImagem(null);
-        setImagemFile(null);
+        console.log('Upload response:', response.data); // Debug log
         
-        // Show success message
-        alert('Foto atualizada com sucesso!');
-      }
+        if (response.status === 200) {
+            // Clear the temporary preview
+            setImagem(null);
+            setImagemFile(null);
+            
+            // Force refresh the profile image by updating the timestamp
+            const imageElement = document.querySelector('.profile-image');
+            if (imageElement) {
+                const currentSrc = imageElement.src;
+                const newSrc = currentSrc.split('?')[0] + '?' + new Date().getTime();
+                imageElement.src = newSrc;
+            }
+            
+            // Optionally refresh user data
+            try {
+                const userResponse = await axios.get('http://localhost:8000/apoiador/profile', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUserData(userResponse.data);
+            } catch (refreshError) {
+                console.warn('Could not refresh user data:', refreshError);
+            }
+            
+            alert('Foto atualizada com sucesso!');
+        }
     } catch (error) {
-      console.error("Error updating profile photo:", error);
-      let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
-      
-      if (error.response && error.response.data && error.response.data.error) {
-        errorMessage = error.response.data.error;
-      }
-      
-      alert(errorMessage);
+        console.error("Error updating profile photo:", error);
+        
+        let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
+        
+        if (error.response) {
+            console.log('Error response:', error.response.data);
+            if (error.response.data && error.response.data.error) {
+                errorMessage = error.response.data.error;
+            }
+        } else if (error.request) {
+            console.log('Error request:', error.request);
+            errorMessage = "Erro de conexão. Verifique sua internet.";
+        } else {
+            console.log('Error message:', error.message);
+        }
+        
+        alert(errorMessage);
     } finally {
-      setUploading(false);
+        setUploading(false);
     }
-  };
+};
 
   const handleSubmitAtualizacao = async () => {
     setUpdateSuccess("");

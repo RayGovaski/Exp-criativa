@@ -222,21 +222,73 @@ export const updatePhoto = (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: "Nenhuma foto enviada" });
         }
+
+        console.log('File received:', req.file); // Debug log
+        console.log('User ID:', userId); // Debug log
+
+        // Get current user data to delete old photo if exists
+        const getCurrentPhotoQuery = "SELECT foto_path FROM Apoiador WHERE id = ?";
         
-        const foto = fs.readFileSync(req.file.path);
-        fs.unlinkSync(req.file.path);
-        
-        const q = "UPDATE Apoiador SET foto = ? WHERE id = ?";
-        db.query(q, [foto, userId], (err, result) => {
+        db.query(getCurrentPhotoQuery, [userId], (err, currentData) => {
             if (err) {
-                console.error("Error updating photo:", err);
+                console.error("Error getting current photo:", err);
+                // Clean up uploaded file
+                if (fs.existsSync(req.file.path)) {
+                    fs.unlinkSync(req.file.path);
+                }
                 return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
             }
+
+            // Delete old photo file if it exists
+            if (currentData.length > 0 && currentData[0].foto_path) {
+                const oldPhotoPath = currentData[0].foto_path;
+                if (fs.existsSync(oldPhotoPath)) {
+                    try {
+                        fs.unlinkSync(oldPhotoPath);
+                        console.log('Old photo deleted:', oldPhotoPath);
+                    } catch (deleteErr) {
+                        console.warn("Could not delete old photo file:", deleteErr);
+                    }
+                }
+            }
+
+            // Update database with new photo path (store relative path)
+            const relativePath = req.file.path.replace(/\\/g, '/'); // Normalize path separators
+            const updateQuery = "UPDATE Apoiador SET foto_path = ? WHERE id = ?";
             
-            return res.status(200).json({ message: "Foto atualizada com sucesso" });
+            db.query(updateQuery, [relativePath, userId], (err, result) => {
+                if (err) {
+                    console.error("Error updating photo in database:", err);
+                    // Clean up uploaded file on error
+                    if (fs.existsSync(req.file.path)) {
+                        fs.unlinkSync(req.file.path);
+                    }
+                    return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+                }
+                
+                if (result.affectedRows === 0) {
+                    // Clean up uploaded file if no rows were affected
+                    if (fs.existsSync(req.file.path)) {
+                        fs.unlinkSync(req.file.path);
+                    }
+                    return res.status(404).json({ error: "Usuário não encontrado" });
+                }
+                
+                console.log('Photo updated successfully for user:', userId);
+                console.log('New photo path:', relativePath);
+                
+                return res.status(200).json({ 
+                    message: "Foto atualizada com sucesso",
+                    photoPath: relativePath 
+                });
+            });
         });
     } catch (error) {
-        console.error("Server error:", error);
+        console.error("Server error in updatePhoto:", error);
+        // Clean up uploaded file on error
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         return res.status(500).json({ error: "Erro no servidor", message: error.message });
     }
 };
@@ -246,6 +298,7 @@ export const getPhoto = (req, res) => {
     
     db.query('SELECT foto_path, foto FROM Apoiador WHERE id = ?', [id], (err, result) => {
         if (err) {
+            console.error("Error fetching photo:", err);
             return res.status(500).json({ error: "Erro ao buscar a foto" });
         }
         
@@ -253,18 +306,30 @@ export const getPhoto = (req, res) => {
             return res.status(404).json({ error: "Apoiador não encontrado" });
         }
         
-        if (result[0].foto_path && fs.existsSync(result[0].foto_path)) {
-            return res.sendFile(path.resolve(result[0].foto_path));
+        const apoiador = result[0];
+        
+        // First try to serve from file path
+        if (apoiador.foto_path) {
+            const fullPath = path.resolve(apoiador.foto_path);
+            console.log('Trying to serve photo from:', fullPath);
+            
+            if (fs.existsSync(fullPath)) {
+                return res.sendFile(fullPath);
+            } else {
+                console.warn('Photo file not found at path:', fullPath);
+            }
         }
         
-        if (result[0].foto) {
+        // Fallback to blob data if file path doesn't work
+        if (apoiador.foto) {
             res.writeHead(200, {
                 'Content-Type': 'image/jpeg',
-                'Content-Length': result[0].foto.length
+                'Content-Length': apoiador.foto.length
             });
-            return res.end(result[0].foto);
+            return res.end(apoiador.foto);
         }
         
+        // No photo found
         return res.status(404).json({ error: "Imagem não encontrada" });
     });
 };

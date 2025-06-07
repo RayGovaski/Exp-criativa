@@ -8,12 +8,45 @@ const DeletarConta = () => {
   const [motivo, setMotivo] = useState('');
   const [senha, setSenha] = useState('');
 
-  const handleDeletarConta = () => {
-    console.log("Conta deletada com motivo:", motivo);
-    setShowModal(false);
-    // Aqui você adicionaria a lógica para realmente deletar a conta
-    // e redirecionar para a página inicial/logout
-  };
+  const handleDeletarConta = async () => {
+    try {
+        const token = localStorage.getItem('token'); // or however you store your auth token
+        
+        const response = await fetch('http://localhost:8000/apoiador/delete-account', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                senha: senha,
+                motivo: motivo
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Account deleted successfully
+            alert('Conta deletada com sucesso!');
+            
+            // Clear local storage and redirect to login/home
+            localStorage.removeItem('token');
+            localStorage.clear(); // Clear all stored data
+            
+            // Redirect to home page or login
+            window.location.href = '/'; // or use your router navigation
+        } else {
+            // Handle error
+            alert(data.error || 'Erro ao deletar conta');
+        }
+    } catch (error) {
+        console.error('Erro ao deletar conta:', error);
+        alert('Erro de conexão. Tente novamente.');
+    } finally {
+        setShowModal(false);
+    }
+};
 
   return (
     <>

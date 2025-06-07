@@ -333,3 +333,70 @@ export const getPhoto = (req, res) => {
         return res.status(404).json({ error: "Imagem não encontrada" });
     });
 };
+
+export const deleteAccount = async (req, res) => {
+    try {
+        const { senha, motivo } = req.body;
+        const userId = req.user.id;
+        
+        if (!senha || !motivo) {
+            return res.status(400).json({ error: "Senha e motivo são obrigatórios" });
+        }
+        
+        // First, verify the user exists and get their data
+        const getUserQuery = "SELECT * FROM Apoiador WHERE id = ?";
+        db.query(getUserQuery, [userId], async (err, userData) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ error: "Erro no banco de dados", message: err.message });
+            }
+            
+            if (userData.length === 0) {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+            
+            const user = userData[0];
+            
+            // Verify password
+            const isPasswordValid = await bcrypt.compare(senha, user.senha);
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: "Senha incorreta" });
+            }
+            
+            // Delete user's photo file if it exists
+            if (user.foto_path && fs.existsSync(user.foto_path)) {
+                try {
+                    fs.unlinkSync(user.foto_path);
+                    console.log('User photo deleted:', user.foto_path);
+                } catch (deleteErr) {
+                    console.warn("Could not delete user photo file:", deleteErr);
+                }
+            }
+            
+            // Log the deletion reason (optional - you might want to store this in a separate table)
+            console.log(`Account deletion requested by user ${userId} with reason: ${motivo}`);
+            
+            // Delete the user account
+            const deleteQuery = "DELETE FROM Apoiador WHERE id = ?";
+            db.query(deleteQuery, [userId], (err, result) => {
+                if (err) {
+                    console.error("Error deleting account:", err);
+                    return res.status(500).json({ error: "Erro ao deletar conta", message: err.message });
+                }
+                
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ error: "Usuário não encontrado" });
+                }
+                
+                console.log(`Account successfully deleted for user ${userId}`);
+                return res.status(200).json({ 
+                    message: "Conta deletada com sucesso",
+                    deleted: true 
+                });
+            });
+        });
+    } catch (error) {
+        console.error("Server error:", error);
+        return res.status(500).json({ error: "Erro no servidor", message: error.message });
+    }
+};

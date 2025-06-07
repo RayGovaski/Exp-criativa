@@ -2,6 +2,7 @@
 import express from 'express';
 import upload from '../config/multer.js';
 import { verifyToken } from '../middleware/auth.js';
+import { deleteAccount } from '../controllers/apoiadorController.js';
 import {
     getAllApoiadores,
     createApoiador,
@@ -26,5 +27,6 @@ router.put('/update-senha', verifyToken, updatePassword);
 router.put('/update-email', verifyToken, updateEmail);
 router.put('/update-telefone', verifyToken, updatePhone);
 router.put('/update-foto', verifyToken, upload.single('foto'), updatePhoto);
+router.delete('/delete-account', verifyToken, deleteAccount);
 
 export default router;

@@ -12,8 +12,4 @@ O projeto Cores do Amanhã é um sistema de doações desenvolvido para uma ONG 
 <h2> ⚙️ Instruções de Instalação</h2>
 
 - npm install
-- npm install bootstrap
-- npm install react-bootstrap bootstrap
-- npm install react-router-dom@6
-- npm install react-router-hash-link
-- npm install recharts
+- npm run dev

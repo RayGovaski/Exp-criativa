@@ -13,6 +13,9 @@ import MenuRegistro from "./pages/menu-registro/MenuRegistro.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
 import Perfil from "./pages/Perfil/Perfil";
+import PaginaDoacoes from "./pages/Pagina-Doacoes/PaginaDoacoes.jsx";
+import AssinaturaPagamento from "./pages/compra-assinatura/assinaturapagamento.jsx";
+import DoacoesPagamento from "./pages/compra-assinatura/DoacoesPagamento.jsx";
 
 import "./App.css";
 
@@ -28,7 +31,9 @@ const App = () => {
           <Route path="/registro-apoiador" element={<RegistroApoiador />} />
           <Route path="/registro-aluno" element={<RegistroAluno />} />
           <Route path="/menu-registro" element={<MenuRegistro />} />
-
+          <Route path="/doar" element={<PaginaDoacoes />} /> 
+           <Route path="/assinaturas" element={<AssinaturaPagamento />} /> 
+            <Route path="/doarr" element={<DoacoesPagamento />} />
            {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/perfil" element={<Perfil />} />

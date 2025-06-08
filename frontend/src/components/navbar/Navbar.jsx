@@ -132,6 +132,7 @@ const Navbar = () => {
                 <Link to="/assinaturas" className="sidebar-dropdown-item" onClick={closeSidebar}>
                   Assinaturas
                 </Link>
+                {/* O LINK PARA A PÁGINA DE DOAÇÕES NO SIDEBAR */}
                 <Link to="/doar" className="sidebar-dropdown-item" onClick={closeSidebar}>
                   Doar para causa
                 </Link>
@@ -221,6 +222,7 @@ const Navbar = () => {
                     >
                       Assinaturas
                     </Link>
+                    {/* O LINK PARA A PÁGINA DE DOAÇÕES NO MENU PRINCIPAL */}
                     <Link 
                       to="/doar" 
                       className="dropdown-item-custom" 
@@ -275,6 +277,12 @@ const Navbar = () => {
                       >
                         Meu Perfil
                       </Link>
+                      <button 
+                        className="dropdown-item-custom logout-button" // Adicione uma classe para estilização, se necessário
+                        onClick={() => { closeAllDropdowns(); handleLogoutClick(); }}
+                      >
+                        Sair
+                      </button>
                     </>
                   )}
                 </div>

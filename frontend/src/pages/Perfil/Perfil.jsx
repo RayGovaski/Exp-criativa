@@ -1,11 +1,11 @@
 // Perfil.jsx
 import React, { useState } from "react";
-import SidebarPerfil from "../../components/comp-perfil-aluno/sidebar-perfil-aluno/SidebarPerfil";
-import DadosPessoais from "../../components/comp-perfil-aluno/dados-pessoais/DadosPessoais";
-import RelatoriosPerfil from "../../components/comp-perfil-aluno/relatorio-perfil/RelatoriosPerfil";
-import ComprovantesPerfil from "../../components/comp-perfil-aluno/comprovantePerfil/ComprovantesPerfil";
-import GerenciarAssinatura from "../../components/comp-perfil-aluno/gerenciar-assinatura/GerenciarAssinatura";
-import DeletarConta from "../../components/comp-perfil-aluno/deletar-perfil/DeletarConta";
+import SidebarPerfil from "../../components/comp-perfil-apoiador/sidebar-perfil-apoiador/SidebarPerfil";
+import DadosPessoais from "../../components/comp-perfil-apoiador/dados-pessoais/DadosPessoais";
+import RelatoriosPerfil from "../../components/comp-perfil-apoiador/relatorio-perfil/RelatoriosPerfil";
+import ComprovantesPerfil from "../../components/comp-perfil-apoiador/comprovantePerfil/ComprovantesPerfil";
+import GerenciarAssinatura from "../../components/comp-perfil-apoiador/gerenciar-assinatura/GerenciarAssinatura";
+import DeletarConta from "../../components/comp-perfil-apoiador/deletar-perfil/DeletarConta";
 import "./Perfil.css";
 
 const Perfil = () => {

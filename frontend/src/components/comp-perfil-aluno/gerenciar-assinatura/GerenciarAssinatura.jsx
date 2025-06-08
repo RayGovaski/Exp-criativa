@@ -82,49 +82,9 @@ const GerenciarAssinatura = () => {
             )}
           </div>
         </div>
-        
-        <h5 className="label-azul mb-3">Informações de Pagamento</h5>
-        
-        <div className="bg-light p-3 rounded mb-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <div className="d-flex align-items-center mb-2">
-                <FaCreditCard className="me-2 text-secondary" />
-                <span>Cartão de crédito com final 4567</span>
-              </div>
-              <p className="text-muted mb-0">Expira em 12/26</p>
-            </div>
-            <div>
-              <Button 
-                variant="outline-secondary" 
-                size="sm"
-                className="me-2"
-                onClick={() => setShowModalCartao(true)}
-              >
-                <small>Atualizar</small>
-              </Button>
-              <Button 
-                variant="outline-danger" 
-                size="sm"
-                className="custom-button-outline-vermelho"
-              >
-                <FaTrash />
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="text-end">
-          <Button 
-            className="custom-button-azul"
-            onClick={() => setShowModalCartao(true)}
-          >
-            Adicionar Novo Cartão
-          </Button>
-        </div>
       </Card>
 
-      {/* Modal para atualizar cartão */}
+      {/* Modal para atualizar cartão nao usar esse */}
       <Modal show={showModalCartao} onHide={() => setShowModalCartao(false)} centered>
         <div className="registro-header-azul">
           <Modal.Title className="text-white">Dados do Cartão</Modal.Title>

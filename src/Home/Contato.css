@@ -197,6 +197,6 @@
 }
 
 .form-control:focus {
-  border-color: #0A7D7E; /* ou a cor que você quiser */
-  box-shadow: 0 0 0 0.2rem rgba(10, 125, 126, 0.25); /* sombra ao redor */
+  border-color: #0A7D7E; 
+  box-shadow: 0 0 0 0.2rem rgba(10, 125, 126, 0.25);
 }

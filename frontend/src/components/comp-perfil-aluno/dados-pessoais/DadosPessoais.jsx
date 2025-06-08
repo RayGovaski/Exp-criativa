@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Image, Button, Modal, Form, Alert } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import axios from 'axios';
 import './DadosPessoais.css';
 
 const DadosPessoais = () => {
+  // eslint-disable-next-line no-unused-vars
   const { user, token, updateAuthData, logout } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -210,7 +211,7 @@ const handleSalvarFoto = async () => {
           };
           break;
         case "email":
-          if (!formDados.novoEmail) {
+          { if (!formDados.novoEmail) {
             setUpdateError("Email não pode estar vazio.");
             return;
           }
@@ -221,7 +222,7 @@ const handleSalvarFoto = async () => {
           }
           endpoint = 'http://localhost:8000/apoiador/update-email';
           data = { email: formDados.novoEmail };
-          break;
+          break; }
         case "telefone":
           if (!formDados.novoTelefone) {
             setUpdateError("Telefone não pode estar vazio.");

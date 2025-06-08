@@ -95,3 +95,57 @@
     font-size: 12px;
   }
 }
+
+/* Estilos para o status de assinatura ativa */
+.bg-assinatura-ativa {
+  background-color: #0A7D7E !important;
+}
+
+/* Estilos para botões vermelhos */
+.custom-button-vermelho {
+  background-color: #F27375;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: white;
+}
+
+.custom-button-vermelho:hover {
+  background-color: #F7AAAA;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-vermelho:disabled {
+  background-color: #F7AAAA;
+  transform: none;
+  opacity: 0.7;
+}
+
+/* Estilos para botões outline vermelhos */
+.custom-button-outline-vermelho {
+  color: #F27375 !important;
+  border-color: #F27375 !important;
+  background-color: transparent;
+}
+
+.custom-button-outline-vermelho:hover {
+  background-color: #fff0f0 !important;
+  color: #F27375 !important;
+  border-color: #F27375 !important;
+}
+
+/* Estilos para o cabeçalho vermelho do modal */
+.registro-header-vermelho {
+  background-color: #F27375;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
+b, strong{
+  font-weight:600
+}

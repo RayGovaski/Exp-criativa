@@ -1,14 +1,12 @@
 // Perfil.jsx
 import React, { useState } from "react";
-import SidebarPerfil from "./SidebarPerfil";
-import DadosPessoais from "./DadosPessoais";
-import RelatoriosPerfil from "./RelatoriosPerfil";
-import ComprovantesPerfil from "./ComprovantesPerfil";
-import GerenciarAssinatura from "./GerenciarAssinatura";
-import DeletarConta from "./DeletarConta";
+import SidebarPerfil from "../../components/comp-perfil-aluno/sidebar-perfil-aluno/SidebarPerfil";
+import DadosPessoais from "../../components/comp-perfil-aluno/dados-pessoais/DadosPessoais";
+import RelatoriosPerfil from "../../components/comp-perfil-aluno/relatorio-perfil/RelatoriosPerfil";
+import ComprovantesPerfil from "../../components/comp-perfil-aluno/comprovantePerfil/ComprovantesPerfil";
+import GerenciarAssinatura from "../../components/comp-perfil-aluno/gerenciar-assinatura/GerenciarAssinatura";
+import DeletarConta from "../../components/comp-perfil-aluno/deletar-perfil/DeletarConta";
 import "./Perfil.css";
-import "./GerenciarAssinatura.css";
-
 
 const Perfil = () => {
   const [secaoAtiva, setSecaoAtiva] = useState("dados");

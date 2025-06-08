@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom"; // Importar useNavigate para redirecionamento
-import { useAuth } from './context/AuthContext'; // Importar useAuth
+import { useAuth } from '../../context/AuthContext'; // Importar useAuth
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";

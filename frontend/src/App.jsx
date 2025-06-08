@@ -1,18 +1,18 @@
 //App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "./Navbar.jsx";
+import Navbar from "./components/navbar/Navbar.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Footer from "./Footer.jsx";
+import Footer from "./components/footer/Footer.jsx";
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import RegistroApoiador from "./Registros/RegistroApoiador.jsx";
-import RegistroAluno from "./Registros/RegistroAluno.jsx";
-import MenuRegistro from "./MenuRegistro.jsx";
-import Home from "./Home";
-import Login from "./Login/Login";
-import Perfil from "./Perfil/Perfil";
+import RegistroApoiador from "./pages/Registros/RegistroApoiador.jsx";
+import RegistroAluno from "./pages/Registros/RegistroAluno.jsx";
+import MenuRegistro from "./pages/menu-registro/MenuRegistro.jsx";
+import Home from "./pages/Home/Home.jsx";
+import Login from "./pages/Login/Login.jsx";
+import Perfil from "./pages/Perfil/Perfil";
 
 import "./App.css";
 

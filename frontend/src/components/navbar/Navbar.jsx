@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate para redirecionamento
-import { useAuth } from '../../context/AuthContext'; // Importar useAuth
+import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext'; 
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth(); // Usar o hook useAuth para obter o status de autenticação e a função logout
+  const { isAuthenticated, logout } = useAuth(); 
   const navigate = useNavigate(); // Hook para navegação
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -277,12 +277,6 @@ const Navbar = () => {
                       >
                         Meu Perfil
                       </Link>
-                      <button 
-                        className="dropdown-item-custom logout-button" // Adicione uma classe para estilização, se necessário
-                        onClick={() => { closeAllDropdowns(); handleLogoutClick(); }}
-                      >
-                        Sair
-                      </button>
                     </>
                   )}
                 </div>

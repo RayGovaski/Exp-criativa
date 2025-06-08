@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate para redirecionamento
+import { useAuth } from './context/AuthContext'; // Importar useAuth
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const Navbar = () => {
+  const { isAuthenticated, logout } = useAuth(); // Usar o hook useAuth para obter o status de autenticação e a função logout
+  const navigate = useNavigate(); // Hook para navegação
+
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showDoarDropdown, setShowDoarDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -54,6 +59,7 @@ const Navbar = () => {
     };
     
     // Listen for route changes (this is a simplified approach)
+    // For react-router-dom v6+, consider using useLocation for more robust route change detection
     window.addEventListener('hashchange', closeDropdowns);
     
     return () => {
@@ -85,6 +91,12 @@ const Navbar = () => {
   const closeAllDropdowns = () => {
     setShowProfileDropdown(false);
     setShowDoarDropdown(false);
+  };
+
+  const handleLogoutClick = () => {
+    closeAllDropdowns(); // Fecha os dropdowns antes de deslogar
+    logout(); // Chama a função logout do AuthContext
+    navigate('/'); // Redireciona para a home ou página de login após o logout (o logout já deve fazer isso, mas é uma segurança)
   };
 
   return (
@@ -131,6 +143,37 @@ const Navbar = () => {
               Contato
             </Link>
           </li>
+          {/* Botões do sidebar baseados no status de autenticação */}
+          {!isAuthenticated() ? (
+            <>
+              <li className="sidebar-item">
+                <Link to="/login" className="sidebar-link" onClick={closeSidebar}>
+                  Login
+                </Link>
+              </li>
+              <li className="sidebar-item">
+                <Link to="/menu-registro" className="sidebar-link" onClick={closeSidebar}>
+                  Registro
+                </Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="sidebar-item">
+                <Link to="/perfil" className="sidebar-link" onClick={closeSidebar}>
+                  Meu Perfil
+                </Link>
+              </li>
+              <li className="sidebar-item">
+                <button 
+                  className="sidebar-link logout-button" // Adicione uma classe para estilização, se necessário
+                  onClick={() => { closeSidebar(); handleLogoutClick(); }}
+                >
+                  Sair
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
 
@@ -189,7 +232,7 @@ const Navbar = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/perfil">
+                <Link className="nav-link nav-item-custom4" to="/perfil"> {/* Contato -> Perfil? Verifique a rota correta */}
                   Contato
                 </Link>
               </li>
@@ -206,20 +249,34 @@ const Navbar = () => {
               />
               {showProfileDropdown && (
                 <div className="profile-dropdown-menu show">
-                  <Link 
-                    to="/login" 
-                    className="dropdown-item-custom" 
-                    onClick={closeAllDropdowns}
-                  >
-                    Login
-                  </Link>
-                  <Link 
-                    to="/menu-registro" 
-                    className="dropdown-item-custom" 
-                    onClick={closeAllDropdowns}
-                  >
-                    Registro
-                  </Link>
+                  {!isAuthenticated() ? ( // Renderização condicional para os botões do perfil
+                    <>
+                      <Link 
+                        to="/login" 
+                        className="dropdown-item-custom" 
+                        onClick={closeAllDropdowns}
+                      >
+                        Login
+                      </Link>
+                      <Link 
+                        to="/menu-registro" 
+                        className="dropdown-item-custom" 
+                        onClick={closeAllDropdowns}
+                      >
+                        Registro
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link 
+                        to="/perfil" // Rota para a página de perfil do usuário
+                        className="dropdown-item-custom" 
+                        onClick={closeAllDropdowns}
+                      >
+                        Meu Perfil
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
             </div>

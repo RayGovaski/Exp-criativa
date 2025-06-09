@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import "./RegistroApoiador.css";
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Importa a função toast
 
 const RegistroApoiador = () => {
   const navigate = useNavigate();
@@ -11,9 +12,10 @@ const RegistroApoiador = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [fileName, setFileName] = useState("Nenhum arquivo selecionado");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  const [apoiador, setApoiador] = useState({ 
+  // Removido o estado 'error' local que era exibido como div, agora usaremos toast.error
+  // const [error, setError] = useState(null);
+
+  const [apoiador, setApoiador] = useState({
     nome: "",
     cpf: "",
     email: "",
@@ -22,11 +24,13 @@ const RegistroApoiador = () => {
     telefone: "",
     foto: null,
     receberNotificacoes: false
+    // Se 'plano_nome' foi adicionado anteriormente, adicione-o aqui novamente se necessário
+    // plano_nome: ""
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    
+
     if (type === 'checkbox') {
       setApoiador({...apoiador, [name]: checked});
     } else if (type === 'file') {
@@ -39,12 +43,16 @@ const RegistroApoiador = () => {
           setPreviewImage(e.target.result);
         };
         reader.readAsDataURL(files[0]);
+      } else { // Se o arquivo for desmarcado ou não selecionado
+        setApoiador({...apoiador, [name]: null});
+        setFileName("Nenhum arquivo selecionado");
+        setPreviewImage(null);
       }
     } else {
       setApoiador({...apoiador, [name]: value});
     }
   };
-  
+
   const handleConfirmarSenhaChange = (e) => {
     setConfirmarSenha(e.target.value);
     setSenhaMatch(apoiador.senha === e.target.value);
@@ -52,25 +60,31 @@ const RegistroApoiador = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Reset error state
-    setError(null);
-    
-    // Validate passwords match
+
+    // Reset error state (já não é necessário com toast)
+    // setError(null);
+
+    // Validação de senhas
     if (apoiador.senha !== confirmarSenha) {
       setSenhaMatch(false);
+      toast.error("As senhas não coincidem!"); // Substituído setError
       return;
     }
-    
-    // Form validation
-    if (!apoiador.nome || !apoiador.cpf || !apoiador.email || !apoiador.senha || !apoiador.data_nascimento) {
-      setError("Por favor, preencha todos os campos obrigatórios.");
+    // Validação de senha mínima (adicionado novamente, se foi perdido)
+    if (apoiador.senha.length < 6) {
+      toast.error("A senha deve ter no mínimo 6 caracteres.");
       return;
     }
-    
+
+    // Validação de campos obrigatórios
+    if (!apoiador.nome || !apoiador.cpf || !apoiador.email || !apoiador.senha || !apoiador.data_nascimento || !apoiador.telefone) {
+      toast.error("Por favor, preencha todos os campos obrigatórios."); // Substituído setError
+      return;
+    }
+
     // Create FormData object to send multipart form data (including file)
     const formData = new FormData();
-    
+
     // Adicionar cada campo ao FormData
     Object.keys(apoiador).forEach(key => {
       // Se for o campo foto, adicione apenas se existir
@@ -78,49 +92,49 @@ const RegistroApoiador = () => {
         if (apoiador[key]) {
           formData.append(key, apoiador[key]);
         }
-      } else {
+      } else if (apoiador[key] !== null) { // Não envie nulls se não for 'foto'
         formData.append(key, apoiador[key]);
       }
     });
-    
+
     setIsLoading(true);
-    
+    toast.info("Registro em andamento..."); // Notificação de informação
+
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.post("http://localhost:8000/apoiador", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
-      // On successful registration, navigate to login
-      alert("Cadastro realizado com sucesso! Faça o login para continuar.");
+
+      toast.success("Cadastro realizado com sucesso! Faça o login para continuar."); // Substituído alert()
       navigate("/login");
     } catch (err) {
       console.error("Erro ao cadastrar:", err);
-      if (err.response) {
-        console.error("Response status:", err.response.status);
-        console.error("Response data:", err.response.data);
-      } else if (err.request) {
-        console.error("Request feito, mas sem resposta:", err.request);
-      } else {
-        console.error("Erro na configuração da requisição:", err.message);
+
+      let errorMessage = "Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.";
+      if (err.response && err.response.data && err.response.data.error) {
+        errorMessage = err.response.data.error; // Erro específico do backend
+      } else if (err.message) {
+        errorMessage = `Erro de rede: ${err.message}`; // Erro de rede
       }
-      setError("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");
+      toast.error(errorMessage); // Exibir erro com toast
+    } finally {
+      setIsLoading(false);
     }
-
-
   };
-  
+
   const FileInput = ({ name, label, onChange }) => {
     return (
       <div className="mb-3">
         <label className="label-azul">{label}</label>
         <div className="file-input-wrapper2">
           <div className="file-input-container">
-            <input 
-              type="file" 
+            <input
+              type="file"
               ref={fileInputRef}
-              name={name} 
+              name={name}
               onChange={onChange}
               className="file-input-azul"
               accept="image/*"
@@ -131,10 +145,10 @@ const RegistroApoiador = () => {
         </div>
         {previewImage && (
           <div className="preview-container mt-2">
-            <img 
-              src={previewImage} 
-              alt="Preview" 
-              className="preview-image" 
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="preview-image"
             />
           </div>
         )}
@@ -151,97 +165,91 @@ const RegistroApoiador = () => {
           <h3 className="text-center-azul">Registro de Apoiador</h3>
           <div className="footer-line2-azul"></div>
         </div>
-        
-        {error && (
-          <div className="alert-error" style={{ 
-            color: 'white', 
-            backgroundColor: '#ff6b6b', 
-            padding: '10px', 
-            margin: '10px 15px 0', 
+
+        {/* Removido o bloco de erro customizado, pois agora usaremos toast */}
+        {/* {error && (
+          <div className="alert-error" style={{
+            color: 'white',
+            backgroundColor: '#ff6b6b',
+            padding: '10px',
+            margin: '10px 15px 0',
             borderRadius: '5px',
             textAlign: 'center'
           }}>
             {error}
           </div>
-        )}
-        
+        )} */}
+
         <form className="registro-form-azul p-3" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="mb-2">
             <label className="label-azul">Nome completo:</label>
-            <input 
-              type="text" 
-              onChange={handleChange} 
-              name="nome" 
+            <input
+              type="text"
+              onChange={handleChange}
+              name="nome"
               value={apoiador.nome}
-              required
             />
           </div>
-          
+
           <div className="mb-2">
             <label className="label-azul">CPF:</label>
-            <input 
-              type="text" 
-              onChange={handleChange} 
-              name="cpf" 
+            <input
+              type="text"
+              onChange={handleChange}
+              name="cpf"
               value={apoiador.cpf}
               placeholder="000.000.000-00"
-              required
             />
           </div>
-          
+
           <div className="mb-2">
             <label className="label-azul">Data de nascimento:</label>
-            <input 
-              type="date" 
-              onChange={handleChange} 
-              name="data_nascimento" 
+            <input
+              type="date"
+              onChange={handleChange}
+              name="data_nascimento"
               value={apoiador.data_nascimento}
-              required
             />
           </div>
-          
+
           <div className="mb-2">
             <label className="label-azul">Telefone:</label>
-            <input 
-              type="text" 
-              onChange={handleChange} 
-              name="telefone" 
+            <input
+              type="text"
+              onChange={handleChange}
+              name="telefone"
               value={apoiador.telefone}
               placeholder="(00) 00000-0000"
-              required
             />
           </div>
-          
+
           <div className="mb-2">
             <label className="label-azul">Email:</label>
-            <input 
-              type="email" 
-              onChange={handleChange} 
-              name="email" 
+            <input
+              type="email"
+              onChange={handleChange}
+              name="email"
               value={apoiador.email}
-              required
             />
           </div>
-          
+
           <div className="mb-2">
             <label className="label-azul">Senha:</label>
-            <input 
-              type="password" 
-              onChange={handleChange} 
-              name="senha" 
+            <input
+              type="password"
+              onChange={handleChange}
+              name="senha"
               value={apoiador.senha}
-              required
             />
           </div>
-          
+
           <div className="mb-3">
             <label className="label-azul">Confirmar senha:</label>
-            <input 
+            <input
               type="password"
               value={confirmarSenha}
               onChange={handleConfirmarSenhaChange}
               className={!senhaMatch ? 'is-invalid' : ''}
-              required
             />
             {!senhaMatch && (
               <div className="text-danger" style={{fontSize: '14px', marginLeft: '15px'}}>
@@ -249,17 +257,17 @@ const RegistroApoiador = () => {
               </div>
             )}
           </div>
-          
-          <FileInput 
+
+          <FileInput
             name="foto"
             label="Foto:"
             onChange={handleChange}
           />
-          
+
           <div className="d-flex align-items-center mb-3 checkbox-wrapper">
             <div className="checkbox-container">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 id="receberNotificacoes"
                 name="receberNotificacoes"
                 checked={apoiador.receberNotificacoes}
@@ -268,25 +276,25 @@ const RegistroApoiador = () => {
               />
             </div>
             <div className="label-container">
-              <label 
-                htmlFor="receberNotificacoes" 
+              <label
+                htmlFor="receberNotificacoes"
                 className="notification-label"
               >
                 quero receber notificação
               </label>
             </div>
           </div>
-          
+
           <div className="button-container-azul">
-            <button 
-              type="submit" 
-              className="custom-button-azul" 
+            <button
+              type="submit"
+              className="custom-button-azul"
               disabled={!senhaMatch || isLoading}
             >
               {isLoading ? 'Registrando...' : 'Registrar'}
-            </button> 
+            </button>
           </div>
-          
+
           <div className="mt-3 text-center">
             <p>Já tem uma conta? <Link to="/login" className="text-decoration-none" style={{color: '#0A7D7E'}}>Entrar</Link></p>
           </div>

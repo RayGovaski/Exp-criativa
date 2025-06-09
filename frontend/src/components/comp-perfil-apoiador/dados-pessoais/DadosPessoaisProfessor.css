@@ -1,0 +1,92 @@
+/* DadosPessoaisProfessor.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* Estilos para o container da imagem de perfil do professor */
+.profile-image-container-professor {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para a imagem de perfil do professor */
+.profile-image-professor {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Estilo para o input de arquivo personalizado (label do botão Escolher Foto) */
+.custom-file-input label {
+  cursor: pointer;
+  color: #0A7D7E;
+  border-color: #0A7D7E;
+  transition: all 0.2s;
+  background-color: transparent;
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 5px;
+}
+
+.custom-file-input label:hover {
+  background-color: #f0f9f9;
+  color: #076666;
+  border-color: #076666;
+}
+
+.custom-file-input label:active {
+  background-color: #e6f7f7 !important;
+  color: #064B4C !important;
+  border-color: #064B4C !important;
+}
+
+/* Estilos gerais para os campos de texto exibidos */
+.form-control.border.bg-light {
+    background-color: #f0f0f0 !important;
+    border-color: #e0e0e0 !important;
+    color: #334155;
+    font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 767px) {
+  .profile-image-container-professor {
+    margin-bottom: 20px;
+  }
+  .custom-file-input {
+    margin-bottom: 15px;
+  }
+}
+
+.pipipi{
+  margin-left: 0px;
+}
+
+.custom-button-azul5 {
+ background-color: #0A7D7E;
+ border: none;
+ transition: all 0.2s;
+ padding: 8px 16px;
+ font-weight: 500;
+ font-family: 'Fredoka', sans-serif!important;
+ color: white;
+ border-radius: 5px;
+}
+
+.custom-button-azul5:hover {
+ background-color: #076666; /* Cor no hover */
+ transform: translateY(-2px);
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-azul5:active {
+  background-color: #064B4C !important; /* <--- ESTA É A COR VERDE ESCURO AO CLICAR */
+  transform: translateY(0); /* Remove o efeito de levantar quando clicado */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Sombra de "pressionado" */
+  border-color: #064B4C !important; /* Garante que a borda também mude se existir */
+  outline: none !important; /* Remove o contorno de foco do Bootstrap */
+}

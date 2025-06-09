@@ -10,6 +10,8 @@ import {
     updateEmail,
     updatePhone,
     updatePhoto,
+    subscribeToPlan,
+    cancelSubscription,
     getPhoto
 } from '../controllers/apoiadorController.js';
 
@@ -26,5 +28,7 @@ router.put('/update-senha', verifyToken, updatePassword);
 router.put('/update-email', verifyToken, updateEmail);
 router.put('/update-telefone', verifyToken, updatePhone);
 router.put('/update-foto', verifyToken, upload.single('foto'), updatePhoto);
+router.post('/assinar-plano', verifyToken, subscribeToPlan);
+router.delete('/cancelar-assinatura', verifyToken, cancelSubscription);
 
 export default router;

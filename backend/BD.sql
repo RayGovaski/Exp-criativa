@@ -188,3 +188,17 @@ CREATE TABLE Administrador (
     nome VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL
 );
+
+
+--INSERTS:
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Semente', 20.00, 'Com o Plano Semente, você planta esperança no futuro de muitas crianças! Sua doação ajuda a fornecer materiais essenciais para as aulas e garante a continuidade do nosso projeto.');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Melodia', 50.00, 'O Plano Melodia fortalece o ensino da música, garantindo que mais crianças tenham acesso a instrumentos e aulas, trazendo experiências que transformam vidas e abrem novas possibilidades no futuro!');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Palco', 100.00, 'O Plano Palco apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Estrela', 200.00, 'O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');

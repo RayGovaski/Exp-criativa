@@ -111,12 +111,12 @@ export const createApoiador = async (req, res) => {
     }
 };
 
+// dentro de apoiadorController.js
 export const getProfile = (req, res) => {
     const userId = req.user.id;
-    // Ajustado para JOIN com Apoiador_Plano e Plano para obter o nome do plano
     const q = `
-        SELECT a.id, a.cpf, a.nome, a.data_nascimento, a.telefone, a.email, 
-               p.nome AS plano_nome, ap.dataAdesao AS data_adesao, a.notificacoes 
+        SELECT a.id, a.cpf, a.nome, a.data_nascimento, a.telefone, a.email,
+               p.nome AS plano_nome, p.preco AS plano_preco, ap.dataAdesao AS data_adesao, a.notificacoes
         FROM Apoiador a
         LEFT JOIN Apoiador_Plano ap ON a.id = ap.apoiadorId
         LEFT JOIN Plano p ON ap.planoId = p.id
@@ -329,7 +329,75 @@ export const updatePhoto = (req, res) => {
         return res.status(500).json({ error: "Erro no servidor", message: error.message });
     }
 };
+export const subscribeToPlan = (req, res) => { // Removido 'async' aqui
+    const { planoId } = req.body;
+    const apoiadorId = req.user.id; // Vem do middleware verifyToken
 
+    if (!planoId) {
+        return res.status(400).json({ error: "ID do plano é obrigatório." });
+    }
+
+    // Primeiro, verifique se o planoId existe
+    const checkPlanQuery = 'SELECT id, nome FROM Plano WHERE id = ?';
+    db.query(checkPlanQuery, [planoId], (err, planos) => {
+        if (err) {
+            console.error('Erro ao verificar plano:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor ao verificar o plano.', details: err.message });
+        }
+        if (planos.length === 0) {
+            return res.status(404).json({ error: 'Plano não encontrado.' });
+        }
+
+        // Em seguida, verifique se o apoiador já possui uma assinatura ativa
+        const checkSubscriptionQuery = 'SELECT * FROM Apoiador_Plano WHERE apoiadorId = ?';
+        db.query(checkSubscriptionQuery, [apoiadorId], (err, existingSubscription) => {
+            if (err) {
+                console.error('Erro ao verificar assinatura existente:', err);
+                return res.status(500).json({ error: 'Erro interno do servidor ao verificar assinatura.', details: err.message });
+            }
+
+            if (existingSubscription.length > 0) {
+                return res.status(409).json({ error: 'Você já possui uma assinatura ativa.' });
+            }
+
+            // Finalmente, insere o registro na tabela Apoiador_Plano
+            const insertSubscriptionQuery = `
+                INSERT INTO Apoiador_Plano (apoiadorId, planoId, dataAdesao) 
+                VALUES (?, ?, NOW())
+            `;
+            db.query(insertSubscriptionQuery, [apoiadorId, planoId], (err, result) => {
+                if (err) {
+                    console.error('Erro ao assinar plano:', err);
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(409).json({ error: 'Você já possui uma assinatura ou ocorreu um erro de duplicidade.' });
+                    }
+                    return res.status(500).json({ error: 'Erro interno do servidor ao processar a assinatura.', details: err.message });
+                }
+                res.status(201).json({ message: 'Assinatura realizada com sucesso!' });
+            });
+        });
+    });
+};
+export const cancelSubscription = (req, res) => {
+    const apoiadorId = req.user.id; // ID do apoiador vem do token de autenticação
+
+    // Query para deletar a entrada do apoiador na tabela Apoiador_Plano
+    const q = 'DELETE FROM Apoiador_Plano WHERE apoiadorId = ?';
+
+    db.query(q, [apoiadorId], (err, result) => {
+        if (err) {
+            console.error('Erro ao cancelar assinatura:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor ao cancelar a assinatura.', details: err.message });
+        }
+
+        if (result.affectedRows === 0) {
+            // Se nenhum registro foi afetado, significa que o apoiador não tinha uma assinatura ativa
+            return res.status(404).json({ error: 'Nenhuma assinatura ativa encontrada para este apoiador.' });
+        }
+
+        res.status(200).json({ message: 'Assinatura cancelada com sucesso!' });
+    });
+};
 export const getPhoto = (req, res) => {
     const id = req.params.id;
 

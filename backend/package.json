@@ -9,7 +9,13 @@
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["express", "api", "mysql", "jwt", "apoiadores"],
+  "keywords": [
+    "express",
+    "api",
+    "mysql",
+    "jwt",
+    "apoiadores"
+  ],
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {

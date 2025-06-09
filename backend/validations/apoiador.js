@@ -7,6 +7,5 @@ export const apoiadorSchema = Joi.object({
     senha: Joi.string().min(6).required(),
     data_nascimento: Joi.date().less('now').required(),
     telefone: Joi.string().pattern(/^\d{10,15}$/).allow(null, ''),
-    plano_nome: Joi.string().allow(null, ''),
     notificacoes: Joi.boolean().default(true)
 });

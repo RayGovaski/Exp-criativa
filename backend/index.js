@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import db from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import apoiadorRoutes from './routes/apoiadorRoutes.js';
+import alunoRoutes from './routes/alunoRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -47,6 +48,7 @@ app.get('/test-db', (req, res) => {
 // API Routes
 app.use('/auth', authRoutes);
 app.use('/apoiador', apoiadorRoutes);
+app.use('/alunos', alunoRoutes);
 
 // Start server
 app.listen(PORT, () => {

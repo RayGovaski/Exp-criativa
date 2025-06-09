@@ -12,10 +12,11 @@ import RegistroAluno from "./pages/Registros/RegistroAluno.jsx";
 import MenuRegistro from "./pages/menu-registro/MenuRegistro.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Login from "./pages/Login/Login.jsx";
-import Perfil from "./pages/Perfil/Perfil";
+import Perfil from "./pages/Perfil/perfil-apoiador/Perfil.jsx";
 import PaginaDoacoes from "./pages/Pagina-Doacoes/PaginaDoacoes.jsx";
 import AssinaturaPagamento from "./pages/compra-assinatura/assinaturapagamento.jsx";
 import DoacoesPagamento from "./pages/compra-assinatura/DoacoesPagamento.jsx";
+import PerfilAluno from "./pages/Perfil/perfil-aluno/Perfil-aluno.jsx";
 
 import "./App.css";
 
@@ -37,6 +38,7 @@ const App = () => {
            {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/perfil-aluno" element={<PerfilAluno />} />
           </Route>
           
           {/* Redirect to login if no route matches */}

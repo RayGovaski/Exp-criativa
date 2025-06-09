@@ -15,3 +15,4 @@ export const cleanPhone = (phone) => {
 export const formatDateToMySQL = (date) => {
     return new Date(date).toISOString().split('T')[0];
 };
+

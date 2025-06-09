@@ -21,8 +21,7 @@ const RegistroApoiador = () => {
     data_nascimento: "",
     telefone: "",
     foto: null,
-    receberNotificacoes: false,
-    plano_nome: "" // Adicionando campo plano_nome para compatibilidade com sua tabela
+    receberNotificacoes: false
   });
 
   const handleChange = (e) => {
@@ -98,16 +97,18 @@ const RegistroApoiador = () => {
       navigate("/login");
     } catch (err) {
       console.error("Erro ao cadastrar:", err);
-      
-      // Handle known error responses
-      if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
+      if (err.response) {
+        console.error("Response status:", err.response.status);
+        console.error("Response data:", err.response.data);
+      } else if (err.request) {
+        console.error("Request feito, mas sem resposta:", err.request);
       } else {
-        setError("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");
+        console.error("Erro na configuração da requisição:", err.message);
       }
-    } finally {
-      setIsLoading(false);
+      setError("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");
     }
+
+
   };
   
   const FileInput = ({ name, label, onChange }) => {

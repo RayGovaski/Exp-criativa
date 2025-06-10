@@ -24,41 +24,41 @@ import DoacoesPagamento from "./pages/compra-assinatura/DoacoesPagamento.jsx";
 import PerfilAluno from "./pages/Perfil/perfil-aluno/Perfil-aluno.jsx";
 import PerfilProfessor from "./pages/Perfil/Perfil-professor/PerfilProfessor.jsx";
 import RegistroProfessor from "./pages/Registros/RegistroProfessor.jsx";
-
 import "./App.css";
 
 const App = () => {
-  return (
-    <Router>
-      <AuthProvider>
-        <Navbar />
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro-apoiador" element={<RegistroApoiador />} />
-          <Route path="/registro-aluno" element={<RegistroAluno />} />
-          <Route path="/registro-professor" element={<RegistroProfessor />} />
-          <Route path="/menu-registro" element={<MenuRegistro />} />
-          <Route path="/doar" element={<PaginaDoacoes />} />
-          <Route path="/assinaturas" element={<AssinaturaPagamento />} />
-          <Route path="/doarr" element={<DoacoesPagamento />} />
-          {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/perfil-aluno" element={<PerfilAluno />} />
-            <Route path="/perfil-professor" element={<PerfilProfessor />} />
-          </Route>
+    return (
+        <Router>
+            <AuthProvider>
+                <Navbar />
+                <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/registro-apoiador" element={<RegistroApoiador />} />
+                    <Route path="/registro-aluno" element={<RegistroAluno />} />
+                    <Route path="/registro-professor" element={<RegistroProfessor />} />
+                    <Route path="/menu-registro" element={<MenuRegistro />} />
+                    <Route path="/doar" element={<PaginaDoacoes />} />
+                    <Route path="/assinaturas" element={<AssinaturaPagamento />} /> {/* Rota para escolher/comprar plano */}
+                    <Route path="/doar-pagamento" element={<DoacoesPagamento />} />
+                    
+                    {/* Protected routes */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/perfil" element={<Perfil />} />
+                        <Route path="/perfil-aluno" element={<PerfilAluno />} />
+                        <Route path="/perfil-professor" element={<PerfilProfessor />} />
+                    </Route>
 
-          {/* Redirect to login if no route matches */}
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-        <Footer />
-        {/* Adicione o ToastContainer aqui. Ele será responsável por renderizar todas as notificações. */}
-        <ToastContainer />
-      </AuthProvider>
-    </Router>
-  );
+                    {/* Redirect to login if no route matches */}
+                    <Route path="*" element={<Navigate to="/login" />} />
+                </Routes>
+                <Footer />
+                {/* Adicione o ToastContainer aqui. Ele será responsável por renderizar todas as notificações. */}
+                <ToastContainer />
+            </AuthProvider>
+        </Router>
+    );
 };
 
 export default App;

@@ -159,8 +159,9 @@ CREATE TABLE Doacao (
     descricao TEXT,
     data_inicio DATE,
     data_fim DATE,
+    prioridade ENUM('Max', 'Média', 'Min') DEFAULT 'media',
     status ENUM('Aberta', 'Encerrada', 'Concluída') DEFAULT 'Aberta',
-    imagem VARCHAR(255)
+    imagem_path VARCHAR(255) NULL
 );
 
 CREATE TABLE Apoiador_Doacao (
@@ -202,3 +203,6 @@ INSERT INTO Plano (nome, preco, descricao) VALUES
 
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Estrela', 200.00, 'O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
+
+
+

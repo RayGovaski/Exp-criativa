@@ -329,55 +329,91 @@ export const updatePhoto = (req, res) => {
         return res.status(500).json({ error: "Erro no servidor", message: error.message });
     }
 };
-export const subscribeToPlan = (req, res) => { // Removido 'async' aqui
-    const { planoId } = req.body;
+export const subscribeToPlan = (req, res) => {
+    const { planoId } = req.body; // Este é o dbId do plano selecionado
     const apoiadorId = req.user.id; // Vem do middleware verifyToken
 
     if (!planoId) {
         return res.status(400).json({ error: "ID do plano é obrigatório." });
     }
 
-    // Primeiro, verifique se o planoId existe
-    const checkPlanQuery = 'SELECT id, nome FROM Plano WHERE id = ?';
+    // 1. Verificar se o planoId existe na tabela Plano
+    const checkPlanQuery = 'SELECT id, nome, preco FROM Plano WHERE id = ?';
     db.query(checkPlanQuery, [planoId], (err, planos) => {
         if (err) {
-            console.error('Erro ao verificar plano:', err);
+            console.error('Erro ao verificar plano (checkPlanQuery):', err);
             return res.status(500).json({ error: 'Erro interno do servidor ao verificar o plano.', details: err.message });
         }
         if (planos.length === 0) {
             return res.status(404).json({ error: 'Plano não encontrado.' });
         }
+        const selectedPlanData = planos[0]; // Dados do plano que o usuário quer assinar
 
-        // Em seguida, verifique se o apoiador já possui uma assinatura ativa
+        // 2. Verificar se o apoiador já possui uma assinatura ativa
         const checkSubscriptionQuery = 'SELECT * FROM Apoiador_Plano WHERE apoiadorId = ?';
         db.query(checkSubscriptionQuery, [apoiadorId], (err, existingSubscription) => {
             if (err) {
-                console.error('Erro ao verificar assinatura existente:', err);
+                console.error('Erro ao verificar assinatura existente (checkSubscriptionQuery):', err);
                 return res.status(500).json({ error: 'Erro interno do servidor ao verificar assinatura.', details: err.message });
             }
 
-            if (existingSubscription.length > 0) {
-                return res.status(409).json({ error: 'Você já possui uma assinatura ativa.' });
-            }
+            // Converter o planoId recebido para número para comparação segura
+            const requestedPlanoIdNum = parseInt(planoId, 10); 
 
-            // Finalmente, insere o registro na tabela Apoiador_Plano
-            const insertSubscriptionQuery = `
-                INSERT INTO Apoiador_Plano (apoiadorId, planoId, dataAdesao) 
-                VALUES (?, ?, NOW())
-            `;
-            db.query(insertSubscriptionQuery, [apoiadorId, planoId], (err, result) => {
-                if (err) {
-                    console.error('Erro ao assinar plano:', err);
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        return res.status(409).json({ error: 'Você já possui uma assinatura ou ocorreu um erro de duplicidade.' });
-                    }
-                    return res.status(500).json({ error: 'Erro interno do servidor ao processar a assinatura.', details: err.message });
+            if (existingSubscription.length > 0) {
+                // *** Cenário: Apoiador JÁ TEM um plano ***
+                console.log('DEBUG: Apoiador já tem uma assinatura.');
+                const currentPlanId = existingSubscription[0].planoId;
+                console.log('DEBUG: Plano atual do apoiador (do DB):', currentPlanId, 'Tipo:', typeof currentPlanId);
+                console.log('DEBUG: Plano ID solicitado (convertido para número):', requestedPlanoIdNum, 'Tipo:', typeof requestedPlanoIdNum);
+
+                if (currentPlanId === requestedPlanoIdNum) {
+                    // Usuário tentou assinar o MESMO plano que já tem
+                    console.log('DEBUG: Plano atual é IGUAL ao solicitado. Retornando mensagem informativa.');
+                    return res.status(200).json({ message: `Você já está atualmente no plano ${selectedPlanData.nome}.` });
+                } else {
+                    // Usuário está trocando para um plano DIFERENTE
+                    console.log('DEBUG: Plano atual é DIFERENTE do solicitado. Tentando ATUALIZAR.');
+                    const updateSubscriptionQuery = `
+                        UPDATE Apoiador_Plano
+                        SET planoId = ?, dataAdesao = NOW()
+                        WHERE apoiadorId = ?
+                    `;
+                    db.query(updateSubscriptionQuery, [requestedPlanoIdNum, apoiadorId], (err, result) => {
+                        if (err) {
+                            console.error('Erro ao mudar de plano (updateSubscriptionQuery):', err);
+                            return res.status(500).json({ error: 'Erro interno do servidor ao mudar de plano.', details: err.message });
+                        }
+                        if (result.affectedRows === 0) {
+                             return res.status(400).json({ error: 'Nenhuma alteração feita. Verifique se o plano atual é diferente do selecionado ou se o apoiador existe.' });
+                        }
+                        res.status(200).json({ message: `Sua assinatura foi alterada com sucesso para o plano ${selectedPlanData.nome}!` });
+                    });
                 }
-                res.status(201).json({ message: 'Assinatura realizada com sucesso!' });
-            });
+            } else {
+                // *** Cenário: Apoiador NÃO TEM plano (pode assinar pela primeira vez) ***
+                console.log('DEBUG: Apoiador NÃO tem assinatura. Tentando INSERIR.');
+                const insertSubscriptionQuery = `
+                    INSERT INTO Apoiador_Plano (apoiadorId, planoId, dataAdesao) 
+                    VALUES (?, ?, NOW())
+                `;
+                db.query(insertSubscriptionQuery, [apoiadorId, requestedPlanoIdNum], (err, result) => { // Use requestedPlanoIdNum aqui
+                    if (err) {
+                        console.error('Erro ao assinar plano (insertSubscriptionQuery):', err);
+                        if (err.code === 'ER_DUP_ENTRY') {
+                            // Este erro de duplicidade NÃO DEVERIA ACONTECER AQUI se a lógica de cima estiver correta,
+                            // mas é uma boa prática mantê-lo para robustez
+                            return res.status(409).json({ error: 'Você já possui uma assinatura. Por favor, gerencie-a na sua área de perfil.' });
+                        }
+                        return res.status(500).json({ error: 'Erro interno do servidor ao processar a assinatura.', details: err.message });
+                    }
+                    res.status(201).json({ message: `Assinatura do plano ${selectedPlanData.nome} realizada com sucesso!` });
+                });
+            }
         });
     });
 };
+
 export const cancelSubscription = (req, res) => {
     const apoiadorId = req.user.id; // ID do apoiador vem do token de autenticação
 

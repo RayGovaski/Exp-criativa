@@ -1,4 +1,4 @@
-
+// Index.js no back
 import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv';
@@ -6,12 +6,12 @@ import db from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import apoiadorRoutes from './routes/apoiadorRoutes.js';
 import alunoRoutes from './routes/alunoRoutes.js';
-
+import doacaoRoutes from './routes/doacaoRoutes.js';
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3306;
 
 // Middleware
 app.use(cors());
@@ -49,6 +49,7 @@ app.get('/test-db', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/apoiador', apoiadorRoutes);
 app.use('/alunos', alunoRoutes);
+app.use('/doacoes', doacaoRoutes);
 
 // Start server
 app.listen(PORT, () => {

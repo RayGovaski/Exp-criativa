@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Form, Row, Col, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FaCreditCard, FaTrash } from 'react-icons/fa';
 import './GerenciarAssinatura.css';
+import { useNavigate } from 'react-router-dom';
 
 const GerenciarAssinatura = () => {
+  const navigate = useNavigate();
   const [assinaturaAtiva, setAssinaturaAtiva] = useState(true); // Initial state for subscription status
   const [showModalCartao, setShowModalCartao] = useState(false);
   const [showModalCancelar, setShowModalCancelar] = useState(false);
@@ -113,11 +115,7 @@ const GerenciarAssinatura = () => {
     };
 
   const handleReativarAssinatura = () => {
-    // Redirecionar para a página de assinatura para que o usuário escolha um plano novamente
-    // Ou exiba um modal para reativação simplificada se você tiver essa lógica
-    alert("Redirecionando para a página de assinatura para reativar seu plano.");
-    // Exemplo de redirecionamento:
-    // navigate('/pagina-de-assinatura'); 
+    navigate('/assinaturas'); 
   };
 
   // Função para calcular a próxima data de cobrança

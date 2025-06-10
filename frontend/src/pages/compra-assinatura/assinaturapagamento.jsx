@@ -56,6 +56,9 @@ const paymentMethods = [
 ];
 
 const AssinaturaPagamento = () => {
+    const [currentSubscription, setCurrentSubscription] = useState(null);
+    const navigate = useNavigate();
+    const { user, token } = useAuth();
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [cardData, setCardData] = useState({ // Renomeado para refletir que são apenas dados de cartão
@@ -65,15 +68,32 @@ const AssinaturaPagamento = () => {
         cardCvv: ''
     });
 
-    const navigate = useNavigate();
-    const { user, token } = useAuth(); // Obtenha o usuário e o token do contexto de autenticação
-
     // Proteção de rota: redireciona se não houver token
     useEffect(() => {
-        if (!token) {
-            navigate('/login'); // Redirecione para sua rota de login
-        }
-    }, [token, navigate]);
+        const fetchCurrentSubscription = async () => {
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+            try {
+                // Busque o perfil para saber o plano atual do usuário
+                const response = await axios.get('http://localhost:8000/apoiador/profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.data && response.data.plano_nome) {
+                    setCurrentSubscription(response.data);
+                } else {
+                    setCurrentSubscription(null); // Nenhuma assinatura ativa
+                }
+            } catch (err) {
+                console.error("Erro ao buscar plano atual:", err);
+                setCurrentSubscription(null); // Em caso de erro, assumir que não tem plano ou mostrar erro
+            }
+        };
+        fetchCurrentSubscription();
+    }, [token, navigate]); // Dependências: token e navigate
 
     const handleCardInputChange = (field, value) => {
         setCardData(prev => ({ ...prev, [field]: value }));
@@ -92,6 +112,10 @@ const AssinaturaPagamento = () => {
         }
 
         const plan = plans.find(p => p.id === selectedPlan);
+        if (!plan) { // Checagem adicional, caso o ID não seja encontrado
+            alert('Plano selecionado inválido.');
+            return;
+        }
         const payment = paymentMethods.find(p => p.id === selectedPayment);
 
         // Validação básica para cartão (se selecionado)
@@ -101,27 +125,39 @@ const AssinaturaPagamento = () => {
             return;
         }
 
+        // --- Lógica de verificação do plano atual no frontend antes de enviar a requisição ---
+        if (currentSubscription && currentSubscription.plano_nome) {
+            if (currentSubscription.plano_nome === plan.title) {
+                alert(`Você já está atualmente no plano ${plan.title}.`);
+                return; // Não envia a requisição se for o mesmo plano
+            } else {
+                // Se for um plano diferente, o backend vai fazer a atualização
+                const confirmChange = window.confirm(
+                    `Você já possui o plano ${currentSubscription.plano_nome}. Deseja trocar para o plano ${plan.title}?`
+                );
+                if (!confirmChange) {
+                    return; // Usuário cancelou a troca
+                }
+            }
+        }
+        // --- Fim da lógica de verificação no frontend ---
+
+
         try {
-            // Requisição para o backend
             const response = await axios.post('http://localhost:8000/apoiador/assinar-plano', {
-                apoiadorId: user.id, // ID do apoiador logado
-                planoId: plan.dbId,   // ID do plano selecionado
-                // Você pode adicionar mais dados aqui, se necessário, como:
-                // metodoPagamento: payment.id, 
-                // dadosCartao: (selectedPayment === 'credit' || selectedPayment === 'debit') ? cardData : null
+                apoiadorId: user.id,
+                planoId: plan.dbId, // Certifique-se de que plan.dbId está sendo usado
             }, {
                 headers: {
-                    Authorization: `Bearer ${token}` // Envia o token de autenticação
+                    Authorization: `Bearer ${token}`
                 }
             });
 
-            if (response.status === 200 || response.status === 201) {
-                alert(`Assinatura do ${plan.title} (${plan.price}) via ${payment.name} confirmada com sucesso!`);
-                // Redirecione ou mostre uma mensagem de sucesso mais elaborada
-                navigate('/assinatura');
-            } else {
-                alert('Erro ao processar assinatura. Tente novamente.');
-            }
+            // A mensagem de sucesso agora virá do backend, que dirá se foi nova assinatura ou troca
+            alert(response.data.message);
+            // Atualize o plano atual no frontend após sucesso
+            setCurrentSubscription({ ...currentSubscription, plano_nome: plan.title, plano_preco: plan.numericPrice, data_adesao: new Date().toISOString() });
+            navigate('/gerenciar-assinatura'); // Redireciona para a página de gerenciamento/detalhes
         } catch (error) {
             console.error("Erro ao assinar plano:", error);
             let errorMessage = "Ocorreu um erro ao processar sua assinatura.";
@@ -142,7 +178,8 @@ const AssinaturaPagamento = () => {
             </div>
         );
     }
-
+    
+    // Renderiza a página de assinatura
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-6xl mx-auto px-4">
@@ -157,6 +194,15 @@ const AssinaturaPagamento = () => {
                     </p>
                 </div>
 
+                {/* Exibir plano atual do usuário, se houver */}
+                {currentSubscription && currentSubscription.plano_nome && (
+                    <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8" role="alert">
+                        <p className="font-bold">Plano Atual:</p>
+                        <p>Você está atualmente no plano **{currentSubscription.plano_nome}**. Selecione um plano diferente abaixo para trocar.</p>
+                    </div>
+                )}
+
+
                 {/* Plans Selection */}
                 <div className="mb-12">
                     <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
@@ -166,10 +212,13 @@ const AssinaturaPagamento = () => {
                         {plans.map((plan) => (
                             <div
                                 key={plan.id}
+                                // Adiciona um estilo visual se este for o plano atual do usuário
                                 className={`relative border-2 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
                                     selectedPlan === plan.id
                                         ? `${plan.highlightColor} shadow-lg transform scale-105`
-                                        : 'border-gray-200 bg-white'
+                                        : currentSubscription && currentSubscription.plano_nome === plan.title
+                                            ? 'border-green-500 bg-green-50 shadow-md' // Estilo para o plano atual
+                                            : 'border-gray-200 bg-white'
                                 }`}
                                 onClick={() => setSelectedPlan(plan.id)}
                             >

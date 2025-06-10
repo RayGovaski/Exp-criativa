@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext'; // Importe o useAuth
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth(); // <--- Obtenha o 'user' do useAuth
   const navigate = useNavigate();
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -17,6 +17,9 @@ const Navbar = () => {
 
   const profileDropdownRef = useRef(null);
   const doarDropdownRef = useRef(null);
+
+  // URL base do backend para a foto do perfil
+  const PROFILE_PHOTO_BASE_URL = 'http://localhost:8000/apoiador/foto/';
 
   useEffect(() => {
     const handleResize = () => {
@@ -90,6 +93,28 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // Função para obter a URL da imagem do perfil
+  const getProfileImageUrl = () => {
+    if (user && user.id) {
+      // Adiciona um timestamp para evitar cache e garantir que a imagem seja atualizada se mudar
+      return `${PROFILE_PHOTO_BASE_URL}${user.id}?t=${new Date().getTime()}`;
+    }
+    // Retorna a imagem de perfil padrão se não houver usuário logado ou ID
+    return "src/Assets/Perfil.svg";
+  };
+
+  // Ajusta o link "Meu Perfil" do sidebar para usar a rota /perfil que renderiza o Perfil.jsx
+  const getProfileLink = () => {
+    if (user && user.role === 'aluno') { // Exemplo: se houver role no seu user object
+      return '/perfil-aluno';
+    } else if (user && user.role === 'professor') {
+      return '/perfil-professor';
+    } else if (user && user.role === 'apoiador') { // Assumindo 'apoiador' para o seu Perfil.jsx
+      return '/perfil';
+    }
+    return '/login'; // Fallback
+  }
+
   return (
     <>
       {sidebarOpen && (
@@ -116,13 +141,15 @@ const Navbar = () => {
               className={`sidebar-link dropdown-toggle ${showDoarDropdown ? 'active-dropdown' : ''}`}
               onClick={() => setShowDoarDropdown(!showDoarDropdown)}
             >
-              Apoie {showDoarDropdown ? '' : ''}
+              Apoie
             </div>
             {showDoarDropdown && (
               <div className="sidebar-dropdown">
-                <Link to="/assinaturas" className="sidebar-dropdown-item" onClick={closeSidebar}>
-                  Assinaturas
-                </Link>
+                {isAuthenticated() && (
+                  <Link to="/assinaturas" className="sidebar-dropdown-item" onClick={closeSidebar}>
+                    Assinaturas
+                  </Link>
+                )}
                 <Link to="/doar" className="sidebar-dropdown-item" onClick={closeSidebar}>
                   Doar para causa
                 </Link>
@@ -134,7 +161,6 @@ const Navbar = () => {
               Contato
             </Link>
           </li>
-          {/* Botões do sidebar baseados no status de autenticação (mantido como estava) */}
           {!isAuthenticated() ? (
             <>
               <li className="sidebar-item">
@@ -151,11 +177,11 @@ const Navbar = () => {
           ) : (
             <>
               <li className="sidebar-item">
-                <Link to="/perfil-aluno" className="sidebar-link" onClick={closeSidebar}> {/* Rota ajustada para perfil-aluno */}
+                {/* Link para o perfil no sidebar */}
+                <Link to={getProfileLink()} className="sidebar-link" onClick={closeSidebar}> 
                   Meu Perfil
                 </Link>
               </li>
-              {/* Opção de Sair do Sidebar é removida aqui, será apenas no dropdown do perfil */}
             </>
           )}
         </ul>
@@ -198,13 +224,15 @@ const Navbar = () => {
                 </Link>
                 {showDoarDropdown && (
                   <div className="dropdown-menu-custom show">
-                    <Link
-                      to="/assinaturas"
-                      className="dropdown-item-custom"
-                      onClick={closeAllDropdowns}
-                    >
-                      Assinaturas
-                    </Link>
+                    {isAuthenticated() && (
+                      <Link
+                        to="/assinaturas"
+                        className="dropdown-item-custom"
+                        onClick={closeAllDropdowns}
+                      >
+                        Assinaturas
+                      </Link>
+                    )}
                     <Link
                       to="/doar"
                       className="dropdown-item-custom"
@@ -216,7 +244,7 @@ const Navbar = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/perfil">
+                <Link className="nav-link nav-item-custom4" to="/#contato">
                   Contato
                 </Link>
               </li>
@@ -225,15 +253,19 @@ const Navbar = () => {
 
           <div className="profile-container" ref={profileDropdownRef}>
             <div className="profile-dropdown-container">
+              {/* <--- IMAGEM DO PERFIL AQUI --- */}
               <img
-                src="src/Assets/Perfil.svg"
+                // Usa a URL da imagem do perfil se o usuário estiver autenticado, senão usa a padrão
+                src={isAuthenticated() ? getProfileImageUrl() : "src/Assets/Perfil.svg"}
                 alt="Perfil"
-                className="profile-img"
+                className="profile-img" // Certifique-se de que esta classe CSS define largura/altura para a imagem
                 onClick={toggleProfileDropdown}
+                // Adiciona um manipulador de erro para carregar uma imagem padrão se a foto não for encontrada
+                onError={(e) => { e.target.onerror = null; e.target.src = "src/Assets/Perfil.svg"; }}
               />
               {showProfileDropdown && (
                 <div className="profile-dropdown-menu show">
-                  {!isAuthenticated() ? ( // Se NÃO autenticado
+                  {!isAuthenticated() ? (
                     <>
                       <Link
                         to="/login"
@@ -250,18 +282,27 @@ const Navbar = () => {
                         Registro
                       </Link>
                     </>
-                  ) : ( // Se AUTENTICADO
+                  ) : (
                     <>
                       <Link
-                        to="/perfil" // Rota para a página de perfil do ALUNO
+                        to="/perfil" // <--- ROTA CORRIGIDA PARA O PERFIL DO APOIADOR (GERAL)
                         className="dropdown-item-custom"
                         onClick={closeAllDropdowns}
                       >
                         Meu Perfil
                       </Link>
-                      {/* NOVO: Adicionado o botão "Sair" aqui */}
+                      {/* Link para Gerenciar Assinatura (se for um apoiador) */}
+                      {user && user.role === 'apoiador' && (
+                         <Link
+                           to="/gerenciar-assinatura"
+                           className="dropdown-item-custom"
+                           onClick={closeAllDropdowns}
+                         >
+                           Gerenciar Assinatura
+                         </Link>
+                      )}
                       <button
-                        className="dropdown-item-custom logout-button" // Usando button para o logout
+                        className="dropdown-item-custom logout-button"
                         onClick={handleLogoutClick}
                       >
                         Sair

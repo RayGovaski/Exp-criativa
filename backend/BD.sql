@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS exp_criativa;
+USE exp_criativa;
+
 -- Tabela de Endereco
 CREATE TABLE Endereco (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -24,7 +27,9 @@ CREATE TABLE Responsavel (
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT 1,
     endereco_id INT,
-    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
+    comprovante_residencia_path VARCHAR(255) NULL,
+    comprovante_renda_pat VARCHAR(255) NULL,
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
 
 -- Tabela de alunos
@@ -41,12 +46,13 @@ CREATE TABLE Aluno (
     senha VARCHAR(255) NOT NULL,
     necessidades_especiais TEXT,
     foto LONGBLOB,
+    foto_path VARCHAR(255) NULL,
     data_matricula DATETIME DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT 1,
-    responsavel_id INTEGER,
+    responsavel_id INT,
     endereco_id INT,
-    FOREIGN KEY (responsavel_id) REFERENCES Responsavel(id),
-    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
+    FOREIGN KEY (responsavel_id) REFERENCES Responsavel(id) ON DELETE SET NULL,
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
 
 -- Tabela de professores
@@ -67,14 +73,14 @@ CREATE TABLE Professor (
     foto LONGBLOB,
     ativo BOOLEAN DEFAULT 1,
     endereco_id INT,
-    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
 
 -- Tabela de turmas
 CREATE TABLE Turma (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50),
-    capacidade INTEGER CHECK (capacidade > 0),
+    capacidade INT CHECK (capacidade > 0),
     hora_inicio TIME NOT NULL,
     hora_termino TIME NOT NULL,
     descricao TEXT,
@@ -84,35 +90,32 @@ CREATE TABLE Turma (
 );
 
 CREATE TABLE Professor_Turma (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    professor_id INTEGER,
-    turma_nome VARCHAR(50),
-    PRIMARY KEY (turma_nome, professor_id),
-    FOREIGN KEY (professor_id) REFERENCES Professor(id),
-    FOREIGN KEY (turma_nome) REFERENCES Turma(nome)
+    professor_id INT,
+    turma_id INT,
+    PRIMARY KEY (turma_id, professor_id),
+    FOREIGN KEY (professor_id) REFERENCES Professor(id) ON DELETE CASCADE,
+    FOREIGN KEY (turma_id) REFERENCES Turma(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Aluno_Turma (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INTEGER,
-    turma_nome VARCHAR(50),
-    PRIMARY KEY (turma_nome, aluno_id),
-    FOREIGN KEY (aluno_id) REFERENCES Aluno(id),
-    FOREIGN KEY (turma_nome) REFERENCES Turma(nome)
+    aluno_id INT,
+    turma_id INT,
+    PRIMARY KEY (turma_id, aluno_id),
+    FOREIGN KEY (aluno_id) REFERENCES Aluno(id) ON DELETE CASCADE,
+    FOREIGN KEY (turma_id) REFERENCES Turma(id) ON DELETE CASCADE
 );
 
 -- Tabela de controle de presença
 CREATE TABLE Controle_Presenca (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    turma_nome VARCHAR(50),
-    data DATE,
-    professor_id INTEGER,
-    aluno_id INTEGER,
+    turma_id INT,
+    data_presenca DATE,
+    professor_id INT,
+    aluno_id INT,
     presenca BOOLEAN NOT NULL,
-    PRIMARY KEY (turma_nome, data, aluno_id),
-    FOREIGN KEY (turma_nome) REFERENCES Turma(nome),
-    FOREIGN KEY (professor_id) REFERENCES Professor(id),
-    FOREIGN KEY (aluno_id) REFERENCES Aluno(id)
+    FOREIGN KEY (turma_id) REFERENCES Turma(id) ON DELETE CASCADE,
+    FOREIGN KEY (professor_id) REFERENCES Professor(id) ON DELETE SET NULL,
+    FOREIGN KEY (aluno_id) REFERENCES Aluno(id) ON DELETE CASCADE
 );
 
 -- Tabela de planos de apoio
@@ -132,12 +135,19 @@ CREATE TABLE Apoiador (
     telefone VARCHAR(15),
     email VARCHAR(100) UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    plano_nome VARCHAR(50),
     data_adesao DATE,
     foto LONGBLOB,
     notificacoes BOOLEAN DEFAULT 1,
-    foto_path VARCHAR(255) NULL,
-    FOREIGN KEY (plano_nome) REFERENCES Plano(nome)
+    foto_path VARCHAR(255) NULL
+);
+
+CREATE TABLE Apoiador_Plano (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    apoiadorId INT UNIQUE,
+    planoId INT,
+    dataAdesao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (apoiadorId) REFERENCES Apoiador(id) ON DELETE CASCADE,
+    FOREIGN KEY (planoId) REFERENCES Plano(id) ON DELETE CASCADE
 );
 
 -- Tabela de doações
@@ -149,46 +159,18 @@ CREATE TABLE Doacao (
     descricao TEXT,
     data_inicio DATE,
     data_fim DATE,
+    prioridade ENUM('Max', 'Média', 'Min') DEFAULT 'media',
     status ENUM('Aberta', 'Encerrada', 'Concluída') DEFAULT 'Aberta',
-    imagem VARCHAR(255)
+    imagem_path VARCHAR(255) NULL
 );
 
 CREATE TABLE Apoiador_Doacao (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    apoiador_id INTEGER,
-    doacao_id INTEGER,
+    apoiador_id INT,
+    doacao_id INT,
+    valor_doado DECIMAL(10,2) NOT NULL DEFAULT 0,
     PRIMARY KEY (apoiador_id, doacao_id),
-    FOREIGN KEY (apoiador_id) REFERENCES Apoiador(id),
-    FOREIGN KEY (doacao_id) REFERENCES Doacao(id)
-);
-
--- Tabela de funções de voluntários
-CREATE TABLE Funcao (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(50),
-    descricao TEXT,
-    carga_horaria_semanal INT,
-    tipo ENUM('Fixa', 'Eventual') DEFAULT 'Fixa'
-);
-
--- Tabela de voluntários
-CREATE TABLE Voluntario (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    cpf CHAR(11) UNIQUE NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    data_nascimento DATE NOT NULL,
-    telefone VARCHAR(15),
-    email VARCHAR(100) UNIQUE,
-    nacionalidade VARCHAR(50),
-    funcao_nome VARCHAR(50),
-    data_entrada DATE,                         
-    disponibilidade TEXT,                      
-    habilidades TEXT,                            
-    foto LONGBLOB,                        
-    ativo BOOLEAN DEFAULT 1,
-    endereco_id INT,
-    FOREIGN KEY (funcao_nome) REFERENCES Funcao(nome),
-    FOREIGN KEY (endereco_id) REFERENCES Endereco(id)
+    FOREIGN KEY (apoiador_id) REFERENCES Apoiador(id) ON DELETE CASCADE,
+    FOREIGN KEY (doacao_id) REFERENCES Doacao(id) ON DELETE CASCADE
 );
 
 -- Tabela de contatos gerais
@@ -207,3 +189,20 @@ CREATE TABLE Administrador (
     nome VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL
 );
+
+
+--INSERTS:
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Semente', 20.00, 'Com o Plano Semente, você planta esperança no futuro de muitas crianças! Sua doação ajuda a fornecer materiais essenciais para as aulas e garante a continuidade do nosso projeto.');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Melodia', 50.00, 'O Plano Melodia fortalece o ensino da música, garantindo que mais crianças tenham acesso a instrumentos e aulas, trazendo experiências que transformam vidas e abrem novas possibilidades no futuro!');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Palco', 100.00, 'O Plano Palco apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
+
+INSERT INTO Plano (nome, preco, descricao) VALUES
+('Plano Estrela', 200.00, 'O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
+
+
+

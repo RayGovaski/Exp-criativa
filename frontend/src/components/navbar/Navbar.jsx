@@ -1,67 +1,62 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/AuthContext'; 
+import { useAuth } from '../../context/AuthContext'; // Importe o useAuth
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth(); 
-  const navigate = useNavigate(); // Hook para navegação
+  const { isAuthenticated, logout, user } = useAuth(); // <--- Obtenha o 'user' do useAuth
+  const navigate = useNavigate();
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showDoarDropdown, setShowDoarDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
-  // Create refs to detect clicks outside the dropdowns
+
   const profileDropdownRef = useRef(null);
   const doarDropdownRef = useRef(null);
+
+  // URL base do backend para a foto do perfil
+  const PROFILE_PHOTO_BASE_URL = 'http://localhost:8000/apoiador/foto/';
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 992);
     };
-    
+
     handleResize();
     window.addEventListener('resize', handleResize);
-    
-    // Add event listener for clicks on the document
+
     const handleClickOutside = (event) => {
-      // Close profile dropdown when clicking outside
-      if (profileDropdownRef.current && 
+      if (profileDropdownRef.current &&
           !profileDropdownRef.current.contains(event.target)) {
         setShowProfileDropdown(false);
       }
-      
-      // Close doar dropdown when clicking outside
-      if (doarDropdownRef.current && 
+
+      if (doarDropdownRef.current &&
           !doarDropdownRef.current.contains(event.target)) {
         setShowDoarDropdown(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
-    
-    // Cleanup
+
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-  // Close dropdowns when route changes
   useEffect(() => {
     const closeDropdowns = () => {
       setShowProfileDropdown(false);
       setShowDoarDropdown(false);
     };
-    
-    // Listen for route changes (this is a simplified approach)
-    // For react-router-dom v6+, consider using useLocation for more robust route change detection
+
     window.addEventListener('hashchange', closeDropdowns);
-    
+
     return () => {
       window.removeEventListener('hashchange', closeDropdowns);
     };
@@ -86,25 +81,46 @@ const Navbar = () => {
   const closeSidebar = () => {
     setSidebarOpen(false);
   };
-  
-  // New function to close all dropdowns
+
   const closeAllDropdowns = () => {
     setShowProfileDropdown(false);
     setShowDoarDropdown(false);
   };
 
   const handleLogoutClick = () => {
-    closeAllDropdowns(); // Fecha os dropdowns antes de deslogar
-    logout(); // Chama a função logout do AuthContext
-    navigate('/'); // Redireciona para a home ou página de login após o logout (o logout já deve fazer isso, mas é uma segurança)
+    closeAllDropdowns();
+    logout();
+    navigate('/');
   };
+
+  // Função para obter a URL da imagem do perfil
+  const getProfileImageUrl = () => {
+    if (user && user.id) {
+      // Adiciona um timestamp para evitar cache e garantir que a imagem seja atualizada se mudar
+      return `${PROFILE_PHOTO_BASE_URL}${user.id}?t=${new Date().getTime()}`;
+    }
+    // Retorna a imagem de perfil padrão se não houver usuário logado ou ID
+    return "src/Assets/Perfil.svg";
+  };
+
+  // Ajusta o link "Meu Perfil" do sidebar para usar a rota /perfil que renderiza o Perfil.jsx
+  const getProfileLink = () => {
+    if (user && user.role === 'aluno') { // Exemplo: se houver role no seu user object
+      return '/perfil-aluno';
+    } else if (user && user.role === 'professor') {
+      return '/perfil-professor';
+    } else if (user && user.role === 'apoiador') { // Assumindo 'apoiador' para o seu Perfil.jsx
+      return '/perfil';
+    }
+    return '/login'; // Fallback
+  }
 
   return (
     <>
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={toggleSidebar}></div>
       )}
-      
+
       <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <span className="sidebar-close" onClick={toggleSidebar}>×</span>
@@ -121,18 +137,19 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="sidebar-item dropdown">
-            <div 
+            <div
               className={`sidebar-link dropdown-toggle ${showDoarDropdown ? 'active-dropdown' : ''}`}
               onClick={() => setShowDoarDropdown(!showDoarDropdown)}
             >
-              Apoie {showDoarDropdown ? '' : ''}
+              Apoie
             </div>
             {showDoarDropdown && (
               <div className="sidebar-dropdown">
-                <Link to="/assinaturas" className="sidebar-dropdown-item" onClick={closeSidebar}>
-                  Assinaturas
-                </Link>
-                {/* O LINK PARA A PÁGINA DE DOAÇÕES NO SIDEBAR */}
+                {isAuthenticated() && (
+                  <Link to="/assinaturas" className="sidebar-dropdown-item" onClick={closeSidebar}>
+                    Assinaturas
+                  </Link>
+                )}
                 <Link to="/doar" className="sidebar-dropdown-item" onClick={closeSidebar}>
                   Doar para causa
                 </Link>
@@ -144,7 +161,6 @@ const Navbar = () => {
               Contato
             </Link>
           </li>
-          {/* Botões do sidebar baseados no status de autenticação */}
           {!isAuthenticated() ? (
             <>
               <li className="sidebar-item">
@@ -161,17 +177,10 @@ const Navbar = () => {
           ) : (
             <>
               <li className="sidebar-item">
-                <Link to="/perfil" className="sidebar-link" onClick={closeSidebar}>
+                {/* Link para o perfil no sidebar */}
+                <Link to={getProfileLink()} className="sidebar-link" onClick={closeSidebar}> 
                   Meu Perfil
                 </Link>
-              </li>
-              <li className="sidebar-item">
-                <button 
-                  className="sidebar-link logout-button" // Adicione uma classe para estilização, se necessário
-                  onClick={() => { closeSidebar(); handleLogoutClick(); }}
-                >
-                  Sair
-                </button>
               </li>
             </>
           )}
@@ -206,8 +215,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item dropdown" ref={doarDropdownRef}>
-                <Link 
-                  className="nav-link nav-item-custom3" 
+                <Link
+                  className="nav-link nav-item-custom3"
                   onClick={toggleDoarDropdown}
                   style={{ cursor: 'pointer' }}
                 >
@@ -215,17 +224,18 @@ const Navbar = () => {
                 </Link>
                 {showDoarDropdown && (
                   <div className="dropdown-menu-custom show">
-                    <Link 
-                      to="/assinaturas" 
-                      className="dropdown-item-custom" 
-                      onClick={closeAllDropdowns}
-                    >
-                      Assinaturas
-                    </Link>
-                    {/* O LINK PARA A PÁGINA DE DOAÇÕES NO MENU PRINCIPAL */}
-                    <Link 
-                      to="/doar" 
-                      className="dropdown-item-custom" 
+                    {isAuthenticated() && (
+                      <Link
+                        to="/assinaturas"
+                        className="dropdown-item-custom"
+                        onClick={closeAllDropdowns}
+                      >
+                        Assinaturas
+                      </Link>
+                    )}
+                    <Link
+                      to="/doar"
+                      className="dropdown-item-custom"
                       onClick={closeAllDropdowns}
                     >
                       Doar para causa
@@ -234,35 +244,39 @@ const Navbar = () => {
                 )}
               </li>
               <li className="nav-item">
-                <Link className="nav-link nav-item-custom4" to="/perfil"> {/* Contato -> Perfil? Verifique a rota correta */}
+                <Link className="nav-link nav-item-custom4" to="/#contato">
                   Contato
                 </Link>
               </li>
             </ul>
           </div>
-          
+
           <div className="profile-container" ref={profileDropdownRef}>
             <div className="profile-dropdown-container">
-              <img 
-                src="src/Assets/Perfil.svg" 
-                alt="Perfil" 
-                className="profile-img" 
+              {/* <--- IMAGEM DO PERFIL AQUI --- */}
+              <img
+                // Usa a URL da imagem do perfil se o usuário estiver autenticado, senão usa a padrão
+                src={isAuthenticated() ? getProfileImageUrl() : "src/Assets/Perfil.svg"}
+                alt="Perfil"
+                className="profile-img" // Certifique-se de que esta classe CSS define largura/altura para a imagem
                 onClick={toggleProfileDropdown}
+                // Adiciona um manipulador de erro para carregar uma imagem padrão se a foto não for encontrada
+                onError={(e) => { e.target.onerror = null; e.target.src = "src/Assets/Perfil.svg"; }}
               />
               {showProfileDropdown && (
                 <div className="profile-dropdown-menu show">
-                  {!isAuthenticated() ? ( // Renderização condicional para os botões do perfil
+                  {!isAuthenticated() ? (
                     <>
-                      <Link 
-                        to="/login" 
-                        className="dropdown-item-custom" 
+                      <Link
+                        to="/login"
+                        className="dropdown-item-custom"
                         onClick={closeAllDropdowns}
                       >
                         Login
                       </Link>
-                      <Link 
-                        to="/menu-registro" 
-                        className="dropdown-item-custom" 
+                      <Link
+                        to="/menu-registro"
+                        className="dropdown-item-custom"
                         onClick={closeAllDropdowns}
                       >
                         Registro
@@ -270,13 +284,29 @@ const Navbar = () => {
                     </>
                   ) : (
                     <>
-                      <Link 
-                        to="/perfil" // Rota para a página de perfil do usuário
-                        className="dropdown-item-custom" 
+                      <Link
+                        to="/perfil" // <--- ROTA CORRIGIDA PARA O PERFIL DO APOIADOR (GERAL)
+                        className="dropdown-item-custom"
                         onClick={closeAllDropdowns}
                       >
                         Meu Perfil
                       </Link>
+                      {/* Link para Gerenciar Assinatura (se for um apoiador) */}
+                      {user && user.role === 'apoiador' && (
+                         <Link
+                           to="/gerenciar-assinatura"
+                           className="dropdown-item-custom"
+                           onClick={closeAllDropdowns}
+                         >
+                           Gerenciar Assinatura
+                         </Link>
+                      )}
+                      <button
+                        className="dropdown-item-custom logout-button"
+                        onClick={handleLogoutClick}
+                      >
+                        Sair
+                      </button>
                     </>
                   )}
                 </div>

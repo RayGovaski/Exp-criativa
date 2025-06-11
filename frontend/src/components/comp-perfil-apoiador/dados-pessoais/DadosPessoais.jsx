@@ -285,9 +285,6 @@ const handleSalvarFoto = async () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-  };
 
   const renderFormularioAtualizacao = () => {
     switch (campoParaAtualizar) {
@@ -465,9 +462,6 @@ const handleSalvarFoto = async () => {
         </div>
         
         <div className="text-end">
-          <Button className="custom-button-azul5" onClick={handleLogout}>
-            Sair
-          </Button>
           <Button className="custom-button-azul5" onClick={handleAbrirModal}>
             Atualizar Dados
           </Button>

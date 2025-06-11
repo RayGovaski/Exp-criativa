@@ -1,50 +1,86 @@
 // src/pages/DoacoesPage/PaginaDoacoes.jsx
-import React from 'react';
-import { Container, Row, Col, ProgressBar, Card } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, ProgressBar, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import '../../components/comp_home/Doacoes.css';
 
-const doacoesMock = [
-    {
-        id: 'violao',
-        titulo: 'Ajude a comprar um violão',
-        descricao: 'Ajude a comprar um violão para que mais crianças aprendam a tocar e se apaixonem pela música!',
-        imagem: 'src/Assets/Card1.png',
-        porcentagem: 55,
-        corTopo: 'cor-rosa',
-        tipoBotao: 'botao-rosa-escuro'
-    },
-    {
-        id: 'roupas_acessorios',
-        titulo: 'Roupas e acessórios',
-        descricao: 'Contribua para a compra de roupas e acessórios que deixam os espetáculos ainda mais mágicos!',
-        imagem: 'src/Assets/Card2.png',
-        porcentagem: 80,
-        corTopo: 'cor-rosa-claro',
-        tipoBotao: 'botao-rosa-claro'
-    },
-    {
-        id: 'materiais_criativos',
-        titulo: 'Materiais criativos',
-        descricao: 'Com sua doação, podemos garantir que as crianças soltem a criatividade com materiais de qualidade!',
-        imagem: 'src/Assets/Card3.png',
-        porcentagem: 95,
-        corTopo: 'cor-rosa',
-        tipoBotao: 'botao-rosa-escuro'
-    },
-    {
-        id: 'microfones_aulas',
-        titulo: 'Microfones para aulas',
-        descricao: 'Ajude a garantir que as crianças tenham equipamentos para se expressar nas aulas de canto e teatro.',
-        imagem: 'src/Assets/Card4.png',
-        porcentagem: 55,
-        corTopo: 'cor-rosa-claro',
-        tipoBotao: 'botao-rosa-claro'
-    }
-];
-
 const PaginaDoacoes = () => {
+    const [doacoes, setDoacoes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchAllDoacoes = async () => {
+            try {
+                // <--- Mude a URL da API aqui para '/doacoes/doar'
+                const response = await axios.get('http://localhost:8000/doacoes/doar'); 
+                const formattedDoacoes = response.data.map(doacao => {
+                    const porcentagem = doacao.porcentagem || 0;
+                    let corTopoClass = '';
+                    let tipoBotaoClass = '';
+
+
+                        corTopoClass = 'cor-rosa-claro';
+                        tipoBotaoClass = 'botao-rosa-claro';
+                    
+                    if (doacao.status === 'Concluída' || porcentagem >= 100) {
+                        tipoBotaoClass += ' disabled';
+                    }
+
+                    const imageUrl = doacao.imagem_path ? `http://localhost:8000/doacoes/imagem/${doacao.id}` : null;
+
+                    return {
+                        id: doacao.id,
+                        titulo: doacao.titulo,
+                        descricao: doacao.descricao,
+                        imagem: imageUrl,
+                        porcentagem: porcentagem,
+                        corTopo: corTopoClass, 
+                        tipoBotao: tipoBotaoClass, 
+                        valorMeta: doacao.valorMeta,
+                        arrecadado: doacao.arrecadado,
+                        status: doacao.status,
+                        prioridade: doacao.prioridade
+                    };
+                });
+                setDoacoes(formattedDoacoes);
+            } catch (err) {
+                console.error("Erro ao buscar todas as doações:", err);
+                setError("Não foi possível carregar as doações. Tente novamente mais tarde.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAllDoacoes();
+    }, []);
+
+    if (loading) {
+        return (
+            <Container className="text-center my-4">
+                <p>Carregando todas as doações...</p>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container className="text-center my-4">
+                <p className="text-danger">{error}</p>
+            </Container>
+        );
+    }
+
+    if (doacoes.length === 0) {
+        return (
+            <Container className="text-center my-4">
+                <p>Nenhuma doação disponível no momento que atenda aos critérios.</p>
+            </Container>
+        );
+    }
+
     return (
         <Container className="doacoes-page-container my-5">
             <Row className="justify-content-center text-center mb-5">
@@ -59,11 +95,16 @@ const PaginaDoacoes = () => {
             </Row>
 
             <Row className="g-4 justify-content-center">
-                {doacoesMock.map((item) => (
+                {doacoes.map((item) => (
                     <Col key={item.id} md={5} lg={3}>
                         <Card className="sombra-card2 card-largo h-100 position-relative">
                             <div className={`card-top-bar ${item.corTopo}`}></div>
-                            <Card.Img variant="top" src={item.imagem} className="img-doacao" />
+                            <Card.Img 
+                                variant="top" 
+                                src={item.imagem || "https://placehold.co/150x150?text=Sem+Imagem"} 
+                                className="img-doacao" 
+                                onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/150x150?text=Erro+Imagem"; }}
+                            />
                             <Card.Body className="d-flex flex-column">
                                 <div>
                                     <Card.Title>{item.titulo}</Card.Title>
@@ -71,7 +112,7 @@ const PaginaDoacoes = () => {
                                 </div>
                                 <ProgressBar now={item.porcentagem} label={`${item.porcentagem}%`} className="mb-3 mt-auto" />
                                 <Link
-                                    to="/doarr"
+                                    to="/doar-pagamento"
                                     state={{ preSelectedCauseId: item.id, preSelectedCauseTitle: item.titulo }}
                                     className={`btn ${item.tipoBotao}`}
                                 >

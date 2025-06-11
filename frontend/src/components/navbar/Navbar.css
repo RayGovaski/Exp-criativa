@@ -274,4 +274,20 @@
   .navbar-brand.mx-auto {
     margin-left: -15px;
   }
+}/* No seu Navbar.css */
+.dropdown-item-custom.logout-button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.25rem 1rem; /* Ajuste o padding para combinar com os links */
+  color: #ffffff; /* Cor padrão do texto de dropdown */
+  text-decoration: none;
+  cursor: pointer;
+  /* Adicione :hover e :active se precisar */
+}
+
+.dropdown-item-custom.logout-button:hover {
+  background-color: #81b8a5; /* Cor de fundo no hover */
+  color: #ffffff;
 }

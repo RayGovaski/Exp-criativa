@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "./MenuRegistro.css";
 
 const MenuRegistro = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleRegistroTipo = (tipo) => {
     if (tipo === "apoiador") {
-      navigate("/registro-apoiador"); 
+      navigate("/registro-apoiador");
     } else if (tipo === "aluno") {
       navigate("/registro-aluno");
     }
@@ -29,6 +29,10 @@ const MenuRegistro = () => {
             </button>
           </div>
           <p className="menu-login">Faça seu <a href="/login">login aqui</a></p>
+          {/* NOVO LINK PARA REGISTRO DE PROFESSOR */}
+          <p className="menu-professor-link">
+            Quer ser um professor? <a href="/registro-professor">Clique aqui</a>
+          </p>
         </div>
       </div>
     </div>

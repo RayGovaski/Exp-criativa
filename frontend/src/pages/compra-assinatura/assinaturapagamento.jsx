@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Smartphone, FileText, Building } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Importe para redirecionamento
+import { useAuth } from "../../context/AuthContext";
+import axios from 'axios'; // Importe o axios para fazer requisições HTTP
 import "./AssinaturaPagamento.css";
 
 const plans = [
     {
         id: 'semente',
+        dbId: 1, // <--- Adicione o ID correspondente no seu banco de dados
         title: "Plano Semente",
         subtitle: "(Toda ajuda faz a diferença!)",
         price: "R$ 20/mês",
@@ -14,15 +18,17 @@ const plans = [
     },
     {
         id: 'melodia',
+        dbId: 2, // <--- Adicione o ID correspondente
         title: "Plano Melodia",
         subtitle: "(Dando voz ao futuro!)",
         price: "R$ 50/mês",
         numericPrice: 50,
         description: "O Plano Melodia fortalece o ensino da música, garantindo que mais crianças tenham acesso a instrumentos e aulas, trazendo experiências que transformam vidas e abrem novas possibilidades no futuro!",
-        highlightColor: "selected-plan-border-cyan" 
+        highlightColor: "selected-plan-border-cyan"
     },
     {
         id: 'palco',
+        dbId: 3, // <--- Adicione o ID correspondente
         title: "Plano Palco",
         subtitle: "(A arte que muda vidas!)",
         price: "R$ 100/mês",
@@ -32,12 +38,13 @@ const plans = [
     },
     {
         id: 'estrela',
+        dbId: 4, // <--- Adicione o ID correspondente
         title: "Plano Estrela",
         subtitle: "(Transformando futuros!)",
         price: "R$ 200/mês",
         numericPrice: 200,
         description: "O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!",
-        highlightColor: "selected-plan-border-cyan" 
+        highlightColor: "selected-plan-border-cyan"
     },
 ];
 
@@ -49,36 +56,130 @@ const paymentMethods = [
 ];
 
 const AssinaturaPagamento = () => {
+    const [currentSubscription, setCurrentSubscription] = useState(null);
+    const navigate = useNavigate();
+    const { user, token } = useAuth();
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
-    const [customerData, setCustomerData] = useState({
-        name: '',
-        email: '',
-        phone: '',
+    const [cardData, setCardData] = useState({ // Renomeado para refletir que são apenas dados de cartão
         cardNumber: '',
         cardName: '',
         cardExpiry: '',
         cardCvv: ''
     });
 
-    const handleInputChange = (field, value) => {
-        setCustomerData(prev => ({ ...prev, [field]: value }));
+    // Proteção de rota: redireciona se não houver token
+    useEffect(() => {
+        const fetchCurrentSubscription = async () => {
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+            try {
+                // Busque o perfil para saber o plano atual do usuário
+                const response = await axios.get('http://localhost:8000/apoiador/profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.data && response.data.plano_nome) {
+                    setCurrentSubscription(response.data);
+                } else {
+                    setCurrentSubscription(null); // Nenhuma assinatura ativa
+                }
+            } catch (err) {
+                console.error("Erro ao buscar plano atual:", err);
+                setCurrentSubscription(null); // Em caso de erro, assumir que não tem plano ou mostrar erro
+            }
+        };
+        fetchCurrentSubscription();
+    }, [token, navigate]); // Dependências: token e navigate
+
+    const handleCardInputChange = (field, value) => {
+        setCardData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleSubscribe = () => {
+    const handleSubscribe = async () => {
         if (!selectedPlan || !selectedPayment) {
             alert('Por favor, selecione um plano e método de pagamento.');
             return;
         }
 
+        if (!user || !user.id) {
+            alert('Erro: ID do apoiador não encontrado. Por favor, faça login novamente.');
+            navigate('/login');
+            return;
+        }
+
         const plan = plans.find(p => p.id === selectedPlan);
+        if (!plan) { // Checagem adicional, caso o ID não seja encontrado
+            alert('Plano selecionado inválido.');
+            return;
+        }
         const payment = paymentMethods.find(p => p.id === selectedPayment);
 
-        alert(`Processando assinatura do ${plan.title} (${plan.price}) via ${payment.name}`);
+        // Validação básica para cartão (se selecionado)
+        if ((selectedPayment === 'credit' || selectedPayment === 'debit') && 
+            (!cardData.cardNumber || !cardData.cardName || !cardData.cardExpiry || !cardData.cardCvv)) {
+            alert('Por favor, preencha todos os dados do cartão.');
+            return;
+        }
+
+        // --- Lógica de verificação do plano atual no frontend antes de enviar a requisição ---
+        if (currentSubscription && currentSubscription.plano_nome) {
+            if (currentSubscription.plano_nome === plan.title) {
+                alert(`Você já está atualmente no plano ${plan.title}.`);
+                return; // Não envia a requisição se for o mesmo plano
+            } else {
+                // Se for um plano diferente, o backend vai fazer a atualização
+                const confirmChange = window.confirm(
+                    `Você já possui o plano ${currentSubscription.plano_nome}. Deseja trocar para o plano ${plan.title}?`
+                );
+                if (!confirmChange) {
+                    return; // Usuário cancelou a troca
+                }
+            }
+        }
+        // --- Fim da lógica de verificação no frontend ---
+
+
+        try {
+            const response = await axios.post('http://localhost:8000/apoiador/assinar-plano', {
+                apoiadorId: user.id,
+                planoId: plan.dbId, // Certifique-se de que plan.dbId está sendo usado
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // A mensagem de sucesso agora virá do backend, que dirá se foi nova assinatura ou troca
+            alert(response.data.message);
+            // Atualize o plano atual no frontend após sucesso
+            setCurrentSubscription({ ...currentSubscription, plano_nome: plan.title, plano_preco: plan.numericPrice, data_adesao: new Date().toISOString() });
+            navigate('/gerenciar-assinatura'); // Redireciona para a página de gerenciamento/detalhes
+        } catch (error) {
+            console.error("Erro ao assinar plano:", error);
+            let errorMessage = "Ocorreu um erro ao processar sua assinatura.";
+            if (error.response && error.response.data && error.response.data.error) {
+                errorMessage = error.response.data.error;
+            }
+            alert(errorMessage);
+        }
     };
 
     const selectedPlanData = plans.find(p => p.id === selectedPlan);
 
+    // Se o usuário não estiver autenticado, mostre um indicador de carregamento ou redirecione
+    if (!token) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-lg text-gray-700">Carregando ou redirecionando para o login...</p>
+            </div>
+        );
+    }
+    
+    // Renderiza a página de assinatura
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-6xl mx-auto px-4">
@@ -93,6 +194,15 @@ const AssinaturaPagamento = () => {
                     </p>
                 </div>
 
+                {/* Exibir plano atual do usuário, se houver */}
+                {currentSubscription && currentSubscription.plano_nome && (
+                    <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8" role="alert">
+                        <p className="font-bold">Plano Atual:</p>
+                        <p>Você está atualmente no plano **{currentSubscription.plano_nome}**. Selecione um plano diferente abaixo para trocar.</p>
+                    </div>
+                )}
+
+
                 {/* Plans Selection */}
                 <div className="mb-12">
                     <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
@@ -102,10 +212,13 @@ const AssinaturaPagamento = () => {
                         {plans.map((plan) => (
                             <div
                                 key={plan.id}
+                                // Adiciona um estilo visual se este for o plano atual do usuário
                                 className={`relative border-2 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
                                     selectedPlan === plan.id
                                         ? `${plan.highlightColor} shadow-lg transform scale-105`
-                                        : 'border-gray-200 bg-white'
+                                        : currentSubscription && currentSubscription.plano_nome === plan.title
+                                            ? 'border-green-500 bg-green-50 shadow-md' // Estilo para o plano atual
+                                            : 'border-gray-200 bg-white'
                                 }`}
                                 onClick={() => setSelectedPlan(plan.id)}
                             >
@@ -181,145 +294,95 @@ const AssinaturaPagamento = () => {
                     </div>
                 )}
 
-                {/* Customer Information Form */}
-                {selectedPlan && selectedPayment && (
+                {/* Payment Details (Apenas Cartão, sem dados do cliente) */}
+                {selectedPlan && selectedPayment && (selectedPayment === 'credit' || selectedPayment === 'debit') && (
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                            Seus Dados
+                            Dados do Cartão
                         </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Nome Completo *
+                                    Número do Cartão *
                                 </label>
                                 <input
                                     type="text"
-                                    value={customerData.name}
-                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                    value={cardData.cardNumber}
+                                    onChange={(e) => handleCardInputChange('cardNumber', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                    placeholder="Seu nome completo"
+                                    placeholder="0000 0000 0000 0000"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    E-mail *
+                                    Nome no Cartão *
                                 </label>
                                 <input
-                                    type="email"
-                                    value={customerData.email}
-                                    onChange={(e) => handleInputChange('email', e.target.value)}
+                                    type="text"
+                                    value={cardData.cardName}
+                                    onChange={(e) => handleCardInputChange('cardName', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                    placeholder="seu@email.com"
+                                    placeholder="Nome como no cartão"
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Telefone
-                                </label>
-                                <input
-                                    type="tel"
-                                    value={customerData.phone}
-                                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                    placeholder="(11) 99999-9999"
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Validade *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={cardData.cardExpiry}
+                                        onChange={(e) => handleCardInputChange('cardExpiry', e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                                        placeholder="MM/AA"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        CVV *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={cardData.cardCvv}
+                                        onChange={(e) => handleCardInputChange('cardCvv', e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                                        placeholder="000"
+                                    />
+                                </div>
                             </div>
                         </div>
+                    </div>
+                )}
 
-                        {/* Payment Details */}
-                        {(selectedPayment === 'credit' || selectedPayment === 'debit') && (
-                            <div className="border-t pt-6">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                                    Dados do Cartão
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Número do Cartão *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={customerData.cardNumber}
-                                            onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                            placeholder="0000 0000 0000 0000"
-                                        />
-                                    </div>
+                {selectedPlan && selectedPayment === 'pix' && (
+                    <div className="bg-white rounded-lg shadow-md p-8 mb-8 text-center">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                            Pagamento via Pix
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                            Após confirmar, você receberá o QR Code para pagamento de <strong>{selectedPlanData?.price}</strong>
+                        </p>
+                        <div className="w-48 h-48 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mx-auto">
+                            <p className="text-gray-500">QR Code será gerado</p>
+                        </div>
+                    </div>
+                )}
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Nome no Cartão *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={customerData.cardName}
-                                            onChange={(e) => handleInputChange('cardName', e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                            placeholder="Nome como no cartão"
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Validade *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={customerData.cardExpiry}
-                                                onChange={(e) => handleInputChange('cardExpiry', e.target.value)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                                placeholder="MM/AA"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                CVV *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={customerData.cardCvv}
-                                                onChange={(e) => handleInputChange('cardCvv', e.target.value)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                                placeholder="000"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {selectedPayment === 'pix' && (
-                            <div className="border-t pt-6 text-center">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                                    Pagamento via Pix
-                                </h3>
-                                <p className="text-gray-600 mb-4">
-                                    Após confirmar, você receberá o QR Code para pagamento de <strong>{selectedPlanData?.price}</strong>
-                                </p>
-                                <div className="w-48 h-48 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mx-auto">
-                                    <p className="text-gray-500">QR Code será gerado</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {selectedPayment === 'boleto' && (
-                            <div className="border-t pt-6 text-center">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                                    Pagamento via Boleto
-                                </h3>
-                                <p className="text-gray-600 mb-4">
-                                    O boleto de <strong>{selectedPlanData?.price}</strong> será gerado após a confirmação
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    Prazo de compensação: até 3 dias úteis
-                                </p>
-                            </div>
-                        )}
+                {selectedPlan && selectedPayment === 'boleto' && (
+                    <div className="bg-white rounded-lg shadow-md p-8 mb-8 text-center">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                            Pagamento via Boleto
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                            O boleto de <strong>{selectedPlanData?.price}</strong> será gerado após a confirmação
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Prazo de compensação: até 3 dias úteis
+                        </p>
                     </div>
                 )}
 

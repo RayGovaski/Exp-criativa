@@ -1,9 +1,11 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useRef } from "react";
 import "./RegistroAluno.css";
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Importa a função toast
 
-const Add = () => {
+const Add = () => { // Renomeado de Add para RegistroAluno, para clareza
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [fileNames, setFileNames] = useState({
@@ -11,7 +13,7 @@ const Add = () => {
     responsavel_comprovante_renda: "Nenhum arquivo selecionado",
     aluno_foto: "Nenhum arquivo selecionado"
   });
-  
+
   const [formData, setFormData] = useState({
     // Responsável (passo 1)
     responsavel_cpf: "",
@@ -28,7 +30,7 @@ const Add = () => {
     responsavel_profissao: "",
     responsavel_renda_familiar: "",
     responsavel_comprovante_renda: null,
-    
+
     // Aluno (passo 2)
     aluno_cpf: "",
     aluno_rg: "",
@@ -43,12 +45,12 @@ const Add = () => {
     aluno_confirmar_senha: "",
     aluno_foto: null
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({...formData, [name]: value});
   };
-  
+
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (files && files[0]) {
@@ -56,56 +58,71 @@ const Add = () => {
       setFileNames({...fileNames, [name]: files[0].name});
     }
   };
-  
+
   const handleNext = (e) => {
     e.preventDefault();
+    // Adicione validações para o Passo 1 antes de avançar
+    // Exemplo:
+    if (!formData.responsavel_nome || !formData.responsavel_email || !formData.responsavel_cpf) {
+        toast.error("Por favor, preencha todos os campos obrigatórios do Responsável.");
+        return;
+    }
     setStep(2);
     window.scrollTo(0, 0);
   };
-  
+
   const handlePrevious = (e) => {
     e.preventDefault();
     setStep(1);
     window.scrollTo(0, 0);
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.aluno_senha !== formData.aluno_confirmar_senha) {
-      alert("As senhas não coincidem!");
+      toast.error("As senhas não coincidem!"); // Substituído alert()
       return;
     }
-    
+    // Adicione validação para o Passo 2 aqui
+    // Exemplo:
+    if (!formData.aluno_nome || !formData.aluno_email || !formData.aluno_senha) {
+        toast.error("Por favor, preencha todos os campos obrigatórios do Aluno.");
+        return;
+    }
+
+
     const submitData = new FormData();
-    
+
     for (const key in formData) {
       if (formData[key] !== null) {
         submitData.append(key, formData[key]);
       }
     }
-    
+
     try {
       await axios.post("http://localhost:8000/alunos", submitData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      navigate("/");
+      toast.success("Cadastro realizado com sucesso!"); // Substituído alert()
+      navigate("/"); // Ou para a página de login
     } catch (err) {
       console.log(err);
-      alert("Erro ao cadastrar. Verifique os dados e tente novamente.");
+      toast.error("Erro ao cadastrar. Verifique os dados e tente novamente."); // Substituído alert()
     }
   };
-  
+
+  // eslint-disable-next-line no-unused-vars
   const FileInput = ({ name, label, value, onChange }) => {
     return (
       <div className="mb-2">
         <label className="label-rosa">{label}</label>
         <div className="file-input-wrapper">
           <div className="file-input-container">
-            <input 
-              type="file" 
-              name={name} 
+            <input
+              type="file"
+              name={name}
               onChange={onChange}
               className="file-input-rosa"
             />
@@ -116,7 +133,7 @@ const Add = () => {
       </div>
     );
   };
-  
+
   return (
     <div className="d-flex justify-content-center align-items-center fundo-rosa" style={{ minHeight: "100vh" }}>
       <div className="registro-container-rosa">
@@ -132,35 +149,37 @@ const Add = () => {
             <span className={`step ${step === 2 ? "active" : ""}`}>2</span>
           </div>
         </div>
-        
+
         <form className="registro-form-rosa p-3">
           {step === 1 ? (
             // passo 1: Responsável
             <>
               <div className="mb-2">
                 <label className="label-rosa">CPF:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_cpf" 
-                  value={formData.responsavel_cpf} 
+                <input
+                  type="text"
+                  name="responsavel_cpf"
+                  value={formData.responsavel_cpf}
                   onChange={handleChange}
                   placeholder="000.000.000-00"
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Nome completo:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_nome" 
-                  value={formData.responsavel_nome} 
+                <input
+                  type="text"
+                  name="responsavel_nome"
+                  value={formData.responsavel_nome}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Sexo:</label>
-                <select 
-                  name="responsavel_sexo" 
-                  value={formData.responsavel_sexo} 
+                <select
+                  name="responsavel_sexo"
+                  value={formData.responsavel_sexo}
                   onChange={handleChange}
                   className="select-rosa"
                 >
@@ -172,104 +191,110 @@ const Add = () => {
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Data de nascimento:</label>
-                <input 
-                  type="date" 
-                  name="responsavel_data_nascimento" 
-                  value={formData.responsavel_data_nascimento} 
+                <input
+                  type="date"
+                  name="responsavel_data_nascimento"
+                  value={formData.responsavel_data_nascimento}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Telefone:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_telefone" 
-                  value={formData.responsavel_telefone} 
+                <input
+                  type="text"
+                  name="responsavel_telefone"
+                  value={formData.responsavel_telefone}
                   onChange={handleChange}
                   placeholder="(00) 00000-0000"
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Email:</label>
-                <input 
-                  type="email" 
-                  name="responsavel_email" 
-                  value={formData.responsavel_email} 
+                <input
+                  type="email"
+                  name="responsavel_email"
+                  value={formData.responsavel_email}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Logradouro:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_logradouro" 
-                  value={formData.responsavel_logradouro} 
+                <input
+                  type="text"
+                  name="responsavel_logradouro"
+                  value={formData.responsavel_logradouro}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Número da residência:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_numero_residencia" 
-                  value={formData.responsavel_numero_residencia} 
+                <input
+                  type="text"
+                  name="responsavel_numero_residencia"
+                  value={formData.responsavel_numero_residencia}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">CEP:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_cep" 
-                  value={formData.responsavel_cep} 
+                <input
+                  type="text"
+                  name="responsavel_cep"
+                  value={formData.responsavel_cep}
                   onChange={handleChange}
                   placeholder="00000-000"
+                  required // Adicionado required
                 />
               </div>
-              
-              <FileInput 
+
+              <FileInput
                 name="responsavel_comprovante_residencia"
                 label="Comprovante de residência:"
                 value={formData.responsavel_comprovante_residencia}
                 onChange={handleFileChange}
               />
-              
+
               <div className="mb-2">
                 <label className="label-rosa">Grau de parentesco:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_grau_parentesco" 
-                  value={formData.responsavel_grau_parentesco} 
+                <input
+                  type="text"
+                  name="responsavel_grau_parentesco"
+                  value={formData.responsavel_grau_parentesco}
                   onChange={handleChange}
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Profissão:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_profissao" 
-                  value={formData.responsavel_profissao} 
+                <input
+                  type="text"
+                  name="responsavel_profissao"
+                  value={formData.responsavel_profissao}
                   onChange={handleChange}
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Renda familiar:</label>
-                <input 
-                  type="text" 
-                  name="responsavel_renda_familiar" 
-                  value={formData.responsavel_renda_familiar} 
+                <input
+                  type="text"
+                  name="responsavel_renda_familiar"
+                  value={formData.responsavel_renda_familiar}
                   onChange={handleChange}
                   placeholder="R$ 0,00"
                 />
               </div>
-              
-              <FileInput 
+
+              <FileInput
                 name="responsavel_comprovante_renda"
                 label="Comprovante de renda:"
                 value={formData.responsavel_comprovante_renda}
                 onChange={handleFileChange}
               />
-              
+
               <div className="button-container-rosa">
                 <button type="button" className="custom-button-rosa" onClick={handleNext}>
                   Próximo
@@ -281,37 +306,39 @@ const Add = () => {
             <>
               <div className="mb-2">
                 <label className="label-rosa">CPF:</label>
-                <input 
-                  type="text" 
-                  name="aluno_cpf" 
-                  value={formData.aluno_cpf} 
+                <input
+                  type="text"
+                  name="aluno_cpf"
+                  value={formData.aluno_cpf}
                   onChange={handleChange}
                   placeholder="000.000.000-00"
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">RG:</label>
-                <input 
-                  type="text" 
-                  name="aluno_rg" 
-                  value={formData.aluno_rg} 
+                <input
+                  type="text"
+                  name="aluno_rg"
+                  value={formData.aluno_rg}
                   onChange={handleChange}
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Nome completo:</label>
-                <input 
-                  type="text" 
-                  name="aluno_nome" 
-                  value={formData.aluno_nome} 
+                <input
+                  type="text"
+                  name="aluno_nome"
+                  value={formData.aluno_nome}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Sexo:</label>
-                <select 
-                  name="aluno_sexo" 
-                  value={formData.aluno_sexo} 
+                <select
+                  name="aluno_sexo"
+                  value={formData.aluno_sexo}
                   onChange={handleChange}
                   className="select-rosa"
                 >
@@ -323,37 +350,38 @@ const Add = () => {
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Data de nascimento:</label>
-                <input 
-                  type="date" 
-                  name="aluno_data_nascimento" 
-                  value={formData.aluno_data_nascimento} 
+                <input
+                  type="date"
+                  name="aluno_data_nascimento"
+                  value={formData.aluno_data_nascimento}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Nacionalidade:</label>
-                <input 
-                  type="text" 
-                  name="aluno_nacionalidade" 
-                  value={formData.aluno_nacionalidade} 
+                <input
+                  type="text"
+                  name="aluno_nacionalidade"
+                  value={formData.aluno_nacionalidade}
                   onChange={handleChange}
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Telefone:</label>
-                <input 
-                  type="text" 
-                  name="aluno_telefone" 
-                  value={formData.aluno_telefone} 
+                <input
+                  type="text"
+                  name="aluno_telefone"
+                  value={formData.aluno_telefone}
                   onChange={handleChange}
                   placeholder="(00) 00000-0000"
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Necessidades especiais:</label>
-                <textarea 
-                  name="aluno_necessidades_especiais" 
-                  value={formData.aluno_necessidades_especiais} 
+                <textarea
+                  name="aluno_necessidades_especiais"
+                  value={formData.aluno_necessidades_especiais}
                   onChange={handleChange}
                   className="textarea-rosa"
                   placeholder="Descreva se houver necessidades especiais"
@@ -361,39 +389,42 @@ const Add = () => {
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Email:</label>
-                <input 
-                  type="email" 
-                  name="aluno_email" 
-                  value={formData.aluno_email} 
+                <input
+                  type="email"
+                  name="aluno_email"
+                  value={formData.aluno_email}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Senha:</label>
-                <input 
-                  type="password" 
-                  name="aluno_senha" 
-                  value={formData.aluno_senha} 
+                <input
+                  type="password"
+                  name="aluno_senha"
+                  value={formData.aluno_senha}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
               <div className="mb-2">
                 <label className="label-rosa">Confirmar senha:</label>
-                <input 
-                  type="password" 
-                  name="aluno_confirmar_senha" 
-                  value={formData.aluno_confirmar_senha} 
+                <input
+                  type="password"
+                  name="aluno_confirmar_senha"
+                  value={formData.aluno_confirmar_senha}
                   onChange={handleChange}
+                  required // Adicionado required
                 />
               </div>
-              
-              <FileInput 
+
+              <FileInput
                 name="aluno_foto"
                 label="Foto do aluno:"
                 value={formData.aluno_foto}
                 onChange={handleFileChange}
               />
-              
+
               <div className="button-container-rosa">
                 <button type="button" className="secondary-button-rosa" onClick={handlePrevious}>
                   Voltar
@@ -411,4 +442,3 @@ const Add = () => {
 };
 
 export default Add;
-

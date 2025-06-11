@@ -1,10 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
 
-.fundo-menu{
+.fundo-menu {
   background-image: url("src/Assets/FundoMenuRegistro.png");
-  background-size: cover; 
-  background-position: center; 
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .menu-container {
@@ -12,44 +15,55 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   text-align: center;
   background: none;
   font-family: 'Fredoka', sans-serif;
+  padding: 20px 0;
 }
 
 .content-wrapper {
   background-color: #ffffff;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .menu-title {
-  font-size: 2vw;
+  font-size: clamp(24px, 4vw, 48px);
   font-weight: 600;
   color: #0A7D7E;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   border-bottom: 3px solid #76B5A0;
   display: inline-block;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
 }
-.menu-text{
-  font-weight:600;
+
+.menu-text {
+  font-weight: 600;
+  font-size: clamp(14px, 2.5vw, 18px);
 }
 
 .menu-options {
   display: flex;
-  gap: 3vw;
-  margin-top: 20px;
+  gap: 30px;
+  margin: 30px 0;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .menu-button {
-  width: 20vw;
-  height: 10vw;
+  min-width: 200px;
+  width: 100%;
+  max-width: 280px;
+  height: 140px;
   border: none;
-  border-radius: 10px;
-  font-size: 1.5rem;
+  border-radius: 15px;
+  font-size: clamp(16px, 2.5vw, 20px);
   font-weight: bold;
   color: white;
   display: flex;
@@ -57,13 +71,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.4s ease-in-out, opacity 0.5s ease-in-out;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   background-size: cover;
-  transition: transform 0.5s;
-  transform-style: preserve-3d;
-  position: relative;
+  background-position: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .apoiador {
@@ -77,34 +90,37 @@
 .apoiador:hover {
   background-color: #0A7D7E;
   background-image: url("src/Assets/ImagemRegistroApoiador.png");
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(10, 125, 126, 0.3);
 }
 
 .aluno:hover {
   background-color: #FF6F61;
   background-image: url("src/Assets/ImagemRegistroAluno.png");
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(255, 111, 97, 0.3);
 }
 
 .menu-button:hover .menu-icon,
 .menu-button:hover span {
-  opacity: 0.5;
-  transition: opacity 0.5s ease-in-out;
-  transition: transform 0.6s ease-in-out; 
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
 }
 
 .menu-icon {
-  width: 5vw;
-  height: 5vw;
-  margin-bottom: 5px;
-  transition: opacity 0.5s ease-in-out;
+  width: clamp(40px, 8vw, 60px);
+  height: clamp(40px, 8vw, 60px);
+  margin-bottom: 10px;
+  transition: opacity 0.3s ease;
 }
 
 .menu-button span {
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.3s ease;
 }
 
 .menu-login {
-  margin-top: 20px;
-  font-size: 1.5vw;
+  margin-top: 25px;
+  font-size: clamp(14px, 2.5vw, 18px);
   color: #0A7D7E;
 }
 
@@ -112,102 +128,130 @@
   font-weight: bold;
   color: #0A7D7E;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .menu-login a:hover {
   text-decoration: underline;
+  color: #076566;
 }
 
-@media (max-width: 1010px) {
-  .menu-title {
-    font-size: 4vw;
+.menu-professor-link {
+  margin-top: 15px;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+.menu-professor-link a {
+  font-weight: bold;
+  color: #0A7D7E;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.menu-professor-link a:hover {
+  text-decoration: underline;
+  color: #076566;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .content-wrapper {
+    padding: 30px 25px;
+    margin: 0 20px;
+  }
+  
+  .menu-options {
+    gap: 20px;
   }
   
   .menu-button {
-    width: 25vw;
-    height: 17vw;
-    font-size: 1.5rem;
-  }
-
-  .menu-icon {
-    width: 10vw;
-    height: 10vw;
-  }
-
-  .menu-login {
-    font-size: 3vw;
-  }
-
-  .menu-text{
-    font-size: 2vw;
+    min-width: 180px;
+    max-width: 250px;
+    height: 120px;
   }
 }
 
+/* Mobile Landscape */
 @media (max-width: 768px) {
-  .menu-title {
-    font-size: 6vw;
-  }
-  
-  .menu-button {
-    width: 60vw;
-    height: 28vw;
-    font-size: 3vw;
-  }
-
-  .menu-icon {
-    width: 15vw;
-    height: 15vw;
-  }
-
-  .menu-login {
-    font-size: 4vw;
-  }
-
-  .menu-text{
-    font-size: 4vw;
-  }
-}
-
-@media (max-width: 550px) {
-  .menu-title {
-    font-size: 8vw;
-  }
-  
-  .menu-button {
-    width: 70vw;
-    height: 40vw;
-    font-size: 3vw;
-  }
-
-  .menu-icon {
-    width: 15vw;
-    height: 15vw;
-  }
-
-  .menu-login {
-    font-size: 6vw;
-  }
-
-  .menu-text{
-    font-size: 6vw;
-  }
-}
-
-@media (max-width: 1100px) {
   .fundo-menu {
     background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png");
+    padding: 15px;
+  }
+  
+  .content-wrapper {
+    padding: 25px 20px;
+    margin: 0 10px;
+    border-radius: 15px;
+  }
+  
+  .menu-options {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .menu-button {
+    width: 100%;
+    max-width: 300px;
+    min-width: 250px;
+    height: 100px;
   }
 }
 
+/* Mobile Portrait */
 @media (max-width: 600px) {
   .fundo-menu {
     background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+    padding: 10px;
+  }
+  
+  .menu-container {
+    padding: 10px 0;
+    min-height: calc(100vh - 20px);
+  }
+  
+  .content-wrapper {
+    padding: 20px 15px;
+    margin: 0 5px;
+    border-radius: 12px;
+  }
+  
+  .menu-button {
+    min-width: 200px;
+    max-width: 280px;
+    height: 90px;
+  }
+  
+  .menu-options {
+    margin: 20px 0;
+    gap: 15px;
   }
 }
 
-@media (max-width: 768px) {
-  .menu-options {
-    flex-direction: column; 
-    gap: 2vw;
+/* Small Mobile */
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 15px 10px;
+  }
+  
+  .menu-button {
+    min-width: 180px;
+    max-width: 250px;
+    height: 80px;
+  }
+  
+  .menu-icon {
+    margin-bottom: 5px;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 360px) {
+  .menu-button {
+    min-width: 160px;
+    max-width: 220px;
+    height: 75px;
   }
 }

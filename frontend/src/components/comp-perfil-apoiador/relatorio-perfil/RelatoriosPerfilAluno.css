@@ -1,0 +1,146 @@
+/* RelatoriosPerfilAluno.css */
+
+/* Reutilizando estilos gerais do PerfilAluno.css para consistência */
+.label-azul {
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+/* Estilos para a tabela de presença */
+.presenca-table {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 8px; /* Cantos arredondados para a tabela */
+  overflow: hidden; /* Garante que os cantos arredondados sejam aplicados */
+}
+
+.presenca-table thead th {
+  background-color: #0A7D7E; /* Cor de cabeçalho da tabela */
+  color: white;
+  border-color: #086364; /* Borda mais escura para o cabeçalho */
+  font-weight: 600;
+  vertical-align: middle; /* Alinha texto do cabeçalho ao meio */
+  padding: 12px;
+}
+
+.presenca-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.presenca-table tbody tr:hover {
+  background-color: #e6f7f7; /* Leve hover para as linhas da tabela */
+}
+
+.presenca-table td {
+  vertical-align: middle; /* Alinha o conteúdo da célula ao meio */
+  padding: 10px 12px;
+}
+
+/* Cores para o status de presença/falta */
+.status-presente {
+  color: #0A7D7E; /* Verde forte para presente */
+  font-weight: 600;
+}
+
+.status-ausente {
+  color: #D9534F; /* Vermelho para ausente */
+  font-weight: 600;
+}
+
+/* --- Estilos para o Calendário Simplificado --- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Colunas flexíveis */
+  gap: 10px; /* Espaço entre os dias */
+  padding: 15px;
+  background-color: #f8f8f8; /* Fundo leve para o grid do calendário */
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #ffffff;
+  min-height: 70px; /* Altura mínima para os dias */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 0.9rem;
+}
+
+.calendar-day .day-number {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #334155;
+  margin-bottom: 5px;
+}
+
+.calendar-day .day-status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: white;
+  background-color: #9ca3af; /* Cinza padrão se não houver status */
+  border-radius: 3px;
+  padding: 2px 5px;
+  min-width: 25px; /* Largura mínima para o status */
+  text-align: center;
+}
+
+/* Cores específicas para os dias no calendário */
+.calendar-day.presente {
+  background-color: #e0f7f7; /* Fundo claro para presente */
+  border-color: #0A7D7E;
+}
+.calendar-day.presente .day-status {
+  background-color: #0A7D7E; /* Verde escuro para o "P" */
+}
+
+.calendar-day.ausente {
+  background-color: #ffe0e0; /* Fundo claro para ausente */
+  border-color: #D9534F;
+}
+.calendar-day.ausente .day-status {
+  background-color: #D9534F; /* Vermelho escuro para o "A" */
+}
+
+/* Legenda dos pontos */
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.presente-dot { background-color: #0A7D7E; }
+.ausente-dot { background-color: #D9534F; }
+.aula-dot { background-color: #9ca3af; } /* Cor para um dia "normal" de aula */
+
+
+/* Responsividade */
+@media (max-width: 767px) {
+  .presenca-table {
+    font-size: 0.9rem;
+  }
+  .presenca-table th, .presenca-table td {
+    padding: 8px;
+  }
+  .calendar-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Colunas menores para mobile */
+    gap: 8px;
+  }
+  .calendar-day {
+    min-height: 60px;
+    padding: 5px;
+  }
+  .calendar-day .day-number {
+    font-size: 1rem;
+  }
+  .calendar-day .day-status {
+    font-size: 0.75rem;
+    min-width: 20px;
+  }
+}

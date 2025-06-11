@@ -1,0 +1,205 @@
+/* PerfilAluno.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.perfil-aluno-bg {
+  min-height: 100vh;
+  /* Use uma imagem de fundo diferente ou a mesma, mas com um nome de arquivo específico para aluno */
+  background-image: url("src/Assets/FundoMenuRegistro.png"); /* Mantenho a mesma por enquanto, mas pode ser ajustada */
+  background-size: cover;
+  background-position: center;
+  font-family: 'Fredoka', sans-serif;
+  /* Adicionado display flex para permitir que o container interno se alinhe */
+  display: flex;
+}
+
+.perfil-aluno-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  /* Centraliza o conteúdo se o background-image permitir */
+  margin: 0 auto; 
+  /* Adiciona um fundo branco e sombra para o container principal do perfil */
+  background-color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  border-radius: 8px; /* Cantos arredondados para o container */
+  overflow: hidden; /* Importante para que os cantos arredondados sejam aplicados corretamente */
+}
+
+.perfil-aluno-conteudo {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto; /* Permite scroll se o conteúdo for muito grande */
+  transition: all 0.3s ease;
+}
+
+/* Oculta o conteúdo e aplica um desfoque quando o menu mobile está aberto */
+.perfil-aluno-conteudo.blur-background {
+  filter: blur(3px);
+  pointer-events: none; /* Impede a interação com o conteúdo desfocado */
+}
+
+.label-azul {
+  color: #0A7D7E; /* Cor primária azul */
+  font-weight: 500;
+}
+
+/* Botões Azuis (usado para Salvar Foto, Atualizar Dados, Sair, etc.) */
+.custom-button-azul6 {
+  background-color: #0A7D7E;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px; /* Padding padrão para botões */
+  font-weight: 500;
+  color: white; /* Cor do texto do botão */
+  border-radius: 5px; /* Cantos arredondados */
+}
+
+.custom-button-azul6:hover {
+  background-color: #076666; /* Azul um pouco mais escuro ao passar o mouse */
+  transform: translateY(-2px); /* Efeito de "levantar" */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.custom-button-azul6:disabled {
+  background-color: #076666;
+  transform: none;
+  opacity: 0.7; /* Suaviza o botão desabilitado */
+  cursor: not-allowed;
+}
+
+/* Título da seção (aparece no topo do conteúdo, especialmente em mobile) */
+.page-title {
+  display: flex;
+  align-items: center;
+  padding-left: 0px; /* Removido padding extra para ser mais genérico ou centralizar em mobile */
+  margin-bottom: 20px; /* Espaçamento abaixo do título */
+  justify-content: center; /* Centraliza o título em mobile */
+}
+
+.page-title-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155; /* Cor de texto mais escura para o título */
+}
+
+/* Estilos para o status de assinatura ativa (se aplicável ao aluno, pode ser renomeado) */
+.bg-assinatura-ativa {
+  background-color: #0A7D7E !important;
+  color: white;
+}
+
+/* Estilos para botões vermelhos (para ações como Deletar Conta) */
+.custom-button-vermelho {
+  background-color: #F27375;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: white;
+  border-radius: 5px;
+}
+
+.custom-button-vermelho:hover {
+  background-color: #F7AAAA;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-vermelho:disabled {
+  background-color: #F7AAAA;
+  transform: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilos para botões outline vermelhos */
+.custom-button-outline-vermelho {
+  color: #F27375 !important;
+  border-color: #F27375 !important;
+  background-color: transparent;
+  transition: all 0.2s;
+  border-radius: 5px;
+  padding: 8px 16px;
+}
+
+.custom-button-outline-vermelho:hover {
+  background-color: #fff0f0 !important; /* Fundo vermelho bem claro */
+  color: #F27375 !important;
+  border-color: #F27375 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra leve no hover */
+}
+
+/* Estilos para o cabeçalho vermelho do modal (se houver, para "Deletar Conta") */
+.registro-header-vermelho {
+  background-color: #F27375;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 10px 10px 0 0;
+}
+
+/* Estilos para negrito, garantindo consistência */
+b, strong {
+  font-weight: 600;
+}
+
+/* --- Estilos Responsivos --- */
+
+/* Ajustes para telas médias (celular médio) */
+@media (max-width: 1100px) {
+  .perfil-aluno-bg {
+    /* Altere para a imagem de fundo específica para aluno em telas médias se existir */
+    background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png");
+  }
+}
+
+/* Ajustes para telas pequenas (celular) */
+@media (max-width: 767px) {
+  .perfil-aluno-container {
+    flex-direction: column; /* Coloca a sidebar e o conteúdo um abaixo do outro */
+    border-radius: 0; /* Remove borda arredondada em mobile */
+    box-shadow: none; /* Remove sombra do container em mobile */
+  }
+
+  .perfil-aluno-conteudo {
+    padding: 20px 15px; /* Ajusta o padding para telas menores */
+    margin-top: 40px; /* Adiciona margem para não ficar colado no topo (onde ficaria o hambúrguer) */
+  }
+
+  /* Ajustes para elementos internos que podem ser afetados */
+  .profile-image-container { /* Se tiver imagem de perfil em DadosPessoaisAluno */
+    margin-bottom: 20px;
+  }
+  
+  .custom-file-input { /* Se tiver input de arquivo em DadosPessoaisAluno */
+    margin-bottom: 15px;
+  }
+
+  .table-responsive { /* Se tiver tabelas responsivas */
+    font-size: 14px;
+  }
+  
+  .btn-detalhes, .custom-button-azul6 { /* Ajusta botões em tabelas/geral */
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .page-title {
+    padding-left: 0px; /* Garante que não haja padding à esquerda, para centralizar */
+    justify-content: center; /* Centraliza o título da página mobile */
+    text-align: center;
+  }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 600px) {
+  .perfil-aluno-bg {
+    /* Altere para a imagem de fundo específica para aluno em telas pequenas se existir */
+    background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+  }
+  
+  .perfil-aluno-conteudo {
+    padding: 15px 10px; /* Reduz ainda mais o padding */
+  }
+}

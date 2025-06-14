@@ -12,6 +12,9 @@ import { ToastContainer } from 'react-toastify';
 // Importa o CSS do react-toastify
 import 'react-toastify/dist/ReactToastify.css';
 
+// Importa o ErrorBoundary
+import ErrorBoundary from './components/ErrorBoundary'; // Supondo que você crie este arquivo
+
 import RegistroApoiador from "./pages/Registros/RegistroApoiador.jsx";
 import RegistroAluno from "./pages/Registros/RegistroAluno.jsx";
 import MenuRegistro from "./pages/menu-registro/MenuRegistro.jsx";
@@ -25,36 +28,40 @@ import PerfilAluno from "./pages/Perfil/perfil-aluno/Perfil-aluno.jsx";
 import PerfilProfessor from "./pages/Perfil/Perfil-professor/PerfilProfessor.jsx";
 import RegistroProfessor from "./pages/Registros/RegistroProfessor.jsx";
 import "./App.css";
+import PerfilADM from "./pages/Perfil/perfil-ADM/PerfilADM.jsx";
 
 const App = () => {
     return (
         <Router>
             <AuthProvider>
                 <Navbar />
-                <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/registro-apoiador" element={<RegistroApoiador />} />
-                    <Route path="/registro-aluno" element={<RegistroAluno />} />
-                    <Route path="/registro-professor" element={<RegistroProfessor />} />
-                    <Route path="/menu-registro" element={<MenuRegistro />} />
-                    <Route path="/doar" element={<PaginaDoacoes />} />
-                    <Route path="/assinaturas" element={<AssinaturaPagamento />} /> {/* Rota para escolher/comprar plano */}
-                    <Route path="/doar-pagamento" element={<DoacoesPagamento />} />
-                    
-                    {/* Protected routes */}
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/perfil" element={<Perfil />} />
-                        <Route path="/perfil-aluno" element={<PerfilAluno />} />
-                        <Route path="/perfil-professor" element={<PerfilProfessor />} />
-                    </Route>
+                {/* Envolvendo as Routes com o ErrorBoundary */}
+                <ErrorBoundary>
+                    <Routes>
+                        {/* Public routes */}
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/registro-apoiador" element={<RegistroApoiador />} />
+                        <Route path="/registro-aluno" element={<RegistroAluno />} />
+                        <Route path="/registro-professor" element={<RegistroProfessor />} />
+                        <Route path="/menu-registro" element={<MenuRegistro />} />
+                        <Route path="/doar" element={<PaginaDoacoes />} />
+                        <Route path="/assinaturas" element={<AssinaturaPagamento />} />
+                        <Route path="/doar-pagamento" element={<DoacoesPagamento />} />
+                        
+                        {/* Protected routes */}
+                        <Route element={<ProtectedRoute />}>
+                            <Route path="/perfil" element={<Perfil />} />
+                            <Route path="/perfil-aluno" element={<PerfilAluno />} />
+                            <Route path="/perfil-professor" element={<PerfilProfessor />} />
+                            <Route path="/perfil-ADM" element={<PerfilADM />} />
+                        </Route>
 
-                    {/* Redirect to login if no route matches */}
-                    <Route path="*" element={<Navigate to="/login" />} />
-                </Routes>
+                        {/* Redirect to login if no route matches */}
+                        <Route path="*" element={<Navigate to="/login" />} />
+                    </Routes>
+                </ErrorBoundary>
                 <Footer />
-                {/* Adicione o ToastContainer aqui. Ele será responsável por renderizar todas as notificações. */}
                 <ToastContainer />
             </AuthProvider>
         </Router>

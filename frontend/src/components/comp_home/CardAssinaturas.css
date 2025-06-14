@@ -277,6 +277,10 @@
   margin-right: 30px;
 }
 
+.botao-verde-escuro:hover {
+  background-color: #125f58 !important;
+}
+
 .btn-mais {
   width: 100%;
   max-width: 1300px; 

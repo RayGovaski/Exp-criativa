@@ -4,12 +4,12 @@ USE exp_criativa;
 -- Tabela de Endereco
 CREATE TABLE Endereco (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    logradouro VARCHAR(100) NOT NULL,
-    numero_residencia INT NOT NULL,
     cep CHAR(8) NOT NULL,
-    cidade VARCHAR(100),
     estado VARCHAR(50),
-    pais VARCHAR(50)
+    cidade VARCHAR(100),
+    bairro VARCHAR(50),
+    logradouro VARCHAR(100) NOT NULL,
+    numero_residencia INT NOT NULL
 );
 
 -- Tabela de responsáveis pelos alunos
@@ -64,18 +64,15 @@ CREATE TABLE Professor (
     data_nascimento DATE NOT NULL,
     telefone VARCHAR(15),
     email VARCHAR(100) UNIQUE,
-    nacionalidade VARCHAR(50),
-    graduacao VARCHAR(100),
-    curriculo TEXT,
+    senha VARCHAR(255),
     data_contratacao DATE,
-    tipo_contrato VARCHAR(50),
     salario DECIMAL(10,2),
-    foto LONGBLOB,
     ativo BOOLEAN DEFAULT 1,
     endereco_id INT,
     FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
 
+<<<<<<< Updated upstream
 -- Tabela de turmas
 CREATE TABLE Turma (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -85,6 +82,20 @@ CREATE TABLE Turma (
     hora_termino TIME NOT NULL,
     descricao TEXT,
     nivel VARCHAR(50),
+=======
+
+-- Tabela de turmas/materia
+CREATE TABLE Turma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
+    sala ENUM('Sala Arco-Íris', 'Sala Girassol', 'Sala Estrelinha', 'Sala Sementinha', 'Sala Piquenique', 'Sala dos Sonhos', 'Sala Inventar', 'Sala do Amanhã', 'Sala Exploradores', 'Sala Conectar') NOT NULL,
+    capacidade INT CHECK (capacidade > 0),
+    dia_da_semana ENUM('Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado') NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_termino TIME NOT NULL,
+    descricao TEXT,
+    nivel ENUM('6 a 8 anos', '9 a 10 anos', '11 a 12 anos', '13 a 14 anos', '15 a 16 anos') NOT NULL,
+>>>>>>> Stashed changes
     data_inicio DATE,
     data_termino DATE
 );
@@ -161,7 +172,7 @@ CREATE TABLE Doacao (
     data_fim DATE,
     prioridade ENUM('Max', 'Média', 'Min') DEFAULT 'media',
     status ENUM('Aberta', 'Encerrada', 'Concluída') DEFAULT 'Aberta',
-    imagem_path VARCHAR(255) NULL
+    imagem LONGBLOB
 );
 
 CREATE TABLE Apoiador_Doacao (
@@ -204,5 +215,7 @@ INSERT INTO Plano (nome, preco, descricao) VALUES
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Estrela', 200.00, 'O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
 
+INSERT INTO Administrador (email, senha) VALUES
+('admin@adm.com', '$2b$10$2J7ji5H1m6utNpXkuUbGkODEE5o3n/B83V2p7ww4BiAm3brrfYxOu');
 
 

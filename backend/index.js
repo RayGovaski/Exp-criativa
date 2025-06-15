@@ -7,11 +7,12 @@ import authRoutes from './routes/authRoutes.js';
 import apoiadorRoutes from './routes/apoiadorRoutes.js';
 import alunoRoutes from './routes/alunoRoutes.js';
 import doacaoRoutes from './routes/doacaoRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3306;
+const PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(cors());
@@ -50,6 +51,7 @@ app.use('/auth', authRoutes);
 app.use('/apoiador', apoiadorRoutes);
 app.use('/alunos', alunoRoutes);
 app.use('/doacoes', doacaoRoutes);
+app.use('/administrador', adminRoutes); 
 
 // Start server
 app.listen(PORT, () => {

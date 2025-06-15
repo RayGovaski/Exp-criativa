@@ -7,10 +7,13 @@ import Footer from "./components/footer/Footer.jsx";
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
+<<<<<<< Updated upstream
 // Importa os componentes do react-toastify
 import { ToastContainer } from 'react-toastify';
 // Importa o CSS do react-toastify
 import 'react-toastify/dist/ReactToastify.css';
+=======
+>>>>>>> Stashed changes
 
 import RegistroApoiador from "./pages/Registros/RegistroApoiador.jsx";
 import RegistroAluno from "./pages/Registros/RegistroAluno.jsx";

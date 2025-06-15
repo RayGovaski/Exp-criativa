@@ -1,6 +1,6 @@
 
 import express from 'express';
-import upload from '../config/multer.js';
+import { uploadImage } from '../config/multer.js';
 import { verifyToken } from '../middleware/auth.js';
 import {
     getAllApoiadores,
@@ -19,7 +19,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getAllApoiadores);
-router.post('/', upload.single('foto'), createApoiador);
+router.post('/', uploadImage.single('foto'), createApoiador);
 router.get('/foto/:id', getPhoto);
 
 // Protected routes
@@ -27,7 +27,7 @@ router.get('/profile', verifyToken, getProfile);
 router.put('/update-senha', verifyToken, updatePassword);
 router.put('/update-email', verifyToken, updateEmail);
 router.put('/update-telefone', verifyToken, updatePhone);
-router.put('/update-foto', verifyToken, upload.single('foto'), updatePhoto);
+router.put('/update-foto', verifyToken, uploadImage.single('foto'), updatePhoto);
 router.post('/assinar-plano', verifyToken, subscribeToPlan);
 router.delete('/cancelar-assinatura', verifyToken, cancelSubscription);
 

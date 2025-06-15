@@ -140,4 +140,234 @@ export const getAllDoacoesFull = (req, res) => {
         console.log('DEBUG: Dados de TODAS as doações retornados do DB:', data);
         return res.status(200).json(data);
     });
+<<<<<<< Updated upstream
+=======
+
+
+};
+export const getDoacaoById = (req, res) => {
+    const { id } = req.params; // ID da doação vindo da URL
+
+    const q = `
+        SELECT 
+            id, nome AS titulo, descricao, imagem_path, valor_meta AS valorMeta, arrecadado,
+            ROUND((arrecadado / valor_meta) * 100) AS porcentagem,
+            status, data_inicio AS dataInicio, data_fim AS dataFim, prioridade 
+        FROM Doacao
+        WHERE id = ?;
+    `;
+
+    db.query(q, [id], (err, data) => {
+        if (err) {
+            console.error("Erro ao buscar doação por ID (getDoacaoById):", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar doação por ID.", message: err.message });
+        }
+
+        if (data.length === 0) {
+            return res.status(404).json({ error: "Doação não encontrada." });
+        }
+
+        return res.status(200).json(data[0]);
+    });
+};
+export const processDonation = (req, res) => {
+    const { doacaoId, valorDoado, customerName, customerEmail, customerPhone } = req.body;
+    const userIdFromToken = req.user ? req.user.id : null; // ID do usuário logado
+    const userRoleFromToken = req.user ? req.user.role : null; // ROLE do usuário logado
+
+    if (!doacaoId || !valorDoado || parseFloat(valorDoado) <= 0) {
+        console.error("ERRO [processDonation]: Dados inválidos fornecidos.");
+        return res.status(400).json({ error: "Dados inválidos: ID da doação e valor doado são obrigatórios e positivos." });
+    }
+
+    const valorNumerico = parseFloat(valorDoado);
+
+    // VALIDAÇÃO CRÍTICA: Se o usuário está logado, ele DEVE ser um Apoiador para registrar a doação em seu nome.
+    // Doações podem ser feitas por VISITANTES (sem token), ou por APOIADORES (com token).
+    // Outras roles (aluno, professor, adm) não devem poder registrar doações em seu nome na tabela Apoiador_Doacao.
+    let finalApoiadorIdToRegister = null; // ID a ser usado na Apoiador_Doacao
+
+    if (userIdFromToken) { // Se há um usuário logado
+        if (userRoleFromToken === 'apoiador') {
+            finalApoiadorIdToRegister = userIdFromToken; // OK, é um apoiador
+        } else {
+            // Se logado, mas NÃO É apoiador, a doação não será vinculada a um apoiador_id
+            console.warn(`AVISO [processDonation]: Usuário logado (ID: ${userIdFromToken}, Role: ${userRoleFromToken}) tentou doar. Doação não será registrada em Apoiador_Doacao.`);
+            // A doação principal (tabela Doacao) ainda pode ser atualizada, mas não em Apoiador_Doacao.
+        }
+    }
+    // Se não está logado (userIdFromToken é null), finalApoiadorIdToRegister permanece null (doação de visitante)
+
+
+    // 1. Buscar dados atuais da doação
+    const getDoacaoQuery = 'SELECT id, nome, valor_meta, arrecadado, status FROM Doacao WHERE id = ?';
+    db.query(getDoacaoQuery, [doacaoId], (err, doacaoData) => {
+        if (err) {
+            console.error("ERRO [processDonation]: Erro ao buscar doação para processar:", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar doação.", details: err.message });
+        }
+
+        if (doacaoData.length === 0) {
+            console.error("ERRO [processDonation]: Doação com ID " + doacaoId + " não encontrada.");
+            return res.status(404).json({ error: "Doação não encontrada." });
+        }
+
+        const currentDoacao = doacaoData[0];
+        const novoArrecadado = currentDoacao.arrecadado + valorNumerico;
+        let novoStatus = currentDoacao.status;
+
+        if (novoArrecadado >= currentDoacao.valor_meta) {
+            novoStatus = 'Concluída';
+        }
+
+        // 2. Atualizar a doação na tabela 'Doacao' (arrecadado e status)
+        const updateDoacaoQuery = `
+            UPDATE Doacao
+            SET arrecadado = ?, status = ?
+            WHERE id = ?;
+        `;
+        db.query(updateDoacaoQuery, [novoArrecadado, novoStatus, doacaoId], (err, result) => {
+            if (err) {
+                console.error("ERRO [processDonation]: Erro ao atualizar arrecadado da doação:", err);
+                return res.status(500).json({ error: "Erro no banco de dados ao atualizar doação.", details: err.message });
+            }
+
+            // 3. Registrar a doação em Apoiador_Doacao APENAS se houver um finalApoiadorIdToRegister válido
+            if (finalApoiadorIdToRegister) { 
+                const insertApoiadorDoacaoQuery = `
+                    INSERT INTO Apoiador_Doacao (apoiador_id, doacao_id, valor_doado, data_doacao)
+                    VALUES (?, ?, ?, NOW());
+                `;
+                db.query(insertApoiadorDoacaoQuery, [finalApoiadorIdToRegister, doacaoId, valorNumerico], (err, resultApoiadorDoacao) => {
+                    if (err) {
+                        console.error("ERRO [processDonation]: Erro ao registrar doação em Apoiador_Doacao:", err);
+                        console.warn("AVISO [processDonation]: Doação principal processada, mas falha ao registrar para o apoiador logado.");
+                        // Não retorna erro 500, pois a doação principal foi bem-sucedida.
+                    }
+                    res.status(200).json({ 
+                        message: `Doação de R$ ${valorNumerico.toFixed(2).replace('.', ',')} para "${currentDoacao.nome}" processada!`,
+                        doacaoAtualizada: { id: currentDoacao.id, arrecadado: novoArrecadado, status: novoStatus }
+                    });
+                });
+            } else {
+                // Doação de visitante ou usuário logado que não é apoiador
+                res.status(200).json({ 
+                    message: `Doação de R$ ${valorNumerico.toFixed(2).replace('.', ',')} para "${currentDoacao.nome}" processada (visitante ou não-apoiador)!`,
+                    doacaoAtualizada: { id: currentDoacao.id, arrecadado: novoArrecadado, status: novoStatus }
+                });
+            }
+        });
+    });
+};
+export const getDonationsAmountByMonth = (req, res) => {
+    const apoiadorId = req.user.id;
+    const { ano } = req.query; // Filtro por ano, se necessário
+
+    if (!ano) {
+        return res.status(400).json({ error: "Ano é obrigatório para o relatório de doações por mês." });
+    }
+
+    const q = `
+        SELECT 
+            MONTH(ad.data_doacao) AS mes,
+            SUM(ad.valor_doado) AS totalDoado
+        FROM Apoiador_Doacao ad
+        WHERE ad.apoiador_id = ? AND YEAR(ad.data_doacao) = ?
+        GROUP BY mes
+        ORDER BY mes ASC;
+    `;
+
+    db.query(q, [apoiadorId, ano], (err, data) => {
+        if (err) {
+            console.error("Erro ao buscar total de doações por mês:", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar relatório por mês.", message: err.message });
+        }
+
+        // Formatar para incluir nomes dos meses (opcional, pode ser no frontend)
+        const nomesMeses = [
+            'Janeiro', 'Fevereiro', 'Mês 3', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+        const formattedData = data.map(row => ({
+            name: nomesMeses[row.mes - 1] || `Mês ${row.mes}`, // Use o nome do mês
+            totalDoado: parseFloat(row.totalDoado) // Garante que é um número
+        }));
+
+        console.log('DEBUG: Doações por mês retornadas:', formattedData);
+        return res.status(200).json(formattedData);
+    });
+};
+export const createDoacaoCard = (req, res) => {
+    // Verificar a role do usuário (já feita pelo verifyToken no adminRoutes, mas é boa prática ter um check)
+    if (!req.user || req.user.role !== 'administrador') {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores podem criar cards de doação." });
+    }
+
+    // Campos da tabela Doacao vindos do formulário
+    const { 
+        nome, valor_meta, descricao, data_inicio, data_fim, 
+        categoria, prioridade, status
+    } = req.body;
+
+    // Imagem como arquivo (LONGBLOB)
+    const imagemFile = req.file; // O Multer coloca o arquivo em req.file
+    let imagemBuffer = null; // Para armazenar o conteúdo do arquivo como BLOB
+
+    // Se um arquivo de imagem foi enviado, leia-o para armazenar como LONGBLOB
+    if (imagemFile) {
+        try {
+            // Leia o arquivo temporário salvo pelo Multer
+            imagemBuffer = fs.readFileSync(imagemFile.path);
+            console.log(`DEBUG [createDoacaoCard-BE]: Imagem ${imagemFile.originalname} lida para BLOB.`);
+        } catch (readErr) {
+            console.error("ERRO [createDoacaoCard-BE]: Erro ao ler arquivo de imagem:", readErr);
+            return res.status(500).json({ error: "Erro ao processar o arquivo de imagem." });
+        } finally {
+            // APAGUE o arquivo temporário gerado pelo Multer
+            fs.unlink(imagemFile.path, (unlinkErr) => {
+                if (unlinkErr) console.error("ERRO [createDoacaoCard-BE]: Falha ao apagar arquivo temporário da imagem:", unlinkErr);
+            });
+        }
+    }
+
+
+    // Validações dos campos NOT NULL e outros
+    if (!nome || !valor_meta || !descricao || !categoria) { // Categoria agora é NOT NULL
+        return res.status(400).json({ error: "Campos obrigatórios faltando: Título, Descrição, Meta, Categoria." });
+    }
+    if (parseFloat(valor_meta) <= 0) {
+        return res.status(400).json({ error: "Meta deve ser um valor positivo." });
+    }
+
+    const valorMetaNumerico = parseFloat(valor_meta);
+    const arrecadadoInicial = 0; // Inicia sempre com 0, pois é um novo card
+
+    const q = `
+        INSERT INTO Doacao (
+            nome, valor_meta, arrecadado, descricao, data_inicio, data_fim, 
+            categoria, prioridade, status, imagem
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+
+    const params = [
+        nome,
+        valorMetaNumerico,
+        arrecadadoInicial,
+        descricao,
+        data_inicio || null, // data_inicio pode ser NULL se não é NOT NULL no DDL
+        data_fim || null,   // data_fim pode ser NULL se não é NOT NULL no DDL
+        categoria,
+        prioridade || 'Média', // Prioridade tem DEFAULT no DDL
+        status || 'Aberta',    // Status tem DEFAULT no DDL
+        imagemBuffer // Conteúdo BLOB da imagem ou NULL
+    ];
+
+    db.query(q, params, (err, result) => {
+        if (err) {
+            console.error("ERRO [createDoacaoCard-BE]: Erro ao criar doação no banco de dados:", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao criar card de doação.", details: err.message });
+        }
+        res.status(201).json({ message: "Card de doação criado com sucesso!", doacaoId: result.insertId });
+    });
+>>>>>>> Stashed changes
 };

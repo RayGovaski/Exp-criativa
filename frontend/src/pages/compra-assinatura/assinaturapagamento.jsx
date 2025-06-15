@@ -157,7 +157,7 @@ const AssinaturaPagamento = () => {
             alert(response.data.message);
             // Atualize o plano atual no frontend após sucesso
             setCurrentSubscription({ ...currentSubscription, plano_nome: plan.title, plano_preco: plan.numericPrice, data_adesao: new Date().toISOString() });
-            navigate('/gerenciar-assinatura'); // Redireciona para a página de gerenciamento/detalhes
+            navigate('/perfil'); // Redireciona para a página de gerenciamento/detalhes
         } catch (error) {
             console.error("Erro ao assinar plano:", error);
             let errorMessage = "Ocorreu um erro ao processar sua assinatura.";

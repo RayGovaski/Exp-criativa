@@ -1,0 +1,78 @@
+/* CriarCardDoacao.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* Reutilizando estilos gerais para consistência */
+.label-azul {
+    color: #0A7D7E; /* Cor principal para rótulos */
+    font-weight: 500;
+}
+
+/* Estilos para o card do formulário de criação de doação */
+.card {
+    border-radius: 12px; /* Cantos arredondados para o card */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    border: none; /* Remove a borda padrão do card */
+}
+
+/* Estilos para os campos de formulário (Form.Control) */
+.form-control {
+    border-radius: 8px; /* Cantos arredondados para os inputs */
+    border: 1px solid #ced4da; /* Borda padrão Bootstrap */
+    padding: 10px 15px;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.form-control:focus {
+    border-color: #0A7D7E; /* Borda verde-azulado no foco */
+    box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25); /* Sombra de foco com cor tema */
+}
+
+/* Estilo para a descrição do formulário */
+.card p {
+    font-size: 0.95em;
+    color: #6c757d; /* Texto mais suave para descrições */
+    margin-bottom: 20px;
+}
+
+/* Estilo para o botão de submissão (reutiliza custom-button-azul5) */
+.custom-button-azul5 {
+    background-color: #0A7D7E;
+    border: none;
+    transition: all 0.2s;
+    padding: 10px 20px; /* Mais padding para o botão de criar */
+    font-weight: 500;
+    font-family: 'Fredoka', sans-serif !important;
+    border-radius: 8px; /* Cantos arredondados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    width: auto; /* Largura automática */
+    display: inline-block; /* Permite centralização se necessário */
+}
+
+.custom-button-azul5:hover {
+    background-color: #076666; /* Verde-azulado mais escuro no hover */
+    transform: translateY(-2px); /* Efeito de leve levantamento */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra mais pronunciada */
+}
+
+.custom-button-azul5:disabled {
+    background-color: #cccccc; /* Cinza para estado desabilitado */
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsividade para ecrãs pequenos */
+@media (max-width: 767px) {
+    .card {
+        padding: 15px;
+    }
+    .form-control {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .custom-button-azul5 {
+        width: 100%; /* Botão ocupa largura total em mobile */
+        padding: 12px;
+        font-size: 1em;
+    }
+}

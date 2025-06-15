@@ -66,7 +66,7 @@ const SubscriptionPlans = () => {
 
   const handleButtonClick = () => {
     if (token && user) { // Ou apenas 'if (token)' se for suficiente para indicar que está logado
-      navigate("assinatura"); // Redireciona para a página de assinatura
+      navigate("/assinaturas"); // Redireciona para a página de assinatura
     } else {
       navigate("/menu-registro"); // Redireciona para a página de registro/login
     }

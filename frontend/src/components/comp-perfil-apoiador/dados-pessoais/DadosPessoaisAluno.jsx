@@ -1,47 +1,67 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'; // Re-adicionado useState, useEffect
-import { Card, Image, Button, Modal, Form, Alert } from 'react-bootstrap'; // Re-adicionado Modal, Form, Alert
-// import { useAuth } from '../../../context/AuthContext'; // Mantido se precisar do logout simulado
-// import axios from 'axios'; // Removido, pois não haverá requisições HTTP reais
+import React, { useState, useEffect } from 'react';
+import { Card, Image, Button, Modal, Form, Alert, Spinner } from 'react-bootstrap'; // Importe Spinner
+import { useAuth } from '../../../context/AuthContext'; // Para obter user e token
+import axios from 'axios'; // Para fazer requisições HTTP
 import './DadosPessoaisAluno.css';
 
 const DadosPessoaisAluno = () => {
-  // --- Dados do Aluno Mockados (Simulados) ---
-  const initialAlunoData = {
-    nome: "Maria Eduarda Silva",
-    data_nascimento: "2015-08-20", // Formato YYYY-MM-DD
-    cpf: "123.456.789-00",
-    telefone: "(11) 98765-4321",
-    email: "maria.eduarda@email.com",
-    // Simulação de foto de perfil (apenas um placeholder)
-    foto_url: 'https://via.placeholder.com/150?text=Aluno',
-    responsavel: {
-      nome: "Ana Paula Silva",
-      cpf: "000.111.222-33",
-      telefone: "(11) 91234-5678",
-      email: "ana.paula@email.com"
-    }
-  };
-
-  const [alunoData, setAlunoData] = useState(initialAlunoData); // Agora useState com dados mockados
-  const [loading, setLoading] = useState(false); // Sempre false, pois dados são mockados
-  const [error, setError] = useState(null); // Sempre null
+  const { user, token, logout } = useAuth(); // Obtenha user e token do AuthContext
+  const [alunoData, setAlunoData] = useState(null); // Estado para os dados reais do aluno
+  const [loading, setLoading] = useState(true); // Controla o estado de carregamento
+  const [error, setError] = useState(null); // Controla mensagens de erro
   const [imagem, setImagem] = useState(null); // Para pré-visualização da imagem local
-  const [imagemFile, setImagemFile] = useState(null); // Para armazenar o arquivo da imagem
+  const [imagemFile, setImagemFile] = useState(null); // Para armazenar o arquivo da imagem para upload
   const [uploading, setUploading] = useState(false); // Para simular estado de upload
-  const [showModal, setShowModal] = useState(false); // Para controlar o modal
-  const [campoParaAtualizar, setCampoParaAtualizar] = useState(""); // Qual campo será atualizado no modal
-  const [formDados, setFormDados] = useState({ // Dados do formulário do modal
+  const [showModal, setShowModal] = useState(false);
+  const [campoParaAtualizar, setCampoParaAtualizar] = useState("");
+  const [formDados, setFormDados] = useState({
     senhaAtual: "",
     novaSenha: "",
     confirmarSenha: "",
     novoEmail: "",
     novoTelefone: ""
   });
-  const [updateSuccess, setUpdateSuccess] = useState(""); // Mensagem de sucesso
-  const [updateError, setUpdateError] = useState(""); // Mensagem de erro
+  const [updateSuccess, setUpdateSuccess] = useState("");
+  const [updateError, setUpdateError] = useState("");
 
-  // Não há useEffect para buscar dados, pois eles já são mockados
+  // URL base para buscar a foto do aluno
+  const ALUNO_PHOTO_BASE_URL = 'http://localhost:8000/alunos/foto/'; // Você precisará de uma rota similar para alunos
+
+  // Efeito para buscar os dados do aluno ao montar o componente
+  useEffect(() => {
+    console.log('DEBUG [DadosPessoaisAluno]: useEffect disparado.');
+    console.log('DEBUG [DadosPessoaisAluno]: User no contexto:', user);
+    console.log('DEBUG [DadosPessoaisAluno]: Token no contexto:', token ? 'presente' : 'ausente');
+
+    const fetchAlunoData = async () => {
+      console.log('DEBUG [DadosPessoaisAluno]: fetchAlunoData iniciado.');
+      if (!token || !user || user.role !== 'aluno') {
+        console.log('DEBUG [DadosPessoaisAluno]: Não autenticado como aluno ou token/user inválido. User.role:', user?.role);
+        setError("Não autenticado como aluno ou sessão expirada. Por favor, faça login novamente.");
+        setLoading(false);
+        // Não redirecionar aqui diretamente para ver o erro na tela.
+        return;
+      }
+
+      try {
+        setLoading(true);
+        console.log('DEBUG [DadosPessoaisAluno]: Tentando requisição GET para /alunos/profile...');
+        const response = await axios.get('http://localhost:8000/alunos/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('DEBUG [DadosPessoaisAluno]: Resposta da API /alunos/profile:', response.data);
+        setAlunoData(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("ERRO [DadosPessoaisAluno]: Erro ao buscar dados do aluno:", err);
+        setError("Falha ao carregar dados do aluno. Por favor, recarregue a página.");
+        setLoading(false);
+      }
+    };
+
+    fetchAlunoData();
+  }, [token, user]); 
 
   // Function to handle image change
   const handleImagemChange = (e) => {
@@ -49,10 +69,9 @@ const DadosPessoaisAluno = () => {
       const file = e.target.files[0];
       setImagemFile(file);
 
-      // Create a preview URL for the image
       const reader = new FileReader();
       reader.onload = (event) => {
-        setImagem(event.target.result); // Define a pré-visualização da imagem local
+        setImagem(event.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -60,12 +79,15 @@ const DadosPessoaisAluno = () => {
 
   // Function to get the profile image source
   const getProfileImageSrc = () => {
-    // Se há uma imagem temporária sendo enviada, mostra essa primeiro
-    if (imagem) {
+    if (imagem) { // Se houver uma pré-visualização local
       return imagem;
     }
-    // Caso contrário, usa a URL mockada do alunoData
-    return alunoData.foto_url;
+    // Se o alunoData já foi carregado e tem foto_path, usa a rota do backend
+    if (alunoData && alunoData.foto_path) {
+      return `${ALUNO_PHOTO_BASE_URL}${alunoData.id}?t=${new Date().getTime()}`;
+    }
+    // Senão, usa a imagem padrão (placeholder)
+    return 'https://placehold.co/150x150?text=Aluno';
   };
 
   // Function to handle form input changes
@@ -103,25 +125,45 @@ const DadosPessoaisAluno = () => {
     }
 
     setUploading(true);
-    // Simulação de upload: espera um pouco e depois "atualiza"
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simula delay de rede
+    const formData = new FormData();
+    formData.append('foto', imagemFile); // 'foto' deve ser o nome do campo esperado pelo backend (multer)
 
-    setImagem(null); // Limpa a pré-visualização
-    setImagemFile(null); // Limpa o arquivo
-    // AlunoData não é atualizado pois não há backend
-    alert('Foto atualizada com sucesso (simulado)!');
-    setUploading(false);
+    try {
+        const response = await axios.put('http://localhost:8000/alunos/update-foto', formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        
+        if (response.status === 200) {
+            setImagem(null); // Limpa a pré-visualização local
+            setImagemFile(null); // Limpa o arquivo local
+            // Atualiza os dados do aluno com o novo foto_path
+            setAlunoData(prevData => ({ ...prevData, foto_path: response.data.photoPath })); 
+            alert('Foto atualizada com sucesso!');
+        }
+    } catch (error) {
+        console.error("Erro ao atualizar foto do aluno:", error);
+        let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
+        if (error.response && error.response.data && error.response.data.error) {
+            errorMessage = error.response.data.error;
+        }
+        alert(errorMessage);
+    } finally {
+        setUploading(false);
+    }
   };
+
 
   const handleSubmitAtualizacao = async () => {
     setUpdateSuccess("");
     setUpdateError("");
 
-    // Simulação de delay de rede
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     try {
-      let successMessage = "";
+      let endpoint = '';
+      let data = {};
+      
       switch (campoParaAtualizar) {
         case "senha":
           if (formDados.novaSenha !== formDados.confirmarSenha) {
@@ -132,8 +174,11 @@ const DadosPessoaisAluno = () => {
             setUpdateError("A senha deve ter pelo menos 6 caracteres.");
             return;
           }
-          // Lógica de atualização de senha simulada
-          successMessage = "Senha atualizada com sucesso (simulado)!";
+          endpoint = 'http://localhost:8000/alunos/update-senha'; // Rota para atualizar senha do aluno
+          data = {
+            senhaAtual: formDados.senhaAtual,
+            novaSenha: formDados.novaSenha
+          };
           break;
         case "email":
           { if (!formDados.novoEmail) {
@@ -145,27 +190,38 @@ const DadosPessoaisAluno = () => {
             setUpdateError("Email inválido.");
             return;
           }
-          // Lógica de atualização de email simulada
-          setAlunoData(prevData => ({ ...prevData, email: formDados.novoEmail }));
-          successMessage = "Email atualizado com sucesso (simulado)!";
+          endpoint = 'http://localhost:8000/alunos/update-email'; // Rota para atualizar email do aluno
+          data = { email: formDados.novoEmail };
           break; }
         case "telefone":
           if (!formDados.novoTelefone) {
             setUpdateError("Telefone não pode estar vazio.");
             return;
           }
-          // Lógica de atualização de telefone simulada
-          setAlunoData(prevData => ({ ...prevData, telefone: formDados.novoTelefone }));
-          successMessage = "Telefone atualizado com sucesso (simulado)!";
+          endpoint = 'http://localhost:8000/alunos/update-telefone'; // Rota para atualizar telefone do aluno
+          data = { telefone: formDados.novoTelefone };
           break;
         default:
           setUpdateError("Selecione o que deseja atualizar.");
           return;
       }
-
-      setUpdateSuccess(successMessage);
-
-      // Reset form fields after successful update
+      
+      const response = await axios.put(endpoint, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+   
+      setAlunoData(prevData => {
+        const updatedData = { ...prevData };
+        if (campoParaAtualizar === "email") {
+          updatedData.email = formDados.novoEmail;
+        } else if (campoParaAtualizar === "telefone") {
+          updatedData.telefone = formDados.novoTelefone;
+        }
+        return updatedData;
+      });
+      
+      setUpdateSuccess(`${campoParaAtualizar.charAt(0).toUpperCase() + campoParaAtualizar.slice(1)} atualizado com sucesso!`);
+      
       setFormDados({
         senhaAtual: "",
         novaSenha: "",
@@ -173,21 +229,23 @@ const DadosPessoaisAluno = () => {
         novoEmail: "",
         novoTelefone: ""
       });
-
-      // Close modal after a short delay to show success message
+      
       setTimeout(() => {
         setShowModal(false);
       }, 1500);
-
-    } catch (error) { // Este catch só pegaria erros de validação local
-      setUpdateError("Erro simulado ao atualizar dados.");
+      
+    } catch (error) {
+      console.error("Erro ao atualizar dados do aluno:", error);
+      let errorMessage = "Erro ao atualizar dados. Tente novamente.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      setUpdateError(errorMessage);
     }
   };
 
   const handleLogout = () => {
-    alert("Logout simulado!");
-    // Se você tiver um AuthContext local, pode chamar uma função de logout simulada aqui
-    // Ex: logout();
+    logout(); // Chama a função de logout do AuthContext
   };
 
   const renderFormularioAtualizacao = () => {
@@ -197,28 +255,28 @@ const DadosPessoaisAluno = () => {
           <>
             <Form.Group className="mb-3">
               <Form.Label className="label-azul">Senha atual</Form.Label>
-              <Form.Control
-                type="password"
+              <Form.Control 
+                type="password" 
                 name="senhaAtual"
                 value={formDados.senhaAtual}
                 onChange={handleInputChange}
               />
             </Form.Group>
-
+            
             <Form.Group className="mb-3">
               <Form.Label className="label-azul">Nova senha</Form.Label>
-              <Form.Control
-                type="password"
+              <Form.Control 
+                type="password" 
                 name="novaSenha"
                 value={formDados.novaSenha}
                 onChange={handleInputChange}
               />
             </Form.Group>
-
+            
             <Form.Group className="mb-3">
               <Form.Label className="label-azul">Confirmar nova senha</Form.Label>
-              <Form.Control
-                type="password"
+              <Form.Control 
+                type="password" 
                 name="confirmarSenha"
                 value={formDados.confirmarSenha}
                 onChange={handleInputChange}
@@ -230,8 +288,8 @@ const DadosPessoaisAluno = () => {
         return (
           <Form.Group className="mb-3">
             <Form.Label className="label-azul">Novo email</Form.Label>
-            <Form.Control
-              type="email"
+            <Form.Control 
+              type="email" 
               name="novoEmail"
               value={formDados.novoEmail}
               onChange={handleInputChange}
@@ -243,8 +301,8 @@ const DadosPessoaisAluno = () => {
         return (
           <Form.Group className="mb-3">
             <Form.Label className="label-azul">Novo telefone</Form.Label>
-            <Form.Control
-              type="text"
+            <Form.Control 
+              type="text" 
               name="novoTelefone"
               value={formDados.novoTelefone}
               onChange={handleInputChange}
@@ -252,7 +310,7 @@ const DadosPessoaisAluno = () => {
             />
           </Form.Group>
         );
-
+          
       default:
         return (
           <p className="text-muted text-center">Selecione qual informação deseja atualizar</p>
@@ -260,13 +318,12 @@ const DadosPessoaisAluno = () => {
     }
   };
 
-  // A tela de loading e erro são desnecessárias se os dados são mockados e não há requisições
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
-        <div className="spinner-border text-primary" role="status">
+        <Spinner animation="border" role="status">
           <span className="visually-hidden">Carregando...</span>
-        </div>
+        </Spinner>
       </div>
     );
   }
@@ -279,11 +336,19 @@ const DadosPessoaisAluno = () => {
     );
   }
 
+  if (!alunoData) {
+    return (
+      <div className="alert alert-warning" role="alert">
+        Dados do aluno não disponíveis. Por favor, faça login novamente.
+      </div>
+    );
+  }
+
   return (
     <>
       <Card className="mb-4 shadow-sm p-4">
         <h4 className="label-azul mb-4">Dados Pessoais do Aluno</h4>
-
+        
         <div className="row mb-4">
           <div className="col-md-4 text-center">
             <div className="d-flex flex-column align-items-center">
@@ -293,23 +358,26 @@ const DadosPessoaisAluno = () => {
                   roundedCircle
                   className="profile-image-aluno"
                   alt="Foto de perfil do aluno"
-                  // Removido onError, pois o src agora sempre será válido (mockado)
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://placehold.co/150x150?text=Aluno'; // Fallback mais robusto
+                  }}
                 />
               </div>
               <div className="custom-file-input mb-3">
-                <input
-                  type="file"
-                  id="file-input-aluno"
+                <input 
+                  type="file" 
+                  id="file-input-aluno" 
                   className="d-none"
-                  onChange={handleImagemChange}
+                  onChange={handleImagemChange} 
                   accept="image/*"
                 />
                 <label htmlFor="file-input-aluno" className="btn btn-outline-secondary">
                   Escolher Foto
                 </label>
               </div>
-              <Button
-                className="custom-button-azul5"
+              <Button 
+                className="custom-button-azul5" 
                 onClick={handleSalvarFoto}
                 disabled={!imagemFile || uploading}
               >
@@ -317,7 +385,7 @@ const DadosPessoaisAluno = () => {
               </Button>
             </div>
           </div>
-
+          
           <div className="col-md-8">
             <div className="mb-3">
               <h6 className="label-azul">Nome completo do Aluno</h6>
@@ -327,7 +395,7 @@ const DadosPessoaisAluno = () => {
             <div className="mb-3">
               <h6 className="label-azul">Data de nascimento</h6>
               <p className="form-control border bg-light">
-                {alunoData.data_nascimento
+                {alunoData.data_nascimento 
                   ? new Date(alunoData.data_nascimento).toLocaleDateString('pt-BR')
                   : 'Não informado'}
               </p>
@@ -347,14 +415,14 @@ const DadosPessoaisAluno = () => {
               <h6 className="label-azul">Email do Aluno</h6>
               <p className="form-control border bg-light">{alunoData.email || 'Não informado'}</p>
             </div>
-
+            
             <div className="mb-3">
               <h6 className="label-azul">Senha</h6>
               <p className="form-control border bg-light">••••••••</p>
             </div>
           </div>
         </div>
-
+        
         {/* Seção de Dados do Responsável */}
         <div className="dados-responsavel-section mt-5 p-4 bg-light rounded">
           <h5 className="label-azul mb-3">Dados do Responsável</h5>
@@ -376,9 +444,40 @@ const DadosPessoaisAluno = () => {
                 <h6 className="label-azul">Email do Responsável</h6>
                 <p className="form-control border bg-white">{alunoData.responsavel.email || 'Não informado'}</p>
               </div>
+               {/* Outros campos do responsável, se existirem e quiser exibi-los */}
+               {alunoData.responsavel.grau_parentesco && (
+                 <div className="mb-3">
+                   <h6 className="label-azul">Grau de Parentesco</h6>
+                   <p className="form-control border bg-white">{alunoData.responsavel.grau_parentesco}</p>
+                 </div>
+               )}
+               {alunoData.responsavel.profissao && (
+                 <div className="mb-3">
+                   <h6 className="label-azul">Profissão</h6>
+                   <p className="form-control border bg-white">{alunoData.responsavel.profissao}</p>
+                 </div>
+               )}
+               {alunoData.responsavel.renda_familiar !== null && (
+                 <div className="mb-3">
+                   <h6 className="label-azul">Renda Familiar</h6>
+                   <p className="form-control border bg-white">R$ {parseFloat(alunoData.responsavel.renda_familiar).toFixed(2).replace('.', ',')}</p>
+                 </div>
+               )}
+               {/* Endereço do responsável, se disponível */}
+               {alunoData.responsavel.endereco && (
+                 <div className="mb-3">
+                   <h6 className="label-azul">Endereço do Responsável</h6>
+                   <p className="form-control border bg-white">
+                     {alunoData.responsavel.endereco.logradouro}, {alunoData.responsavel.endereco.numero_residencia} - {alunoData.responsavel.endereco.cep}
+                     {alunoData.responsavel.endereco.cidade && `, ${alunoData.responsavel.endereco.cidade}`}
+                     {alunoData.responsavel.endereco.estado && `/${alunoData.responsavel.endereco.estado}`}
+                     {alunoData.responsavel.endereco.pais && `, ${alunoData.responsavel.endereco.pais}`}
+                   </p>
+                 </div>
+               )}
             </>
           ) : (
-            <p className="text-muted">Nenhum responsável cadastrado.</p>
+            <p className="text-muted">Nenhum responsável cadastrado ou associado.</p>
           )}
         </div>
 

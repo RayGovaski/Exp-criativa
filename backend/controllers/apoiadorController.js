@@ -330,13 +330,28 @@ export const updatePhoto = (req, res) => {
     }
 };
 export const subscribeToPlan = (req, res) => {
-    const { planoId } = req.body; // Este é o dbId do plano selecionado
-    const apoiadorId = req.user.id; // Vem do middleware verifyToken
+    const { planoId } = req.body; 
+    const userIdFromToken = req.user ? req.user.id : null; 
+    const userRoleFromToken = req.user ? req.user.role : null; // Obtenha a role do usuário logado
+
+    // VALIDAÇÃO CRÍTICA: Apenas apoiadores podem assinar planos
+    if (!userIdFromToken || userRoleFromToken !== 'apoiador') {
+        console.warn(`AVISO [subscribeToPlan]: Acesso negado. Usuário logado (ID: ${userIdFromToken}, Role: ${userRoleFromToken}) tentou assinar plano.`);
+        return res.status(403).json({ error: "Acesso negado. Somente apoiadores podem assinar planos." });
+    }
+    
+    // Se chegou aqui, é um apoiador logado. Use userIdFromToken para as operações.
+    const apoiadorId = userIdFromToken; 
 
     if (!planoId) {
         return res.status(400).json({ error: "ID do plano é obrigatório." });
     }
 
+    // ... (restante da lógica de subscribeToPlan, que já usa apoiadorId) ...
+    // A lógica interna de verificação e atualização/inserção pode permanecer como está,
+    // pois agora sabemos que 'apoiadorId' é do apoiador logado e autorizado.
+    // Lembre-se de usar 'apoiadorId' em vez de 'userIdFromToken' dentro do resto da função.
+    
     // 1. Verificar se o planoId existe na tabela Plano
     const checkPlanQuery = 'SELECT id, nome, preco FROM Plano WHERE id = ?';
     db.query(checkPlanQuery, [planoId], (err, planos) => {
@@ -347,7 +362,7 @@ export const subscribeToPlan = (req, res) => {
         if (planos.length === 0) {
             return res.status(404).json({ error: 'Plano não encontrado.' });
         }
-        const selectedPlanData = planos[0]; // Dados do plano que o usuário quer assinar
+        const selectedPlanData = planos[0];
 
         // 2. Verificar se o apoiador já possui uma assinatura ativa
         const checkSubscriptionQuery = 'SELECT * FROM Apoiador_Plano WHERE apoiadorId = ?';
@@ -357,23 +372,14 @@ export const subscribeToPlan = (req, res) => {
                 return res.status(500).json({ error: 'Erro interno do servidor ao verificar assinatura.', details: err.message });
             }
 
-            // Converter o planoId recebido para número para comparação segura
             const requestedPlanoIdNum = parseInt(planoId, 10); 
 
             if (existingSubscription.length > 0) {
-                // *** Cenário: Apoiador JÁ TEM um plano ***
-                console.log('DEBUG: Apoiador já tem uma assinatura.');
                 const currentPlanId = existingSubscription[0].planoId;
-                console.log('DEBUG: Plano atual do apoiador (do DB):', currentPlanId, 'Tipo:', typeof currentPlanId);
-                console.log('DEBUG: Plano ID solicitado (convertido para número):', requestedPlanoIdNum, 'Tipo:', typeof requestedPlanoIdNum);
 
                 if (currentPlanId === requestedPlanoIdNum) {
-                    // Usuário tentou assinar o MESMO plano que já tem
-                    console.log('DEBUG: Plano atual é IGUAL ao solicitado. Retornando mensagem informativa.');
                     return res.status(200).json({ message: `Você já está atualmente no plano ${selectedPlanData.nome}.` });
                 } else {
-                    // Usuário está trocando para um plano DIFERENTE
-                    console.log('DEBUG: Plano atual é DIFERENTE do solicitado. Tentando ATUALIZAR.');
                     const updateSubscriptionQuery = `
                         UPDATE Apoiador_Plano
                         SET planoId = ?, dataAdesao = NOW()
@@ -391,18 +397,14 @@ export const subscribeToPlan = (req, res) => {
                     });
                 }
             } else {
-                // *** Cenário: Apoiador NÃO TEM plano (pode assinar pela primeira vez) ***
-                console.log('DEBUG: Apoiador NÃO tem assinatura. Tentando INSERIR.');
                 const insertSubscriptionQuery = `
                     INSERT INTO Apoiador_Plano (apoiadorId, planoId, dataAdesao) 
                     VALUES (?, ?, NOW())
                 `;
-                db.query(insertSubscriptionQuery, [apoiadorId, requestedPlanoIdNum], (err, result) => { // Use requestedPlanoIdNum aqui
+                db.query(insertSubscriptionQuery, [apoiadorId, requestedPlanoIdNum], (err, result) => {
                     if (err) {
                         console.error('Erro ao assinar plano (insertSubscriptionQuery):', err);
                         if (err.code === 'ER_DUP_ENTRY') {
-                            // Este erro de duplicidade NÃO DEVERIA ACONTECER AQUI se a lógica de cima estiver correta,
-                            // mas é uma boa prática mantê-lo para robustez
                             return res.status(409).json({ error: 'Você já possui uma assinatura. Por favor, gerencie-a na sua área de perfil.' });
                         }
                         return res.status(500).json({ error: 'Erro interno do servidor ao processar a assinatura.', details: err.message });
@@ -472,5 +474,76 @@ export const getPhoto = (req, res) => {
 
         // No photo found
         return res.status(404).json({ error: "Imagem não encontrada" });
+    });
+};
+
+export const getDoacaoById = (req, res) => {
+    const { id } = req.params; // ID da doação vindo da URL
+
+    const q = `
+        SELECT 
+            id, nome AS titulo, descricao, imagem_path, valor_meta AS valorMeta, arrecadado,
+            ROUND((arrecadado / valor_meta) * 100) AS porcentagem,
+            status, data_inicio AS dataInicio, data_fim AS dataFim, prioridade 
+        FROM Doacao
+        WHERE id = ?;
+    `;
+
+    db.query(q, [id], (err, data) => {
+        if (err) {
+            console.error("Erro ao buscar doação por ID (getDoacaoById):", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar doação por ID.", message: err.message });
+        }
+
+        if (data.length === 0) {
+            return res.status(404).json({ error: "Doação não encontrada." });
+        }
+
+        return res.status(200).json(data[0]);
+    });
+};
+export const getApoiadorHistoricoDoacao = (req, res) => {
+    const apoiadorId = req.user.id; // ID do apoiador logado
+
+    const q = `
+        SELECT 
+            ad.id, -- ID do registro em Apoiador_Doacao (para a key no React)
+            d.id AS doacao_id, -- ID da Doacao (para detalhes)
+            d.nome AS causa, -- Usamos 'nome' da Doacao como 'causa'
+            ad.valor_doado AS valor, 
+            ad.data_doacao AS data, 
+            d.status, -- Status da Doacao
+            d.descricao AS descricao_causa, -- Descrição da causa/doação
+            -- Para o comprovante, você pode ter um campo comprovante_path em Apoiador_Doacao
+            -- ou verificar se o status permite download. Por enquanto, vamos simular:
+            TRUE AS comprovante_disponivel -- Simula que comprovante está sempre disponível
+        FROM Apoiador_Doacao ad
+        JOIN Doacao d ON ad.doacao_id = d.id
+        WHERE ad.apoiador_id = ?
+        ORDER BY ad.data_doacao DESC;
+    `;
+
+    db.query(q, [apoiadorId], (err, data) => {
+        if (err) {
+            console.error("Erro ao buscar histórico de doações do apoiador:", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar histórico de doações.", message: err.message });
+        }
+
+        // Formatar os dados para o frontend
+        const formattedData = data.map(record => ({
+            id: record.id, // ID do registro da doação individual
+            causa: record.causa,
+            // 'instituicao' não existe no seu DB, remova do frontend ou coloque um valor fixo
+            instituicao: 'Experiência Criativa', // Exemplo: ou buscar de outra tabela se tiver
+            valor: record.valor,
+            data: new Date(record.data).toLocaleDateString('pt-BR'), // Formata para DD/MM/AAAA
+            status: record.status,
+            comprovante: record.comprovante_disponivel, // Usar o campo do DB ou TRUE
+            descricaoDetalhada: record.descricao_causa, // Para o modal
+            doacao_id: record.doacao_id // Guardar o ID da doação original para futuras consultas
+        }));
+        
+        console.log('DEBUG: Histórico de doações retornado:', formattedData);
+        return res.status(200).json(formattedData);
     });
 };

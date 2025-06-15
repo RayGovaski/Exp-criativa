@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { CreditCard, Smartphone, FileText } from 'lucide-react';
-import "./DoacoesPagamento.css";
+// src\pages\compra-assinatura\DoacoesPagamento.jsx
 
-const causes = [
-    { id: '', title: 'Selecione um projeto para doar', description: '' },
-    { id: 'infraestrutura', title: "Infraestrutura e Manutenção", description: "Ajuda a manter nosso espaço funcionando." },
-    { id: 'materiais_pedagogicos', title: "Materiais Pedagógicos", description: "Para aquisição de livros, instrumentos, materiais de arte." },
-    { id: 'bolsas_estudo', title: "Bolsas de Estudo", description: "Para financiar bolsas integrais." },
-    { id: 'eventos_culturais', title: "Eventos e Apresentações", description: "Para realização de eventos culturais." },
-    { id: 'violao', title: "Projeto: Compra de Violão", description: "Ajude a comprar um violão." },
-    { id: 'roupas_acessorios', title: "Projeto: Roupas e Acessórios", description: "Contribua para a compra de roupas e acessórios." },
-    { id: 'materiais_criativos', title: "Projeto: Materiais Criativos", description: "Garanta materiais de qualidade." },
-    { id: 'microfones_aulas', title: "Projeto: Microfones para Aulas", description: "Ajude com equipamentos para aulas de canto e teatro." },
-];
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CreditCard, Smartphone, FileText } from 'lucide-react';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext'; 
+import "./DoacoesPagamento.css";
+import { ProgressBar } from 'react-bootstrap'; // Import ProgressBar
 
 const paymentMethods = [
     { id: 'credit', name: 'Cartão de Crédito', icon: CreditCard },
@@ -24,9 +17,11 @@ const paymentMethods = [
 
 const DoacoesPagamento = () => {
     const location = useLocation();
-    const { preSelectedCauseId } = location.state || {};
+    const navigate = useNavigate();
+    const { user, token, isAuthenticated } = useAuth(); 
 
-    const [selectedCause, setSelectedCause] = useState(''); 
+    const { preSelectedCauseId } = location.state || {}; 
+
     const [donationAmount, setDonationAmount] = useState('');
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [customerData, setCustomerData] = useState({
@@ -38,12 +33,31 @@ const DoacoesPagamento = () => {
         cardExpiry: '',
         cardCvv: ''
     });
+    const [loadingProject, setLoadingProject] = useState(true);
+    const [projectError, setProjectError] = useState(null);
+    const [selectedProjectData, setSelectedProjectData] = useState(null);
 
     useEffect(() => {
-        if (preSelectedCauseId) {
-            setSelectedCause(preSelectedCauseId);
-        }
-    }, [preSelectedCauseId]);
+        const fetchProjectDetails = async () => {
+            if (!preSelectedCauseId) {
+                setProjectError("Nenhum projeto de doação selecionado. Redirecionando...");
+                setTimeout(() => navigate('/doar'), 2000); 
+                return;
+            }
+            try {
+                const response = await axios.get(`http://localhost:8000/doacoes/${preSelectedCauseId}`);
+                setSelectedProjectData(response.data);
+            } catch (err) {
+                console.error("Erro ao buscar detalhes do projeto:", err);
+                setProjectError("Erro ao carregar detalhes do projeto. Tente novamente.");
+            } finally {
+                setLoadingProject(false);
+            }
+        };
+
+        fetchProjectDetails();
+    }, [preSelectedCauseId, navigate]);
+
 
     const handleInputChange = (field, value) => {
         setCustomerData(prev => ({ ...prev, [field]: value }));
@@ -52,23 +66,60 @@ const DoacoesPagamento = () => {
     const handleDonationAmountChange = (e) => {
         const value = e.target.value;
         if (/^\d*([.,]\d{0,2})?$/.test(value) || value === '') {
-            setDonationAmount(value.replace(',', '.'));
+            setDonationAmount(value.replace(',', '.')); 
         }
     };
 
-    const handleDonate = () => {
-        if (!donationAmount || parseFloat(donationAmount) <= 0 || !selectedCause || selectedCause === '' || !selectedPayment) {
-            alert('Por favor, insira um valor de doação válido, selecione um projeto e um método de pagamento.');
+    const handleDonate = async () => {
+        if (!donationAmount || parseFloat(donationAmount) <= 0 || !preSelectedCauseId || !selectedPayment) {
+            alert('Por favor, insira um valor de doação válido e selecione um método de pagamento.');
             return;
         }
 
-        const cause = causes.find(c => c.id === selectedCause);
-        const payment = paymentMethods.find(p => p.id === selectedPayment);
+        const valorNumerico = parseFloat(donationAmount);
 
-        alert(`Processando doação de R$ ${parseFloat(donationAmount).toFixed(2).replace('.', ',')} para o projeto "${cause.title}" via ${payment.name}.`);
+        if (!isAuthenticated() && (!customerData.name || !customerData.email || !customerData.phone)) {
+            alert('Por favor, preencha seus dados (Nome, Email, Telefone) para continuar.');
+            return;
+        }
+
+        if ((selectedPayment === 'credit' || selectedPayment === 'debit') && 
+            (!customerData.cardNumber || !customerData.cardName || !customerData.cardExpiry || !customerData.cardCvv)) {
+            alert('Por favor, preencha todos os dados do cartão.');
+            return;
+        }
+
+        const donationPayload = {
+            doacaoId: preSelectedCauseId,
+            valorDoado: valorNumerico,
+            ...(isAuthenticated() ? {} : { 
+                customerName: customerData.name,
+                customerEmail: customerData.email,
+                customerPhone: customerData.phone,
+            }),
+            ...(selectedPayment === 'credit' || selectedPayment === 'debit' ? customerData : {}),
+            metodoPagamento: selectedPayment 
+        };
+
+        try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { 
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await axios.post('http://localhost:8000/doacoes/doar-valor', donationPayload, { headers });
+
+            alert(response.data.message);
+            navigate('/doar'); 
+        } catch (error) {
+            console.error("Erro ao processar doação:", error);
+            let errorMessage = "Ocorreu um erro ao processar sua doação.";
+            if (error.response && error.response.data && error.response.data.error) {
+                errorMessage = error.response.data.error;
+            }
+            alert(errorMessage);
+        }
     };
-
-    const selectedCauseData = causes.find(c => c.id === selectedCause);
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -76,13 +127,29 @@ const DoacoesPagamento = () => {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-bold text-gray-800 mb-4 mt-4">
-                        Faça sua Doação
+                        Faça sua Doação para "{selectedProjectData?.titulo || 'Carregando...'}"
                     </h1>
                     <div className="w-24 h-1 bg-pink-600 mx-auto mb-4"></div>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                         Sua generosidade transforma vidas! Preencha os detalhes da sua doação abaixo.
                     </p>
                 </div>
+
+                {/* Seção de Detalhes do Projeto Selecionado */}
+                {selectedProjectData && ( 
+                    <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                            Detalhes do Projeto
+                        </h2>
+                        <p className="text-lg text-gray-700 mb-2"><strong>Projeto:</strong> {selectedProjectData.titulo}</p>
+                        <p className="text-md text-gray-600 mb-4">{selectedProjectData.descricao}</p>
+                        <ProgressBar 
+                            now={selectedProjectData.porcentagem} 
+                            label={`${selectedProjectData.arrecadado.toFixed(2).replace('.', ',')} / ${selectedProjectData.valorMeta.toFixed(2).replace('.', ',')} (Meta: ${selectedProjectData.porcentagem}%)`} 
+                            className="mb-3" 
+                        />
+                    </div>
+                )}
 
                 {/* 1. Donation Amount Input */}
                 <div className="bg-white rounded-lg shadow-md p-8 mb-8">
@@ -101,35 +168,8 @@ const DoacoesPagamento = () => {
                     </div>
                 </div>
 
-                {/* 2. Project Selection Dropdown */}
-                {donationAmount && parseFloat(donationAmount) > 0 && (
-                    <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                            Para qual projeto você deseja doar?
-                        </h2>
-                        <div className="flex justify-center">
-                            <select
-                                value={selectedCause}
-                                onChange={(e) => setSelectedCause(e.target.value)}
-                                className="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg text-lg text-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                            >
-                                {causes.map((cause) => (
-                                    <option key={cause.id} value={cause.id} disabled={cause.id === ''}>
-                                        {cause.title}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        {selectedCauseData && selectedCauseData.description && selectedCause !== '' && (
-                            <p className="text-sm text-gray-600 mt-4 text-center">
-                                {selectedCauseData.description}
-                            </p>
-                        )}
-                    </div>
-                )}
-
-                {/* 3. Payment Method Selection */}
-                {donationAmount && parseFloat(donationAmount) > 0 && selectedCause && selectedCause !== '' && (
+                {/* 2. Payment Method Selection */}
+                {donationAmount && parseFloat(donationAmount) > 0 && ( 
                     <div className="mb-12">
                         <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
                             Método de Pagamento
@@ -140,11 +180,17 @@ const DoacoesPagamento = () => {
                                 return (
                                     <div
                                         key={method.id}
+                                        // --- CORREÇÃO AQUI: Garanta que a template string esteja fechada ---
+                                        // Aparentemente, faltou o ` no final de `selected` ou o ` antes de relative
+                                        // Ou a classe `relative` estava fora da template string.
                                         className={`payment-method-card ${
-                                            selectedPayment === method.id
-                                                ? 'selected'
-                                                : ''
-                                        } relative`}
+                                            selectedPayment === method.id ? 'selected' : ''
+                                        } relative`} 
+                                        // A linha 189 é onde a classe é construída.
+                                        // A string deve ser `className="..."`
+                                        // A interpolação de variáveis é `${minhaVariavel}`
+                                        // Se houver ternário, é `${condicao ? 'valor1' : 'valor2'}`
+                                        // E o ` deve fechar a template string.
                                         onClick={() => setSelectedPayment(method.id)}
                                     >
                                         <IconComponent className="method-icon" />
@@ -158,8 +204,8 @@ const DoacoesPagamento = () => {
                     </div>
                 )}
 
-                {/* 4. Customer Information Form */}
-                {donationAmount && parseFloat(donationAmount) > 0 && selectedCause && selectedCause !== '' && selectedPayment && (
+                {/* 3. Customer Information Form (Escondido se LOGADO) */}
+                {donationAmount && parseFloat(donationAmount) > 0 && selectedPayment && !isAuthenticated() && ( 
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">
                             Seus Dados
@@ -301,7 +347,7 @@ const DoacoesPagamento = () => {
                 )}
 
                 {/* Action Button */}
-                {donationAmount && parseFloat(donationAmount) > 0 && selectedCause && selectedCause !== '' && selectedPayment && (
+                {donationAmount && parseFloat(donationAmount) > 0 && selectedPayment && ( 
                     <div className="text-center">
                         <button
                             onClick={handleDonate}

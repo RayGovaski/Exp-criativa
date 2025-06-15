@@ -2,7 +2,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import './theme.css'; // Importa os estilos dos temas
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext'; // Importa o ThemeProvider
 import ProtectedRoute from './ProtectedRoute'; // Importe ProtectedRoute
 
 import { ToastContainer } from 'react-toastify';
@@ -34,66 +36,81 @@ const App = () => {
 
     return (
         <Router>
-            <AuthProvider>
-                <ErrorBoundary>
-                    <Routes>
-                        {/* Rotas Públicas (acesso livre, mas doação é um caso especial) */}
-                        <Route path="/" element={<Layout><Home /></Layout>} />
-                        <Route path="/login" element={<Layout><Login /></Layout>} />
-                        <Route path="/registro-apoiador" element={<Layout><RegistroApoiador /></Layout>} />
-                        <Route path="/registro-aluno" element={<Layout><RegistroAluno /></Layout>} />
-                        <Route path="/registro-professor" element={<Layout><RegistroProfessor /></Layout>} />
-                        <Route path="/menu-registro" element={<Layout><MenuRegistro /></Layout>} />
-                        
-                        {/* Páginas de Doação:
-                           - São acessíveis a visitantes (não logados).
-                           - São acessíveis a apoiadores, professores, administradores.
-                           - NÃO são acessíveis a alunos logados.
-                           Para isso, usamos um truque: o ProtectedRoute para nonAlunoRoles,
-                           e para não-logados, ele permite acesso via 'allowedRoles' ser vazio.
-                        */}
-                        <Route 
-                            path="/doar" 
-                            element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><PaginaDoacoes /></Layout></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/doar-pagamento" 
-                            element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><DoacoesPagamento /></Layout></ProtectedRoute>} 
-                        />
-                        
-                        {/* Rotas de Assinatura (APENAS PARA APOIADORES) */}
-                        <Route 
-                            path="/assinaturas" 
-                            element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><AssinaturaPagamento /></Layout></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/gerenciar-assinatura" 
-                            element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><GerenciarAssinatura /></Layout></ProtectedRoute>} 
-                        />
+            <ThemeProvider> {/* Adiciona o ThemeProvider aqui */}
+                <AuthProvider>
+                    <ErrorBoundary>
+                        <Routes>
+                            {/* Rotas Públicas (acesso livre, mas doação é um caso especial) */}
+                            <Route path="/" element={<Layout><Home /></Layout>} />
+                            <Route path="/login" element={<Layout><Login /></Layout>} />
+                            <Route path="/registro-apoiador" element={<Layout><RegistroApoiador /></Layout>} />
+                            <Route path="/registro-aluno" element={<Layout><RegistroAluno /></Layout>} />
+                            <Route path="/registro-professor" element={<Layout><RegistroProfessor /></Layout>} />
+                            <Route path="/menu-registro" element={<Layout><MenuRegistro /></Layout>} />
+                            
+                            {/* Páginas de Doação:
+                               - São acessíveis a visitantes (não logados).
+                               - São acessíveis a apoiadores, professores, administradores.
+                               - NÃO são acessíveis a alunos logados.
+                               Para isso, usamos um truque: o ProtectedRoute para nonAlunoRoles,
+                               e para não-logados, ele permite acesso via 'allowedRoles' ser vazio.
+                            */}
+                            <Route 
+                                path="/doar" 
+                                element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><PaginaDoacoes /></Layout></ProtectedRoute>} 
+                            />
+                            <Route 
+                                path="/doar-pagamento" 
+                                element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><DoacoesPagamento /></Layout></ProtectedRoute>} 
+                            />
+                            
+                            {/* Rotas de Assinatura (APENAS PARA APOIADORES) */}
+                            <Route 
+                                path="/assinaturas" 
+                                element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><AssinaturaPagamento /></Layout></ProtectedRoute>} 
+                            />
+                            <Route 
+                                path="/gerenciar-assinatura" 
+                                element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><GerenciarAssinatura /></Layout></ProtectedRoute>} 
+                            />
 
-                        {/* Perfis específicos por ROLE */}
-                        <Route 
-                            path="/perfil" 
-                            element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><Perfil /></Layout></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/perfil-aluno" 
-                            element={<ProtectedRoute allowedRoles={['aluno']}><Layout><PerfilAluno /></Layout></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/perfil-professor" 
-                            element={<ProtectedRoute allowedRoles={['professor']}><Layout><PerfilProfessor /></Layout></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/perfil-adm" 
-                            element={<ProtectedRoute allowedRoles={['administrador']}><Layout><PerfilADM /></Layout></ProtectedRoute>} 
-                        /> 
+                            {/* Perfis específicos por ROLE */}
+                            <Route 
+                                path="/perfil" 
+                                element={<ProtectedRoute allowedRoles={['apoiador']}><Layout><Perfil /></Layout></ProtectedRoute>} 
+                            />
+                            <Route 
+                                path="/perfil-aluno" 
+                                element={<ProtectedRoute allowedRoles={['aluno']}><Layout><PerfilAluno /></Layout></ProtectedRoute>} 
+                            />
+                            <Route 
+                                path="/perfil-professor" 
+                                element={<ProtectedRoute allowedRoles={['professor']}><Layout><PerfilProfessor /></Layout></ProtectedRoute>} 
+                            />
+                            <Route 
+                                path="/perfil-adm" 
+                                element={<ProtectedRoute allowedRoles={['administrador']}><Layout><PerfilADM /></Layout></ProtectedRoute>} 
+                            /> 
+                            
+                            {/* Rota de redirecionamento final se nenhuma rota casar (para o login) */}
+                            <Route path="*" element={<Navigate to="/login" />} />
+                        </Routes>
                         
-                        {/* Rota de redirecionamento final se nenhuma rota casar (para o login) */}
-                        <Route path="*" element={<Navigate to="/login" />} />
-                    </Routes>
-                </ErrorBoundary>
-            </AuthProvider>
+                        {/* ToastContainer para notificações */}
+                        <ToastContainer
+                            position="top-right"
+                            autoClose={5000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                        />
+                    </ErrorBoundary>
+                </AuthProvider>
+            </ThemeProvider>
         </Router>
     );
 };

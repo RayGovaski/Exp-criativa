@@ -45,10 +45,6 @@ const ComprovantesPerfil = () => {
     setShowModal(true);
   };
 
-  const handleDownloadComprovante = (id) => {
-    console.log(`Baixando comprovante da doação ${id}`);
-    alert("Funcionalidade de download de comprovante ainda não implementada.");
-  };
 
   const doacoesFiltradas = doacoes.filter(
     doacao => doacao.causa.toLowerCase().includes(filtro.toLowerCase())
@@ -124,15 +120,7 @@ const ComprovantesPerfil = () => {
                     >
                       Detalhes
                     </Button>
-                    {doacao.comprovante && (
-                      <Button 
-                        className="custom-button-azul"
-                        size="sm"
-                        onClick={() => handleDownloadComprovante(doacao.id)}
-                      >
-                        <FaFileDownload className="me-1" /> Comprovante
-                      </Button>
-                    )}
+                    
                   </td>
                 </tr>
               ))}
@@ -197,14 +185,7 @@ const ComprovantesPerfil = () => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
-          {doacaoSelecionada && doacaoSelecionada.comprovante && (
-            <Button 
-              className="custom-button-azul px-4" 
-              onClick={() => handleDownloadComprovante(doacaoSelecionada.id)}
-            >
-              <FaFileDownload className="me-2" /> Baixar Comprovante
-            </Button>
-          )}
+         
           <Button 
             variant="outline-secondary" 
             onClick={() => setShowModal(false)} 

@@ -1,8 +1,34 @@
+/* Other Carrossel.css styles */
+
+.carousel-image-1 {
+  background-image: url("src/Assets/CarrosselPrincipal.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  /* You might need to set a min-height or height for the img to be visible */
+  min-height: 400px; /* Adjust as needed */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.carousel-image-2 {
+  background-image: url("src/Assets/CarrosselPrincipal2.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  min-height: 400px; /* Adjust as needed */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 .carousel img {
   height: 500px;
   object-fit: cover;
   width: 100%;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: block;
 }
 
 .carousel-caption {

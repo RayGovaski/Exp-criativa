@@ -177,7 +177,6 @@ body {
 /* Page title for mobile (hidden on desktop) */
 .page-title {
     padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .page-title-text {

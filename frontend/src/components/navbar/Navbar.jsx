@@ -4,12 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { HashLink as Link } from "react-router-hash-link";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext'; 
+import { useTheme } from "../../context/ThemeContext";
+import { Sun, Moon, User } from "lucide-react";
 import "./Navbar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const Navbar = () => {
-  const { isAuthenticated, logout, user } = useAuth(); // 'user' agora tem perfil completo + role
+  const { isAuthenticated, logout, user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -20,14 +23,19 @@ const Navbar = () => {
   const profileDropdownRef = useRef(null);
   const doarDropdownRef = useRef(null);
 
-  // URLs base para buscar as fotos de perfil por tipo de usuário
-  // ASSUMA que estas rotas existem e que o backend serve as fotos por ID
-  const PHOTO_BASE_URLS = {
-    apoiador: 'http://localhost:8000/apoiador/foto/',
-    aluno: 'http://localhost:8000/alunos/foto/',
-    professor: 'http://localhost:8000/professores/foto/', // Crie esta rota no seu backend
-    administrador: 'http://localhost:8000/administradores/foto/', // Crie esta rota no seu backend
-  };
+  // Componente do Toggle Switch
+  const ThemeToggleSwitch = ({ onClick, isDark }) => (
+    <button 
+      className={`theme-toggle-switch ${isDark ? 'dark' : ''}`}
+      onClick={onClick}
+      aria-label="Alternar tema"
+    >
+      <div className="theme-toggle-slider">
+        <Sun className="theme-icon sun-icon" />
+        <Moon className="theme-icon moon-icon" />
+      </div>
+    </button>
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -101,28 +109,18 @@ const Navbar = () => {
     logout(); 
   };
 
-  // Função para obter a URL da imagem do perfil
-  const getProfileImageUrl = () => {
-    // Se não há usuário logado ou o objeto user está incompleto
-    if (!user || !user.id || !user.role) {
-      return "src/Assets/Perfil.svg"; // Fallback: imagem padrão
-    }
-
-    // user.foto_path agora virá do perfil completo buscado pelo AuthContext
-    if (user.foto_path) {
-        const baseUrl = PHOTO_BASE_URLS[user.role];
-        if (baseUrl) {
-            // Constrói a URL usando a URL base específica da role e o ID do usuário
-            return `${baseUrl}${user.id}?t=${new Date().getTime()}`; 
-        }
-    }
-    // Se user.foto_path é nulo ou a base URL não foi encontrada para a role
-    return "src/Assets/Perfil.svg"; // Fallback: imagem padrão
+  const handleThemeToggle = () => {
+    toggleTheme();
+    closeAllDropdowns();
   };
 
-  // Ajusta o link "Meu Perfil" e "Gerenciar Assinatura"
+  const handleThemeToggleSidebar = () => {
+    toggleTheme();
+    closeSidebar();
+  };
+
   const getProfileLinkByRole = () => {
-    if (!user || !user.role) return '/login'; // Se não tiver role, vai para login
+    if (!user || !user.role) return '/login';
     switch (user.role) {
       case 'apoiador': return '/perfil';
       case 'aluno': return '/perfil-aluno';
@@ -132,13 +130,13 @@ const Navbar = () => {
     }
   };
 
-
   return (
     <>
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={toggleSidebar}></div>
       )}
 
+      {/* Sidebar para Mobile */}
       <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <span className="sidebar-close" onClick={toggleSidebar}>×</span>
@@ -165,6 +163,17 @@ const Navbar = () => {
           <li className="sidebar-item">
             <Link to="/#contato" className="sidebar-link" onClick={closeSidebar}>Contato</Link>
           </li>
+          
+          {/* Toggle de Tema no Sidebar */}
+          <li className="sidebar-item theme-toggle-item">
+            <div className="theme-toggle-container">
+              <ThemeToggleSwitch 
+                onClick={handleThemeToggleSidebar} 
+                isDark={theme === 'dark'} 
+              />
+            </div>
+          </li>
+
           {!isAuthenticated() ? (
             <>
               <li className="sidebar-item"><Link to="/login" className="sidebar-link" onClick={closeSidebar}>Login</Link></li>
@@ -175,17 +184,15 @@ const Navbar = () => {
               <li className="sidebar-item">
                 <Link to={getProfileLinkByRole()} className="sidebar-link" onClick={closeSidebar}>Meu Perfil</Link> 
               </li>
-              {/* Adicionar Gerenciar Assinatura no sidebar se for apoiador */}
-              {user && user.role === 'apoiador' && (
-                  <li className="sidebar-item">
-                      <Link to="/gerenciar-assinatura" className="sidebar-link" onClick={closeSidebar}>Gerenciar Assinatura</Link>
-                  </li>
-              )}
+              <li className="sidebar-item">
+                <button className="sidebar-link logout-button" onClick={() => { handleLogoutClick(); closeSidebar(); }}>Sair</button>
+              </li>
             </>
           )}
         </ul>
       </div>
 
+      {/* Navbar principal */}
       <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container-fluid navbar-container">
           <button className="navbar-toggler border-0" type="button" onClick={toggleSidebar} aria-label="Toggle navigation">
@@ -205,11 +212,11 @@ const Navbar = () => {
                   Apoie {showDoarDropdown ? '▲' : '▼'}
                 </Link>
                 {showDoarDropdown && (
-                  <div className="dropdown-menu-custom show">
+                  <div className={`dropdown-menu-custom show ${theme === 'dark' ? 'dark' : ''}`}>
                     {isAuthenticated() && (
-                      <Link to="/assinaturas" className="dropdown-item-custom" onClick={closeAllDropdowns}>Assinaturas</Link>
+                      <Link to="/assinaturas" className={`dropdown-item-custom ${theme === 'dark' ? 'dark' : ''}`} onClick={closeAllDropdowns}>Assinaturas</Link>
                     )}
-                    <Link to="/doar" className="dropdown-item-custom" onClick={closeAllDropdowns}>Doar para causa</Link>
+                    <Link to="/doar" className={`dropdown-item-custom ${theme === 'dark' ? 'dark' : ''}`} onClick={closeAllDropdowns}>Doar para causa</Link>
                   </div>
                 )}
               </li>
@@ -219,24 +226,47 @@ const Navbar = () => {
 
           <div className="profile-container" ref={profileDropdownRef}>
             <div className="profile-dropdown-container">
-              <img
-                src={isAuthenticated() ? getProfileImageUrl() : "src/Assets/Perfil.svg"}
-                alt="Perfil"
-                className="profile-img"
+              {/* Sempre renderiza apenas o ícone, com cor baseada no tema */}
+              <div 
+                className={`profile-icon ${theme === 'dark' ? 'dark' : ''}`}
                 onClick={toggleProfileDropdown}
-                onError={(e) => { e.target.onerror = null; e.target.src = "src/Assets/Perfil.svg"; }}
-              />
+              >
+                <User size={28} />
+              </div>
+              
               {showProfileDropdown && (
-                <div className="profile-dropdown-menu show">
-                  {!isAuthenticated() ? (
+                <div className={`profile-dropdown-menu show ${theme === 'dark' ? 'dark' : ''}`}>
+                  {isAuthenticated() ? (
                     <>
-                      <Link to="/login" className="dropdown-item-custom" onClick={closeAllDropdowns}>Login</Link>
-                      <Link to="/menu-registro" className="dropdown-item-custom" onClick={closeAllDropdowns}>Registro</Link>
+                      <Link to={getProfileLinkByRole()} className={`dropdown-item-custom ${theme === 'dark' ? 'dark' : ''}`} onClick={closeAllDropdowns}>Meu Perfil</Link>
+                      <button className={`dropdown-item-custom logout-button ${theme === 'dark' ? 'dark' : ''}`} onClick={handleLogoutClick}>Sair</button>
+                      <hr className={`dropdown-divider-custom ${theme === 'dark' ? 'dark' : ''}`} />
+                      
+                      {/* Toggle de Tema no Dropdown */}
+                      <div className={`dropdown-item-custom theme-toggle-item ${theme === 'dark' ? 'dark' : ''}`}>
+                        <div className="theme-toggle-container">
+                          <ThemeToggleSwitch 
+                            onClick={handleThemeToggle} 
+                            isDark={theme === 'dark'} 
+                          />
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <Link to={getProfileLinkByRole()} className="dropdown-item-custom" onClick={closeAllDropdowns}>Meu Perfil</Link>
-                      <button className="dropdown-item-custom logout-button" onClick={handleLogoutClick}>Sair</button>
+                      <Link to="/login" className={`dropdown-item-custom ${theme === 'dark' ? 'dark' : ''}`} onClick={closeAllDropdowns}>Login</Link>
+                      <Link to="/menu-registro" className={`dropdown-item-custom ${theme === 'dark' ? 'dark' : ''}`} onClick={closeAllDropdowns}>Registro</Link>
+                      <hr className={`dropdown-divider-custom ${theme === 'dark' ? 'dark' : ''}`} />
+                      
+                      {/* Toggle de Tema no Dropdown para usuários deslogados */}
+                      <div className={`dropdown-item-custom theme-toggle-item ${theme === 'dark' ? 'dark' : ''}`}>
+                        <div className="theme-toggle-container">
+                          <ThemeToggleSwitch 
+                            onClick={handleThemeToggle} 
+                            isDark={theme === 'dark'} 
+                          />
+                        </div>
+                      </div>
                     </>
                   )}
                 </div>

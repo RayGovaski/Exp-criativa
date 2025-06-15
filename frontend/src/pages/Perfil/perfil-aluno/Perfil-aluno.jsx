@@ -1,8 +1,9 @@
-// PerfilAluno.jsx
+// frontend\src\pages\Perfil\perfil-aluno\Perfil-aluno.jsx
+
 import React, { useState } from "react";
 import SidebarPerfilAluno from "../../../components/comp-perfil-apoiador/sidebar-perfil-aluno/SidebarPerfilAluno";
-import MateriasAluno from "../../../components/comp-perfil-apoiador/materias-aluno/MateriasAluno"; // Novo componente
-import SalaAluno from "../../../components/comp-perfil-apoiador/sala-aluno/SalaAluno"; // Novo componente
+import MateriasAluno from "../../../components/comp-perfil-apoiador/materias-aluno/MateriasAluno";
+import SalaAluno from "../../../components/comp-perfil-apoiador/sala-aluno/SalaAluno";
 
 import "./Perfil-aluno.css";
 import DeletarConta from "../../../components/comp-perfil-apoiador/deletar-perfil/DeletarConta";
@@ -13,11 +14,13 @@ const PerfilAluno = () => {
   const [secaoAtiva, setSecaoAtiva] = useState("dados"); // Seção padrão
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  console.log('DEBUG [PerfilAluno]: Componente PerfilAluno renderizado.');
+  console.log('DEBUG [PerfilAluno]: SecaoAtiva atual:', secaoAtiva);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Helper function to get the title for the mobile view
   const getSectionTitle = (section) => {
     switch (section) {
       case "dados":
@@ -36,6 +39,7 @@ const PerfilAluno = () => {
   };
 
   const renderConteudo = () => {
+    console.log('DEBUG [PerfilAluno]: renderConteudo acionado para secaoAtiva:', secaoAtiva);
     switch (secaoAtiva) {
       case "dados":
         return <DadosPessoaisAluno />;
@@ -53,8 +57,8 @@ const PerfilAluno = () => {
   };
 
   return (
-    <div className="perfil-aluno-bg"> {/* Novo nome de classe para o background */}
-      <div className="perfil-aluno-container"> {/* Novo nome de classe para o container */}
+    <div className="perfil-aluno-bg">
+      <div className="perfil-aluno-container">
         <SidebarPerfilAluno
           setSecaoAtiva={setSecaoAtiva}
           secaoAtiva={secaoAtiva}
@@ -67,7 +71,7 @@ const PerfilAluno = () => {
               {getSectionTitle(secaoAtiva)}
             </h4>
           </div>
-          {renderConteudo()}
+          {renderConteudo()} {/* Aqui o conteúdo é renderizado */}
         </div>
       </div>
     </div>

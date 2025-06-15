@@ -1,21 +1,18 @@
 // src/context/AuthContext.js
-import React, { createContext, useState, useContext, useEffect } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-// Create context
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-// Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-<<<<<<< Updated upstream
-  // Check if user is logged in on initial load
-=======
   const setAxiosAuthHeader = useCallback((authToken) => {
     if (authToken) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
@@ -73,6 +70,7 @@ export const AuthProvider = ({ children }) => {
         break;
       case 'administrador':
         profileEndpoint = `http://localhost:8000/administrador/profile`;
+
         break;
       default:
         console.error('ERRO [AuthContext]: Role desconhecida:', decodedUserPayload.role);
@@ -116,88 +114,57 @@ export const AuthProvider = ({ children }) => {
   }, [fetchAndSetUserProfile]); // Dependência: fetchAndSetUserProfile
 
 
->>>>>>> Stashed changes
   useEffect(() => {
-    const checkLoggedIn = async () => {
-      if (token) {
-        // Set default authorization header for all requests
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-        try {
-          // Verify the token by fetching user data
-          const response = await axios.get('http://localhost:8000/apoiador/profile');
-          setUser(response.data);
-        } catch (error) {
-          // If token is invalid, clear localStorage and state
-          console.error("Invalid token:", error);
-          localStorage.removeItem('token');
-          setToken(null);
-          setUser(null);
-          delete axios.defaults.headers.common['Authorization'];
-        }
-      }
-      setLoading(false);
-    };
+    console.log('DEBUG [AuthContext]: useEffect de inicialização disparado.');
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      decodeAndSetUser(storedToken);
+    }
+    setLoading(false);
+  }, [decodeAndSetUser]);
 
-    checkLoggedIn();
-  }, [token]);
 
-  // Login function
   const login = async (email, senha) => {
+    console.log('DEBUG [AuthContext]: Iniciando processo de login.');
     try {
       setLoading(true);
-      // 🔧 FIXED: Changed from /login to /auth/login
       const response = await axios.post('http://localhost:8000/auth/login', { email, senha });
       
-      const { token, user } = response.data;
+      const { token: receivedToken } = response.data; // Apenas pegamos o token aqui, o user virá do fetchAndSetUserProfile
       
-      // Save token to localStorage
-      localStorage.setItem('token', token);
-      
-      // Set token in axios headers
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      // Update state
-      setToken(token);
-      setUser(user);
-      
-      return { success: true };
-    } catch (error) {
-      console.error("Login error:", error);
-      let errorMessage = "Erro ao fazer login. Tente novamente.";
-      
-      if (error.response && error.response.data && error.response.data.error) {
-        errorMessage = error.response.data.error;
+      console.log('DEBUG [AuthContext]: Login API sucesso. Token recebido.');
+      if (await decodeAndSetUser(receivedToken)) { // Passa A STRING JWT para a função
+        console.log('DEBUG [AuthContext]: Login bem-sucedido. Usuário (perfil completo) setado e token armazenado.');
+        return { success: true, user: user }; // Retorne o 'user' do estado do contexto
+      } else {
+        console.log('DEBUG [AuthContext]: Login API sucesso, mas falha ao decodificar/setar token ou buscar perfil.');
+        return { success: false, error: "Erro ao processar token de login ou buscar perfil." };
       }
-      
+    } catch (error) {
+      console.error("ERRO [AuthContext]: Erro de login:", error);
+      const errorMessage = error.response?.data?.error || "Credenciais inválidas ou erro de rede.";
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
+      console.log('DEBUG [AuthContext]: Processo de login finalizado.');
     }
   };
 
-  // Logout function
-  const logout = () => {
-    // Remove token from localStorage
-    localStorage.removeItem('token');
-    
-    // Remove authorization header
-    delete axios.defaults.headers.common['Authorization'];
-    
-    // Clear state
-    setToken(null);
+  const logout = useCallback(() => {
+    console.log('DEBUG [AuthContext]: Executando LOGOUT. Limpando sessão...');
     setUser(null);
-    
-    // Redirect to login page
+    setToken(null);
+    localStorage.removeItem('token');
+    setAxiosAuthHeader(null);
+    console.log('DEBUG [AuthContext]: Sessão limpa. Redirecionando para /login.');
     navigate('/login');
-  };
+  }, [setAxiosAuthHeader, navigate]);
 
-  // Check if user is authenticated
   const isAuthenticated = () => {
-    return !!token;
+    console.log('DEBUG [AuthContext]: Verificando isAuthenticated. User:', !!user, 'Token:', !!token);
+    return !!user && !!token; 
   };
 
-  // Context value
   const value = {
     user,
     token,
@@ -207,10 +174,13 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

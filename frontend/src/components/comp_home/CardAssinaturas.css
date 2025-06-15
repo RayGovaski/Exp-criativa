@@ -112,6 +112,40 @@
   border-top-right-radius: 20px;
 }
 
+/* Estilo para o item da feature com check icon via CSS */
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.feature-item::before {
+  content: "";
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background-image: url('./src/Assets/check.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+/* Alternativa usando um ícone SVG inline (mais recomendado) */
+.feature-item-svg::before {
+  content: "";
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300B894'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
 .tamanho2{
   width: 25px;
   height: auto;
@@ -275,6 +309,10 @@
   margin-bottom: 10px;
   margin-left: 30px;
   margin-right: 30px;
+}
+
+.botao-verde-escuro:hover {
+  background-color: #125f58 !important;
 }
 
 .btn-mais {

@@ -11,5 +11,12 @@ O projeto Cores do Amanhã é um sistema de doações desenvolvido para uma ONG 
 
 <h2> ⚙️ Instruções de Instalação</h2>
 
+backend
+- cd backend
+- npm install
+- npm start 
+
+frontend
+- cd frontend
 - npm install
 - npm run dev

@@ -1,67 +1,62 @@
-import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken';
-import db from '../config/database.js';
-import { JWT_SECRET } from '../middleware/auth.js';
-import { validateEmail } from '../utils/validators.js';
+// backend/controllers/authController.js
 
-<<<<<<< Updated upstream
-export const login = async (req, res) => {
-    try {
-        const { email, senha } = req.body;
-        
-        if (!email || !senha) {
-            return res.status(400).json({ error: "Email e senha são obrigatórios" });
-=======
-export const login = (req, res) => { 
+import db from '../config/database.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../middleware/auth.js'; // Assegure-se de que JWT_SECRET é acessível
+import { validateEmail } from '../utils/validators.js'; // Importa a validação de email
+
+export const login = (req, res) => {
     const { email, senha } = req.body;
 
     console.log('DEBUG [Login-BE]: Requisição de login recebida para email:', email);
 
     if (!email || !senha) {
+        console.log('DEBUG [Login-BE]: Email ou senha ausentes. Retornando 400.');
         return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
     }
+
     if (!validateEmail(email)) {
+        console.log('DEBUG [Login-BE]: Formato de email inválido. Retornando 400.');
         return res.status(400).json({ error: 'Email inválido.' });
     }
 
+    // Array de tipos de usuários e suas respectivas tabelas e campos de foto/email
+    // Mantenha a ordem de prioridade se houver (ex: Apoiador > Aluno > Professor)
     const userTypes = [
         { role: 'apoiador', table: 'Apoiador', fotoPathField: 'foto_path' },
         { role: 'aluno', table: 'Aluno', fotoPathField: 'foto_path' },
-        { role: 'professor', table: 'Professor', fotoPathField: null }, // Professor também pode ter foto_path
-        { role: 'administrador', table: 'Administrador', fotoPathField: null } // ADM geralmente não tem foto
+        { role: 'professor', table: 'Professor', fotoPathField: 'foto_path' }, // ASSUMINDO que Professor tem 'foto_path'
+        { role: 'administrador', table: 'Administrador', fotoPathField: null } // ADM não tem 'nome' nem 'foto_path' no seu DDL
     ];
 
     const authenticateInTable = (index) => {
         if (index >= userTypes.length) {
-            console.log('DEBUG [Login-BE]: Tentou em todas as roles, credenciais inválidas. Retornando 401.');
+            console.log('DEBUG [Login-BE]: Tentou em todas as roles, usuário não encontrado ou senha incorreta em todas. Retornando 401.');
             return res.status(401).json({ error: 'Email ou senha inválidos.' });
->>>>>>> Stashed changes
         }
 
-        if (!validateEmail(email)) {
-            return res.status(400).json({ error: "Email inválido" });
+        const { role, table, fotoPathField } = userTypes[index];
+        console.log(`DEBUG [Login-BE]: Tentando autenticar como: ${role} na tabela ${table}.`);
+        
+        // --- CONSTRUÇÃO DA QUERY AJUSTADA PARA CADA ROLE ---
+        let selectFields;
+        if (role === 'administrador') {
+            // Para Administrador, selecione apenas id, email, senha (NÃO 'nome' ou 'foto_path')
+            selectFields = `id, email, senha`; 
+        } else {
+            // Para outras roles, selecione id, nome, email, senha e foto_path se a coluna existir
+            // Assumimos que 'nome' existe para apoiador, aluno, professor
+            selectFields = `id, nome, email, senha${fotoPathField ? `, ${fotoPathField}` : ''}`;
         }
-        
-<<<<<<< Updated upstream
-        const q = "SELECT * FROM Apoiador WHERE email = ?";
-=======
-        // Seleciona campos, incluindo foto_path SE A COLUNA EXISTIR na tabela
-        // Se fotoPathField for null, ou a coluna não existir, o SQL pode falhar.
-        // O ideal é a coluna existir como NULLABLE nas tabelas que podem ter foto.
-        const selectFields = `id, email, senha${fotoPathField ? `, ${fotoPathField}` : ''}`;
         const q = `SELECT ${selectFields} FROM ${table} WHERE email = ?`;
->>>>>>> Stashed changes
         
-        db.query(q, [email], async (err, data) => {
+        db.query(q, [email], (err, data) => {
             if (err) {
-                console.error("Database error:", err);
-                return res.status(500).json({ error: "Database error", message: err.message });
+                console.error(`ERRO [Login-BE-${role}]: Erro no DB ao buscar ${table}:`, err);
+                console.error('SQL que causou o erro:', q, 'Parâmetros:', [email]);
+                return res.status(500).json({ error: `Erro interno do servidor ao tentar login como ${role}.` });
             }
-<<<<<<< Updated upstream
-      
-            if (data.length === 0) {
-                return res.status(401).json({ error: "Email ou senha inválidos" });
-=======
 
             if (data.length > 0) {
                 const userInDb = data[0];
@@ -73,19 +68,33 @@ export const login = (req, res) => {
                         return res.status(500).json({ error: "Erro ao comparar senhas." });
                     }
 
-                    console.log(`DEBUG [Login-BE-${role}]: Senha fornecida válida: ${isPasswordValid}.`);
+                    console.log(`DEBUG [Login-BE-${role}]: Senha fornecida válida (bcrypt.compare): ${isPasswordValid}.`);
 
                     if (!isPasswordValid) {
                         console.log(`DEBUG [Login-BE-${role}]: Senha INCORRETA para ${role}. Passando para a próxima role.`);
-                        authenticateInTable(index + 1);
+                        authenticateInTable(index + 1); // Tenta na próxima tabela
                     } else {
                         console.log(`DEBUG [Login-BE-${role}]: Senha CORRETA para ${role}. Login BEM-SUCEDIDO!`);
-                        const tokenPayload = {
-                            id: userInDb.id,
-                            email: userInDb.email,
-                            role: role, // role é CRÍTICA no payload
-                            foto_path: userInDb.foto_path || null // Pegue foto_path direto do userInDb se existir
-                        };
+                        
+                        // --- AJUSTE NO PAYLOAD DO TOKEN PARA CADA ROLE ---
+                        let tokenPayload;
+                        if (role === 'administrador') {
+                            tokenPayload = {
+                                id: userInDb.id,
+                                email: userInDb.email,
+                                nome: 'Administrador', // Nome padrão para ADM
+                                role: role,
+                                foto_path: null // ADM não tem foto_path
+                            };
+                        } else {
+                            tokenPayload = {
+                                id: userInDb.id,
+                                email: userInDb.email,
+                                nome: userInDb.nome, // 'nome' deve vir da query
+                                role: role,
+                                foto_path: userInDb.foto_path || null // 'foto_path' deve vir da query
+                            };
+                        }
 
                         const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '24h' });
                         console.log('DEBUG [Login-BE]: Token JWT gerado. Retornando 200 OK.');
@@ -95,43 +104,13 @@ export const login = (req, res) => {
                             user: tokenPayload // Retorna o payload completo que foi usado no token
                         });
                     }
-                }); 
+                }); // Fim do bcrypt.compare callback
             } else {
                 console.log(`DEBUG [Login-BE-${role}]: Email "${email}" NÃO encontrado na tabela ${table}. Passando para a próxima role.`);
-                authenticateInTable(index + 1);
->>>>>>> Stashed changes
+                authenticateInTable(index + 1); // Tenta na próxima tabela
             }
-            
-            const user = data[0];
-            const isPasswordValid = await bcrypt.compare(senha, user.senha);
-            
-            if (!isPasswordValid) {
-                return res.status(401).json({ error: "Email ou senha inválidos" });
-            }
-            
-            const token = jwt.sign(
-                { 
-                    id: user.id, 
-                    email: user.email,
-                    nome: user.nome,
-                    role: 'apoiador' 
-                },
-                JWT_SECRET,
-                { expiresIn: '24h' } 
-            );
-            
-            return res.status(200).json({
-                message: "Login realizado com sucesso!",
-                user: {
-                    id: user.id,
-                    nome: user.nome,
-                    email: user.email
-                },
-                token
-            });
-        });
-    } catch (error) {
-        console.error("Server error:", error);
-        return res.status(500).json({ error: "Server error", message: error.message });
-    }
+        }); // Fim do db.query callback
+    };
+
+    authenticateInTable(0); // Inicia o processo de autenticação com a primeira role (apoiador)
 };

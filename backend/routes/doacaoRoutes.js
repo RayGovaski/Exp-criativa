@@ -1,13 +1,6 @@
 // backend/routes/doacaoRoutes.js
 
 import express from 'express';
-<<<<<<< Updated upstream
-import { getAllDoacoes, createDoacao, getDoacaoImage, getAllDoacoesFull } from '../controllers/doacaoController.js';
-import upload from '../config/multer.js'; // <--- ADICIONE ESTA LINHA PARA IMPORTAR O MULTER
-
-const router = express.Router();
-
-=======
 import { get4Doacoes, createDoacao, getDoacaoImage, getAllDoacoesFull, getDoacaoById, processDonation } from '../controllers/doacaoController.js'; 
 import { uploadImage } from '../config/multer.js';
 import { verifyToken } from '../middleware/auth.js';
@@ -22,7 +15,6 @@ router.post('/doar-valor', verifyToken, processDonation); // <-- Esta é a rota 
 router.post('/', uploadImage.single('imagem'), createDoacao);
 
 // -- ROTAS GET -- (coloque as estáticas antes das dinâmicas)
->>>>>>> Stashed changes
 // Rota para buscar as 4 doações principais (para Home)
 router.get('/', getAllDoacoes);
 

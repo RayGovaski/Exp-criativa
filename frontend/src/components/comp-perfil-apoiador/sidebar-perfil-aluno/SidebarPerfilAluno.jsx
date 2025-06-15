@@ -1,14 +1,49 @@
 import React from 'react';
-import { FaUser, FaChartBar, FaBook, FaChalkboardTeacher, FaTrashAlt, FaBars, FaTimes } from 'react-icons/fa';
-import './SidebarPerfilAluno.css'; // Don't forget to create this CSS file!
+import { FaUser, FaChartBar, FaBook, FaChalkboardTeacher, FaTrashAlt, FaBars, FaTimes, FaSignOutAlt } from 'react-icons/fa';
+import { Sun, Moon } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from "../../../context/ThemeContext";
+import './SidebarPerfilAluno.css';
 
 const SidebarPerfilAluno = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMobileMenu }) => {
+  const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+
   const handleNavigation = (section) => {
     setSecaoAtiva(section);
     if (window.innerWidth < 768) { // Close menu only on mobile devices
       toggleMobileMenu();
     }
   };
+
+  const handleLogoutClick = () => {
+    console.log('DEBUG [SidebarPerfilAluno]: Botão "Sair" clicado. Chamando logout do AuthContext.');
+    if (window.innerWidth < 768) {
+      toggleMobileMenu(); // Close mobile menu first
+    }
+    logout();
+  };
+
+  const handleThemeToggle = () => {
+    toggleTheme();
+    if (window.innerWidth < 768) {
+      toggleMobileMenu(); // Close mobile menu after theme change
+    }
+  };
+
+  // Componente do Toggle Switch (mesmo da navbar)
+  const ThemeToggleSwitch = ({ onClick, isDark }) => (
+    <button 
+      className={`theme-toggle-switch-aluno ${isDark ? 'dark' : ''}`}
+      onClick={onClick}
+      aria-label="Alternar tema"
+    >
+      <div className="theme-toggle-slider-aluno">
+        <Sun className="theme-icon-aluno sun-icon" />
+        <Moon className="theme-icon-aluno moon-icon" />
+      </div>
+    </button>
+  );
 
   return (
     <>
@@ -24,7 +59,7 @@ const SidebarPerfilAluno = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMob
       </div>
 
       {/* Sidebar - always visible on desktop, conditionally visible on mobile */}
-      <div className={`sidebar-perfil-aluno ${isMobileOpen ? 'mobile-open' : ''}`}>
+      <div className={`sidebar-perfil-aluno ${isMobileOpen ? 'mobile-open' : ''} ${theme === 'dark' ? 'dark' : ''}`}>
         <div className="d-flex d-md-none justify-content-end w-100 p-2">
           <button className="close-button-aluno" onClick={toggleMobileMenu}>
             <FaTimes />
@@ -81,6 +116,26 @@ const SidebarPerfilAluno = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMob
           >
             <FaTrashAlt /> Deletar Conta
           </a>
+          
+          {/* Divisor */}
+          <hr className={`sidebar-divider-aluno ${theme === 'dark' ? 'dark' : ''}`} />
+          
+          {/* Toggle de Tema */}
+          <div className="sidebar-theme-toggle-aluno">
+            <span className="theme-label-aluno">Tema</span>
+            <ThemeToggleSwitch 
+              onClick={handleThemeToggle} 
+              isDark={theme === 'dark'} 
+            />
+          </div>
+          
+          {/* Botão Sair */}
+          <button
+            className="sidebar-logout-button-aluno"
+            onClick={handleLogoutClick}
+          >
+            <FaSignOutAlt /> Sair
+          </button>
         </div>
       </div>
 

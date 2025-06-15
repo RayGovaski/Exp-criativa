@@ -1,0 +1,103 @@
+/* RelatoriosADM.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* Reutilizando estilos gerais para consistência */
+.label-azul {
+    color: #0A7D7E; /* Verde-azulado principal */
+    font-weight: 500;
+}
+
+/* Estilos para o card principal do relatório */
+.card {
+    border-radius: 12px; /* Cantos mais arredondados para os cards */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    border: none; /* Remove a borda padrão do card */
+}
+
+/* Estilos para seções de estatísticas ou "overview" */
+.placeholder-content {
+    background-color: #eaf6f6; /* Fundo claro para seções de dados */
+    border: 1px dashed #0A7D7E; /* Borda tracejada com a cor principal */
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    color: #076666; /* Cor do texto dentro do placeholder */
+    font-family: 'Fredoka', sans-serif;
+}
+
+.placeholder-content h5 {
+    color: #0A7D7E;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(10, 125, 126, 0.2); /* Linha divisória */
+    padding-bottom: 10px;
+}
+
+.placeholder-content p {
+    margin-bottom: 8px;
+    font-size: 1.05em;
+    display: flex;
+    justify-content: space-between; /* Alinha o texto e o valor */
+    padding-right: 10px;
+}
+
+.placeholder-content p strong {
+    color: #076666; /* Cor mais escura para valores importantes */
+}
+
+/* Estilos para tabelas de relatórios (se forem adicionadas no futuro) */
+.relatorios-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse; /* Remove espaçamento entre células */
+    border-radius: 8px; /* Cantos arredondados para a tabela */
+    overflow: hidden; /* Garante que os cantos arredondados sejam aplicados */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.relatorios-table thead th {
+    background-color: #0A7D7E;
+    color: white;
+    border: 1px solid #086364;
+    padding: 12px 15px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.relatorios-table tbody tr {
+    border-bottom: 1px solid #eee; /* Linha divisória suave entre as linhas */
+    transition: background-color 0.2s ease;
+}
+
+.relatorios-table tbody tr:last-child {
+    border-bottom: none; /* Remove a borda da última linha */
+}
+
+.relatorios-table tbody tr:hover {
+    background-color: #f0f9f9; /* Leve hover para as linhas da tabela */
+}
+
+.relatorios-table td {
+    padding: 10px 15px;
+    border-left: 1px solid #f0f0f0; /* Bordas verticais leves */
+    border-right: 1px solid #f0f0f0;
+}
+
+.relatorios-table td:first-child {
+    border-left: none; /* Remove borda da primeira coluna */
+}
+.relatorios-table td:last-child {
+    border-right: none; /* Remove borda da última coluna */
+}
+
+/* Responsividade básica para tabelas em ecrãs pequenos */
+@media (max-width: 767px) {
+    .relatorios-table, .placeholder-content {
+        padding: 15px;
+        font-size: 0.9em;
+    }
+
+    .relatorios-table thead th, .relatorios-table td {
+        padding: 10px;
+    }
+}

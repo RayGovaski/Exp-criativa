@@ -5,8 +5,10 @@ import { useLocation } from 'react-router-dom';
 import Navbar from './components/navbar/Navbar.jsx';
 import Footer from './components/footer/Footer.jsx';
 import { useAuth } from './context/AuthContext'; 
+
 import { ToastContainer } from 'react-toastify'; // <--- IMPORTE AQUI
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const NAVBAR_HEIGHT_PX = 60; // <--- CONFIRME A ALTURA REAL DA SUA NAVBAR AQUI (via F12)
 
@@ -33,6 +35,7 @@ const Layout = ({ children }) => {
       
       {!shouldHideFooter && <Footer />}
       <ToastContainer />
+
     </>
   );
 };

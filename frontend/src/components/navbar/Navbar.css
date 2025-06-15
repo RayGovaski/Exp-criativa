@@ -126,11 +126,20 @@
   padding: 10px 0;
   margin-top: 5px;
   right: 0;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .dropdown-menu-custom {
   top: 100%;
   left: 0;
+}
+
+/* Tema escuro para dropdowns */
+.profile-dropdown-menu.dark,
+.dropdown-menu-custom.dark {
+  background-color: #2c2c2c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid #444;
 }
 
 .dropdown-item-custom {
@@ -139,11 +148,21 @@
   text-decoration: none;
   color: #ffffff;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .dropdown-item-custom:hover {
   background-color: #81b8a5;
+  color: #ffffff;
+}
+
+/* Tema escuro para itens do dropdown */
+.dropdown-item-custom.dark {
+  color: #e0e0e0;
+}
+
+.dropdown-item-custom.dark:hover {
+  background-color: #404040;
   color: #ffffff;
 }
 
@@ -267,9 +286,6 @@
 }
 
 @media (max-width: 469px) {
-  .navbar-container {
-    padding: 0 10px;
-  }
   
   .navbar-brand.mx-auto {
     margin-left: -15px;
@@ -284,10 +300,197 @@
   color: #ffffff; /* Cor padrão do texto de dropdown */
   text-decoration: none;
   cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
   /* Adicione :hover e :active se precisar */
 }
 
 .dropdown-item-custom.logout-button:hover {
   background-color: #81b8a5; /* Cor de fundo no hover */
   color: #ffffff;
+}
+
+/* Tema escuro para botão de logout */
+.dropdown-item-custom.logout-button.dark {
+  color: #e0e0e0;
+}
+
+.dropdown-item-custom.logout-button.dark:hover {
+  background-color: #404040;
+  color: #ffffff;
+}
+
+/* Divider para dropdown */
+.dropdown-divider-custom {
+  height: 0;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dropdown-divider-custom.dark {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Toggle Switch de Tema - Adicione ao seu Navbar.css */
+
+/* Container do Toggle Switch */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Toggle Switch */
+.theme-toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: linear-gradient(45deg, #FF7575, #FFB4B4);
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: none;
+  outline: none;
+}
+
+/* Toggle Switch no modo escuro */
+.theme-toggle-switch.dark {
+  background: linear-gradient(45deg, #0F7D7E, #81b8a5);
+}
+
+/* Bolinha do Toggle */
+.theme-toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Bolinha quando está no modo escuro */
+.theme-toggle-switch.dark .theme-toggle-slider {
+  transform: translateX(30px);
+}
+
+/* Ícones dentro da bolinha */
+.theme-icon {
+  width: 16px;
+  height: 16px;
+  transition: opacity 0.3s ease;
+}
+
+/* Ícone do sol (modo claro) */
+.sun-icon {
+  opacity: 1;
+  color: #FF7575;
+}
+
+/* Ícone da lua (modo escuro) */
+.moon-icon {
+  opacity: 0;
+  color: #0F7D7E;
+  position: absolute;
+}
+
+/* Quando está no modo escuro, mostra a lua */
+.theme-toggle-switch.dark .sun-icon {
+  opacity: 0;
+}
+
+.theme-toggle-switch.dark .moon-icon {
+  opacity: 1;
+}
+
+/* Estilos para o dropdown */
+.dropdown-item-custom.theme-toggle-item {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para o sidebar */
+.sidebar-item.theme-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* Hover effects */
+.theme-toggle-switch:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 991px) {
+  .theme-toggle-switch {
+    width: 55px;
+    height: 28px;
+  }
+  
+  .theme-toggle-slider {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .theme-toggle-switch.dark .theme-toggle-slider {
+    transform: translateX(27px);
+  }
+  
+  .theme-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Ícone de perfil - VERSÃO ATUALIZADA SEM BORDA */
+.profile-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: transparent;
+  border: none; /* Removida a borda */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+  color: #000; /* Cor preta para modo normal */
+  padding: 10px; /* Adiciona um pouco de padding para área clicável */
+}
+
+.profile-icon:hover {
+  transform: scale(1.05);
+}
+
+/* Ícone de perfil no modo escuro - cor branca */
+.profile-icon.dark {
+  color: #fff; /* Cor branca para modo escuro */
+}
+
+/* Animação suave para transição entre ícone e imagem */
+.profile-img,
+.profile-icon {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

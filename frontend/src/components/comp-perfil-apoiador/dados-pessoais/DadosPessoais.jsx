@@ -76,7 +76,7 @@ const DadosPessoais = () => {
     }
     
     // Default placeholder image if no image is available
-    return 'https://via.placeholder.com/150?text=Perfil';
+    return 'https://placehold.co/150x150?text=Perfil'; 
 };
 
   // Function to handle form input changes
@@ -398,7 +398,7 @@ const handleSalvarFoto = async () => {
                   alt="Foto de perfil"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/150?text=Perfil';
+                    e.target.src = 'https://placehold.co/150x150?text=Perfil';
                   }}
                 />
               </div>

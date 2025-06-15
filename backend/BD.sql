@@ -21,7 +21,7 @@ CREATE TABLE Responsavel (
     data_nascimento DATE NOT NULL,
     telefone VARCHAR(15) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    grau_parentesco VARCHAR(50),
+    grau_parentesco ENUM('Mãe/Pai', 'Avó/Avô', 'Outros'),
     profissao VARCHAR(100),
     renda_familiar DECIMAL(10,2),
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -36,12 +36,10 @@ CREATE TABLE Responsavel (
 CREATE TABLE Aluno (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cpf CHAR(11) UNIQUE NOT NULL,
-    rg VARCHAR(20),
     nome VARCHAR(100) NOT NULL,
     sexo ENUM('M', 'F', 'Outro'),
     data_nascimento DATE NOT NULL,
     nacionalidade VARCHAR(50),
-    telefone VARCHAR(15),
     email VARCHAR(100) UNIQUE,
     senha VARCHAR(255) NOT NULL,
     necessidades_especiais TEXT,
@@ -55,7 +53,6 @@ CREATE TABLE Aluno (
     FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
 
--- Tabela de professores
 CREATE TABLE Professor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cpf CHAR(11) UNIQUE NOT NULL,
@@ -66,21 +63,20 @@ CREATE TABLE Professor (
     email VARCHAR(100) UNIQUE,
     senha VARCHAR(255),
     data_contratacao DATE,
-    salario DECIMAL(10,2),
+    salario DECIMAL(10,2), -- Salário mantido conforme o DDL que você mais usou
     ativo BOOLEAN DEFAULT 1,
     endereco_id INT,
     FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
 );
-
-<<<<<<< Updated upstream
--- Tabela de turmas
 CREATE TABLE Turma (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50),
+    sala VARCHAR(50) UNIQUE,
     capacidade INT CHECK (capacidade > 0),
+    dia_da_semana ENUM('Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado') NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_termino TIME NOT NULL,
-    descricao TEXT,
+    descricao TEXT,  
     nivel VARCHAR(50),
 =======
 
@@ -95,7 +91,6 @@ CREATE TABLE Turma (
     hora_termino TIME NOT NULL,
     descricao TEXT,
     nivel ENUM('6 a 8 anos', '9 a 10 anos', '11 a 12 anos', '13 a 14 anos', '15 a 16 anos') NOT NULL,
->>>>>>> Stashed changes
     data_inicio DATE,
     data_termino DATE
 );
@@ -170,16 +165,18 @@ CREATE TABLE Doacao (
     descricao TEXT,
     data_inicio DATE,
     data_fim DATE,
+    categoria VARCHAR(100) NOT NULL,
     prioridade ENUM('Max', 'Média', 'Min') DEFAULT 'media',
     status ENUM('Aberta', 'Encerrada', 'Concluída') DEFAULT 'Aberta',
     imagem LONGBLOB
 );
 
 CREATE TABLE Apoiador_Doacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     apoiador_id INT,
     doacao_id INT,
     valor_doado DECIMAL(10,2) NOT NULL DEFAULT 0,
-    PRIMARY KEY (apoiador_id, doacao_id),
+    data_doacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (apoiador_id) REFERENCES Apoiador(id) ON DELETE CASCADE,
     FOREIGN KEY (doacao_id) REFERENCES Doacao(id) ON DELETE CASCADE
 );
@@ -197,25 +194,31 @@ CREATE TABLE Contato (
 -- Tabela de administradores
 CREATE TABLE Administrador (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL
 );
 
 
---INSERTS:
+-- INSERTS:
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Semente', 20.00, 'Com o Plano Semente, você planta esperança no futuro de muitas crianças! Sua doação ajuda a fornecer materiais essenciais para as aulas e garante a continuidade do nosso projeto.');
-
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Melodia', 50.00, 'O Plano Melodia fortalece o ensino da música, garantindo que mais crianças tenham acesso a instrumentos e aulas, trazendo experiências que transformam vidas e abrem novas possibilidades no futuro!');
-
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Palco', 100.00, 'O Plano Palco apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
-
 INSERT INTO Plano (nome, preco, descricao) VALUES
 ('Plano Estrela', 200.00, 'O Plano Estrela apoia o desenvolvimento artístico das crianças, ajudando a criar momentos inesquecíveis e dando mais oportunidades para que elas brilhem no palco e na vida!');
 
 INSERT INTO Administrador (email, senha) VALUES
 ('admin@adm.com', '$2b$10$2J7ji5H1m6utNpXkuUbGkODEE5o3n/B83V2p7ww4BiAm3brrfYxOu');
 
+
+
+INSERT INTO Doacao (nome, valor_meta, arrecadado, descricao, data_inicio, data_fim, prioridade, status, imagem_path) VALUES
+('Violão para Aulas', 500.00, 275.00, 'Ajude a comprar um violão para que mais crianças aprendam a tocar e se apaixonem pela música!', '2025-01-15', '2025-07-15', 'Max', 'Aberta', NULL),
+('Figurinos para Espetáculos', 1000.00, 800.00, 'Contribua para a compra de roupas e acessórios que deixam os espetáculos ainda mais mágicos!', '2025-02-01', '2025-08-01', 'Max', 'Aberta', NULL),
+('Materiais Artísticos', 300.00, 285.00, 'Com sua doação, podemos garantir que as crianças soltem a criatividade com materiais de qualidade!', '2025-03-10', '2025-09-10', 'Max', 'Aberta', NULL),
+('Microfones para Aulas de Canto', 700.00, 385.00, 'Ajude a garantir que as crianças tenham equipamentos para se expressar nas aulas de canto e teatro.', '2025-04-05', '2025-10-05', 'Max', 'Aberta', NULL),
+('Reforma da Sala de Música', 2000.00, 50.00, 'Financiamento para a reforma e modernização da nossa sala de música.', '2025-06-01', '2025-12-01', 'Max', 'Aberta', NULL),
+('Novas Cadeiras', 1500.00, 0.00, 'Ajude a equipar nosso auditório com cadeiras confortáveis para o público e alunos.', '2025-06-01', '2025-12-01', 'Média', 'Aberta', NULL);
 

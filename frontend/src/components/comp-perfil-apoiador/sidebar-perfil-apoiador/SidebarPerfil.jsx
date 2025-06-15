@@ -13,24 +13,31 @@ const SidebarPerfil = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMobileMe
 
   return (
     <>
-      {/* Botão de Hambúrguer - apenas visível em dispositivos móveis */}
-      <div className="hamburger-menu d-md-none">
-        <button 
-          className="hamburger-button" 
-          onClick={toggleMobileMenu} 
-          aria-label="Toggle navigation menu"
-        >
-          {isMobileOpen ? <FaTimes /> : <FaBars />}
-        </button>
-      </div>
+      {/* Botão de Hambúrguer - apenas visível em dispositivos móveis quando o menu estiver fechado */}
+      {!isMobileOpen && (
+        <div className="hamburger-menu">
+          <button 
+            className="hamburger-button"
+            onClick={toggleMobileMenu}
+          >
+            <FaBars />
+          </button>
+        </div>
+      )}
 
       {/* Sidebar - sempre visível em desktop, condicionalmente visível em mobile */}
       <div className={`sidebar-perfil ${isMobileOpen ? 'mobile-open' : ''}`}>
-        <div className="d-flex d-md-none justify-content-end w-100 p-2">
-          <button className="close-button" onClick={toggleMobileMenu}>
+        <div className="sidebar-header">
+          {/* Botão de fechar - apenas visível em dispositivos móveis */}
+          <button 
+            className="close-button"
+            onClick={toggleMobileMenu}
+            style={{ display: window.innerWidth < 768 ? 'block' : 'none' }}
+          >
             <FaTimes />
           </button>
         </div>
+
         <div className="sidebar-links">
           <a 
             href="#" 
@@ -70,7 +77,7 @@ const SidebarPerfil = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMobileMe
             }}
             className={secaoAtiva === "assinatura" ? "active" : ""}
           >
-            <FaCreditCard /> Assinatura
+            <FaCreditCard /> Gerenciar Assinatura
           </a>
           <a 
             href="#" 
@@ -84,10 +91,13 @@ const SidebarPerfil = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMobileMe
           </a>
         </div>
       </div>
-      
+
       {/* Overlay para fechar o menu ao clicar fora (apenas visível em mobile quando o menu está aberto) */}
       {isMobileOpen && (
-        <div className="sidebar-overlay d-md-none" onClick={toggleMobileMenu}></div>
+        <div 
+          className="sidebar-overlay"
+          onClick={toggleMobileMenu}
+        />
       )}
     </>
   );

@@ -12,7 +12,8 @@ import {
     updatePhoto,
     subscribeToPlan,
     cancelSubscription,
-    getPhoto
+    getPhoto,
+    getApoiadorHistoricoDoacao
 } from '../controllers/apoiadorController.js';
 
 const router = express.Router();
@@ -30,5 +31,7 @@ router.put('/update-telefone', verifyToken, updatePhone);
 router.put('/update-foto', verifyToken, uploadImage.single('foto'), updatePhoto);
 router.post('/assinar-plano', verifyToken, subscribeToPlan);
 router.delete('/cancelar-assinatura', verifyToken, cancelSubscription);
+
+router.get('/doacao/historico', verifyToken, getApoiadorHistoricoDoacao);
 
 export default router;

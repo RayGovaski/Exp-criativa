@@ -1,3 +1,6 @@
+// src/pages/Login/Login.jsx // <-- Cuidado, o nome do arquivo no comentário é 'Login.jsx', mas o código é de 'MenuRegistro.jsx'
+// src/pages/MenuRegistro/MenuRegistro.jsx <--- Corrigido para clareza
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./MenuRegistro.css";

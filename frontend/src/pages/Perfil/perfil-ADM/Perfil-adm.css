@@ -1,0 +1,302 @@
+/* Perfil-adm.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* --- General Styles --- */
+body {
+    font-family: 'Fredoka', sans-serif !important;
+}
+
+.label-azul {
+    color: #0A7D7E; /* A shade of teal */
+    font-weight: 500;
+}
+
+.text-muted-custom {
+    color: #a0a0a0; /* Lighter grey for secondary text */
+}
+
+/* --- Button Styles (reused from DadosPessoais.css) --- */
+.custom-button-azul5 {
+    background-color: #0A7D7E;
+    border: none;
+    transition: all 0.2s;
+    padding: 8px 16px;
+    font-weight: 500;
+    font-family: 'Fredoka', sans-serif !important;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.custom-button-azul5:hover {
+    background-color: #076666; /* Darker teal on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+}
+
+.custom-button-azul5:disabled {
+    background-color: #cccccc; /* Lighter grey for disabled state */
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.custom-button-outline {
+    color: #0A7D7E;
+    border-color: #0A7D7E;
+    background-color: transparent;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-radius: 8px; /* Rounded corners */
+}
+
+.custom-button-outline:hover {
+    background-color: #f0f9f9; /* Very light teal background on hover */
+    color: #076666;
+    border-color: #076666;
+    transform: translateY(-2px);
+}
+
+.custom-button-outline:active {
+    background-color: #e0f2f2 !important; /* Even lighter teal on active */
+    border-color: #076666 !important;
+    color: #076666 !important;
+}
+
+
+/* --- Main Layout --- */
+.perfil-adm-bg {
+    background-color: #f0f2f5; /* Light grey background for the whole profile page */
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.perfil-adm-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Soft shadow for the container */
+    overflow: hidden; /* Ensures rounded corners are respected */
+}
+
+/* --- Sidebar Styles --- */
+.perfil-sidebar {
+    width: 280px;
+    background-color: #0A7D7E; /* Teal background for sidebar */
+    color: white;
+    padding: 30px 20px;
+    flex-shrink: 0; /* Prevents sidebar from shrinking */
+    transition: transform 0.3s ease-in-out; /* For mobile menu animation */
+    z-index: 1000; /* Ensure sidebar is above other content on mobile */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Shadow for sidebar */
+}
+
+.profile-section-sidebar {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separator */
+}
+
+.profile-section-sidebar img {
+    border: 3px solid rgba(255, 255, 255, 0.8); /* Border around profile image */
+}
+
+.profile-section-sidebar h5 {
+    font-weight: 600;
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.profile-section-sidebar p {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebar-nav .list-group-item {
+    background-color: transparent;
+    border: none;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px; /* Rounded items */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-nav .list-group-item .nav-link {
+    color: white;
+    font-weight: 500;
+    font-size: 1.05em;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-nav .list-group-item:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.15); /* Light hover effect */
+    color: white;
+    cursor: pointer;
+}
+
+.sidebar-nav .list-group-item.active {
+    background-color: #2c9a9a; /* Darker teal for active item */
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Shadow for active item */
+}
+
+.sidebar-nav .list-group-item.active .nav-link {
+    color: white; /* Ensure text remains white when active */
+}
+
+.sidebar-item .nav-link svg {
+    margin-right: 10px;
+    color: white; /* Icon color */
+}
+
+/* Specific style for delete account button */
+.sidebar-item.delete-item .nav-link {
+    color: #ffdddd; /* Lighter red for delete text */
+}
+
+.sidebar-item.delete-item:hover {
+    background-color: #b70000; /* Red background on hover */
+}
+
+/* --- Content Area Styles --- */
+.perfil-adm-conteudo {
+    flex-grow: 1; /* Allows content to take remaining space */
+    padding: 30px;
+    background-color: #f8f9fa; /* Light grey background for content */
+    overflow-y: auto; /* Enable scrolling for content if it overflows */
+}
+
+/* Blur effect when mobile menu is open */
+.perfil-adm-conteudo.blur-background {
+    filter: blur(5px);
+    pointer-events: none; /* Disable interaction with blurred content */
+}
+
+/* Page title for mobile (hidden on desktop) */
+.page-title {
+    padding-bottom: 15px;
+}
+
+.page-title-text {
+    font-weight: 600;
+}
+
+/* Placeholder content styling */
+.placeholder-content {
+    background-color: #eaf6f6;
+    border: 1px dashed #0A7D7E;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    color: #076666;
+}
+
+.placeholder-content h5 {
+    color: #0A7D7E;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* --- Modal Styles (reused from DadosPessoais.css) --- */
+.registro-header-azul {
+    background-color: #076666; /* Darker teal for modal header */
+    color: white;
+    text-align: center;
+    padding: 15px;
+    padding-top: 20px;
+    border-radius: 5px 5px 0 0;
+}
+
+.modal-atualizar .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-atualizar .form-control:focus {
+    border-color: #0A7D7E;
+    box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+.radio-custom-azul .form-check-input:checked {
+    background-color: #0A7D7E;
+    border-color: #0A7D7E;
+}
+
+.radio-custom-azul .form-check-input:focus {
+    border-color: #0A7D7E;
+    box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+/* --- Responsive Design --- */
+
+/* Mobile: Sidebar slides in from the left */
+@media (max-width: 767px) {
+    .perfil-adm-container {
+        flex-direction: column;
+        border-radius: 0; /* No border-radius on mobile for full width */
+        box-shadow: none; /* No shadow on mobile for full width */
+    }
+
+    .perfil-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%); /* Hidden by default */
+        width: 250px; /* Adjust as needed */
+        padding-top: 80px; /* Space for hamburger menu */
+    }
+
+    .perfil-sidebar.open {
+        transform: translateX(0); /* Slide in when open */
+    }
+
+    .perfil-adm-conteudo {
+        padding: 20px;
+        margin-top: 60px; /* Space for hamburger menu */
+        width: 100%;
+    }
+
+    .hamburger-menu {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001; /* Above sidebar */
+        background-color: #0A7D7E;
+        color: white;
+        padding: 8px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .page-title {
+        display: block !important; /* Show title on mobile */
+        text-align: center;
+        margin-top: 0;
+        padding-top: 0;
+    }
+}
+
+/* Tablet and Desktop: Sidebar is static */
+@media (min-width: 768px) {
+    .perfil-sidebar {
+        transform: translateX(0) !important; /* Always visible on desktop */
+        position: relative;
+        height: auto; /* Height adapts to content */
+    }
+
+    .hamburger-menu {
+        display: none !important; /* Hide hamburger on desktop */
+    }
+
+    .page-title {
+        display: none !important; /* Hide title on desktop */
+    }
+}
+

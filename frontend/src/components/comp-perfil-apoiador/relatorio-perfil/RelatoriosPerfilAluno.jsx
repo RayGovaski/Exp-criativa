@@ -1,54 +1,24 @@
-// eslint-disable-next-line no-unused-vars
+// src/components/comp-perfil-apoiador/relatorio-perfil/RelatoriosPerfilAluno.jsx
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Table, Form, Row, Col } from 'react-bootstrap';
+import { Card, Table, Form, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
+import { useAuth } from '../../../context/AuthContext';
+import axios from 'axios';
 import './RelatoriosPerfilAluno.css';
 
-// --- DADOS SIMULADOS MAIS COMPLEXOS ---
-// Dados de presença detalhados para múltiplas aulas e meses/dias
-const todosDadosPresenca = [
-  // Junho de 2024
-  { id: 1, aula: 'Matemática Aplicada', data: '03/06/2024', status: 'Presente' },
-  { id: 2, aula: 'Matemática Aplicada', data: '05/06/2024', status: 'Presente' },
-  { id: 3, aula: 'Português: Escrita Criativa', data: '04/06/2024', status: 'Ausente' },
-  { id: 4, aula: 'Português: Escrita Criativa', data: '06/06/2024', status: 'Presente' },
-  { id: 5, aula: 'História do Brasil', data: '03/06/2024', status: 'Presente' },
-  { id: 6, aula: 'História do Brasil', data: '05/06/2024', status: 'Presente' },
-  { id: 7, aula: 'Ciências: O Corpo Humano', data: '04/06/2024', status: 'Presente' },
-  { id: 8, aula: 'Ciências: O Corpo Humano', data: '06/06/2024', status: 'Ausente' },
-  { id: 9, aula: 'Matemática Aplicada', data: '10/06/2024', status: 'Presente' },
-  { id: 10, aula: 'Português: Escrita Criativa', data: '11/06/2024', status: 'Presente' },
-  { id: 11, aula: 'Ciências: O Corpo Humano', data: '13/06/2024', status: 'Presente' },
-  { id: 12, aula: 'História do Brasil', data: '12/06/2024', status: 'Ausente' },
-
-  // Julho de 2024
-  { id: 13, aula: 'Matemática Aplicada', data: '01/07/2024', status: 'Presente' },
-  { id: 14, aula: 'Português: Escrita Criativa', data: '02/07/2024', status: 'Presente' },
-  { id: 15, aula: 'Ciências: O Corpo Humano', data: '03/07/2024', status: 'Presente' },
-  { id: 16, aula: 'Matemática Aplicada', data: '08/07/2024', status: 'Presente' },
-  { id: 17, aula: 'Português: Escrita Criativa', data: '09/07/2024', status: 'Presente' },
-  { id: 18, aula: 'Ciências: O Corpo Humano', data: '10/07/2024', status: 'Ausente' },
-
-  // Junho de 2025 (Exemplo para o ano atual)
-  { id: 19, aula: 'Matemática Aplicada', data: '03/06/2025', status: 'Presente' },
-  { id: 20, aula: 'Português: Escrita Criativa', data: '04/06/2025', status: 'Presente' },
-  { id: 21, aula: 'História do Brasil', data: '05/06/2025', status: 'Ausente' },
-  { id: 22, aula: 'Ciências: O Corpo Humano', data: '06/06/2025', status: 'Presente' },
-  { id: 23, aula: 'Matemática Aplicada', data: '10/06/2025', status: 'Presente' },
-  { id: 24, aula: 'Português: Escrita Criativa', data: '11/06/2025', status: 'Presente' },
-  { id: 25, aula: 'História do Brasil', data: '12/06/2025', status: 'Presente' },
-  { id: 26, aula: 'Ciências: O Corpo Humano', data: '13/06/2025', status: 'Ausente' },
-];
-
 const RelatoriosPerfilAluno = () => {
+  const { user, token } = useAuth();
   const dataAtual = new Date();
-  const [mesSelecionado, setMesSelecionado] = useState(dataAtual.getMonth() + 1); // Mês atual (1-12)
-  const [anoSelecionado, setAnoSelecionado] = useState(dataAtual.getFullYear()); // Ano atual
+  const [mesSelecionado, setMesSelecionado] = useState(dataAtual.getMonth() + 1);
+  const [anoSelecionado, setAnoSelecionado] = useState(dataAtual.getFullYear());
+  const [dadosPresenca, setDadosPresenca] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Gerar lista de anos para o seletor (ex: 5 anos para trás e 1 para frente)
   const anosDisponiveis = useMemo(() => {
     const currentYear = new Date().getFullYear();
     const years = [];
@@ -58,19 +28,36 @@ const RelatoriosPerfilAluno = () => {
     return years;
   }, []);
 
-  // Filtrar dados com base no mês e ano selecionados
-  const dadosFiltrados = useMemo(() => {
-    return todosDadosPresenca.filter(registro => {
-      // eslint-disable-next-line no-unused-vars
-      const [dia, mes, ano] = registro.data.split('/').map(Number);
-      return mes === mesSelecionado && ano === anoSelecionado;
-    });
-  }, [mesSelecionado, anoSelecionado]);
+  useEffect(() => {
+    const fetchPresenceData = async () => {
+      if (!user || !token || user.role !== 'aluno') {
+        setError("Não autenticado como aluno ou sessão expirada. Faça login novamente.");
+        setLoading(false);
+        return;
+      }
 
-  // Preparar dados para o gráfico de barras (Presença por Aula)
+      setLoading(true);
+      setError(null);
+      try {
+        // --- CORREÇÃO AQUI: Use ${variableName} para interpolar em template strings ---
+        const response = await axios.get(`http://localhost:8000/alunos/reports/presence?mes=${mesSelecionado}&ano=${anoSelecionado}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setDadosPresenca(response.data);
+      } catch (err) {
+        console.error("Erro ao buscar dados de presença:", err);
+        setError("Falha ao carregar relatórios de presença. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPresenceData();
+  }, [mesSelecionado, anoSelecionado, user, token]);
+
   const dadosGraficoBarras = useMemo(() => {
-    const contagemAulas = {}; // { 'Matemática': { presente: X, ausente: Y } }
-    dadosFiltrados.forEach(registro => {
+    const contagemAulas = {};
+    dadosPresenca.forEach(registro => {
       if (!contagemAulas[registro.aula]) {
         contagemAulas[registro.aula] = { presente: 0, ausente: 0 };
       }
@@ -86,48 +73,47 @@ const RelatoriosPerfilAluno = () => {
       Presente: contagemAulas[aulaNome].presente,
       Ausente: contagemAulas[aulaNome].ausente
     }));
-  }, [dadosFiltrados]);
+  }, [dadosPresenca]);
 
-  // Preparar dados para o gráfico de pizza (Porcentagem Geral de Presença)
   const dadosGraficoPizza = useMemo(() => {
-    const totalRegistros = dadosFiltrados.length;
+    const totalRegistros = dadosPresenca.length;
     if (totalRegistros === 0) {
-      return []; // Retorna vazio se não houver dados
+      return [];
     }
-    const totalPresente = dadosFiltrados.filter(r => r.status === 'Presente').length;
+    const totalPresente = dadosPresenca.filter(r => r.status === 'Presente').length;
     const totalAusente = totalRegistros - totalPresente;
 
     return [
       { name: 'Presença', value: totalPresente },
       { name: 'Faltas', value: totalAusente }
     ];
-  }, [dadosFiltrados]);
+  }, [dadosPresenca]);
 
-  const coresPizza = ['#0A7D7E', '#D9534F']; // Verde para Presença, Vermelho para Faltas
+  const coresPizza = ['#0A7D7E', '#D9534F'];
 
-  // --- Lógica para o Calendário Simplificado ---
-  const diasNoMes = new Date(anoSelecionado, mesSelecionado, 0).getDate(); // Número de dias no mês
-  const primeiroDiaDoMes = new Date(anoSelecionado, mesSelecionado - 1, 1).getDay(); // Dia da semana do 1º dia (0=Dom, 1=Seg...)
+  const diasNoMes = new Date(anoSelecionado, mesSelecionado, 0).getDate();
+  const primeiroDiaDoMes = new Date(anoSelecionado, mesSelecionado - 1, 1).getDay();
 
   const renderDiasCalendario = useMemo(() => {
     const dias = [];
-    // Preencher dias vazios antes do 1º dia do mês
     for (let i = 0; i < primeiroDiaDoMes; i++) {
       dias.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
     }
 
-    // Preencher dias do mês com status de presença
     for (let i = 1; i <= diasNoMes; i++) {
-      const dataString = `${String(i).padStart(2, '0')}/${String(mesSelecionado).padStart(2, '0')}/${anoSelecionado}`;
-      const registrosDoDia = dadosFiltrados.filter(r => r.data === dataString);
-      let statusDia = ''; // 'presente', 'ausente', ou '' (para dias sem aula)
+      // Ajuste para garantir que 'mesSelecionado' tenha 2 dígitos
+      const mesFormatado = String(mesSelecionado).padStart(2, '0');
+      const diaFormatado = String(i).padStart(2, '0');
+      const dataString = `${diaFormatado}/${mesFormatado}/${anoSelecionado}`;
+
+      const registrosDoDia = dadosPresenca.filter(r => r.data === dataString);
+      let statusDia = '';
 
       if (registrosDoDia.length > 0) {
-        // Se todas as aulas do dia foram ausentes, o dia é 'ausente'
         if (registrosDoDia.every(r => r.status === 'Ausente')) {
           statusDia = 'ausente';
         } else {
-          statusDia = 'presente'; // Se pelo menos uma aula foi presente, o dia é 'presente'
+          statusDia = 'presente';
         }
       }
 
@@ -143,14 +129,32 @@ const RelatoriosPerfilAluno = () => {
       );
     }
     return dias;
-  }, [mesSelecionado, anoSelecionado, dadosFiltrados, diasNoMes, primeiroDiaDoMes]);
+  }, [mesSelecionado, anoSelecionado, dadosPresenca, diasNoMes, primeiroDiaDoMes]);
 
 
-  // Mapeamento de números do mês para nomes
   const nomesMeses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
+
+  if (loading) {
+    return (
+      <Card className="mb-4 shadow-sm p-4 text-center">
+        <Spinner animation="border" role="status" className="mb-3" />
+        <p>Carregando relatórios de presença...</p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="mb-4 shadow-sm p-4">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mb-4 shadow-sm p-4">
@@ -190,13 +194,13 @@ const RelatoriosPerfilAluno = () => {
         </Row>
       </Form>
 
-      {dadosFiltrados.length === 0 && (
+      {dadosPresenca.length === 0 && (
         <div className="alert alert-info text-center mt-3">
           Nenhum dado de presença encontrado para {nomesMeses[mesSelecionado - 1]} de {anoSelecionado}.
         </div>
       )}
 
-      {dadosFiltrados.length > 0 && (
+      {dadosPresenca.length > 0 && (
         <>
           {/* Gráficos */}
           <div className="row mb-5">
@@ -205,7 +209,8 @@ const RelatoriosPerfilAluno = () => {
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={dadosGraficoBarras}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  
+                  <XAxis dataKey="name" interval={0} angle={0} textAnchor="middle" height={80} />
+                  <YAxis allowDecimals={false} />
                   <YAxis />
                   <Tooltip />
                   <Legend />
@@ -226,13 +231,14 @@ const RelatoriosPerfilAluno = () => {
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
+                    label={({ name, value }) => `${name}: ${value}`}
                     labelLine={false}
                   >
                     {dadosGraficoPizza.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={coresPizza[index % coresPizza.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => `${value} registros`} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -268,7 +274,7 @@ const RelatoriosPerfilAluno = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {dadosFiltrados.map((registro) => (
+                  {dadosPresenca.map((registro) => (
                     <tr key={registro.id}>
                       <td>{registro.aula}</td>
                       <td>{registro.data}</td>

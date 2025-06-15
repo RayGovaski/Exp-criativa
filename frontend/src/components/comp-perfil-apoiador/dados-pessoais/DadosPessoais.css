@@ -2,6 +2,10 @@
 
 /* Estilos gerais */
 
+.perfil-conteudo{
+  margin-top: 6rem;
+}
+
 .profile-image-container {
   width: 150px;
   height: 150px;

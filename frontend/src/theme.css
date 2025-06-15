@@ -1,0 +1,904 @@
+  /* theme.css - Apenas modo escuro (sem interferir no modo padrão) */
+
+  /* ===== TEMA ESCURO ===== */
+  .dark-mode {
+    --bg-primary: #242424;           /* Fundo principal: azul petróleo bem escuro */
+    --bg-secondary: #182126;         /* Fundo secundário: cinza-azulado escuro */
+    --bg-tertiary: #232e34;          /* Terciário: um pouco mais claro */
+    --text-primary: #f3f6f8;         /* Texto principal: quase branco */
+    --text-secondary: #b5c2c9;       /* Texto secundário: cinza azulado claro */
+    --text-muted: #7e8a92;           /* Texto muted: cinza médio */
+    --border-color: #22313a;         /* Bordas: azul petróleo/cinza escuro */
+    --shadow: rgba(157, 157, 157, 0.1); /* Sombra: verde do tema, bem suave */
+              /* Navbar: escuro, mas destaca do fundo */
+    --navbar-text: #f3f6f8;          /* Texto navbar: branco */
+    --card-bg: #313334;              /* Cards: cinza-azulado escuro */
+    --button-primary: #239698;       /* Botão principal: verde do tema */
+    --button-primary-hover: #076666; /* Hover do botão: verde mais escuro */
+    --input-bg: #303030;             /* Inputs: igual ao terciário */
+    --input-border: #2e3b43;         /* Borda input: cinza azulado */
+  }
+
+
+  /* ===== APLICAÇÃO DOS ESTILOS APENAS NO MODO ESCURO ===== */
+.dark-mode .card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px var(--shadow);
+  border-radius: 20px !important; /* <--- Adicionado ou ajustado aqui! */
+}
+  /* Body e elementos principais */
+  body.dark-mode {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Navbar */
+  .dark-mode .navbar {
+    background-color: var(--navbar-bg) !important;
+    color: var(--navbar-text) !important;
+    box-shadow: 0 2px 4px var(--shadow);
+  }
+
+  .dark-mode .navbar .navbar-brand,
+  .dark-mode .navbar .nav-link {
+    color: var(--navbar-text) !important;
+    transition: color 0.3s ease;
+  }
+
+  
+
+  /* Cards */
+  .dark-mode .card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+
+  /* Formulários */
+  .dark-mode .form-control {
+    background-color: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--input-border) !important;
+  }
+
+  .dark-mode .form-control:focus {
+    background-color: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--button-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(10, 125, 126, 0.25) !important;
+  }
+
+  .dark-mode .form-label {
+    color: var(--text-primary) !important;
+  }
+
+  /* Botões */
+ 
+
+  .dark-mode .btn-primary:hover {
+    background-color: var(--button-primary-hover) !important;
+    border-color: var(--button-primary-hover) !important;
+  }
+
+  .dark-mode .btn-outline-secondary {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .dark-mode .btn-outline-secondary:hover {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Modais */
+  .dark-mode .modal-content {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  .dark-mode .modal-header {
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .dark-mode .modal-footer {
+    border-top: 1px solid var(--border-color) !important;
+  }
+
+  /* Tabelas */
+  .dark-mode .table {
+    color: var(--text-primary) !important;
+  }
+
+  .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--bg-secondary) !important;
+  }
+
+  .dark-mode .table th {
+    border-top: 1px solid var(--border-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .dark-mode .table td {
+    border-top: 1px solid var(--border-color) !important;
+  }
+
+  /* Alertas */
+  .dark-mode .alert-primary {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Dropdown */
+  .dark-mode .dropdown-menu {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  .dark-mode .dropdown-item {
+    color: var(--text-primary) !important;
+  }
+
+  .dark-mode .dropdown-item:hover {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* Breadcrumb */
+  .dark-mode .breadcrumb {
+    background-color: var(--bg-secondary) !important;
+  }
+
+  .dark-mode .breadcrumb-item a {
+    color: var(--button-primary) !important;
+  }
+
+  /* Paginação */
+  .dark-mode .page-link {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  .dark-mode .page-link:hover {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .dark-mode .page-item.active .page-link {
+    background-color: var(--button-primary) !important;
+    border-color: var(--button-primary) !important;
+  }
+
+  /* Elementos customizados */
+  .dark-mode .bg-light {
+    background-color: var(--bg-secondary) !important;
+  }
+
+  .dark-mode .bg-white {
+    background-color: var(--card-bg) !important;
+  }
+
+
+  .dark-mode .border {
+    border-color: var(--border-color) !important;
+  }
+
+  /* Botão de alternância de tema */
+  .theme-toggle {
+    background: none;
+    border: 2px solid #dee2e6;
+    color: #212529;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+  }
+
+  .theme-toggle:hover {
+    background-color: #f8f9fa;
+  }
+
+  .dark-mode .descricao-crianca{
+    color: #fff;
+  }
+
+  .dark-mode .contato-content {
+      background-color: rgba(61, 61, 61, 0.85); 
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+  .dark-mode .theme-toggle {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .dark-mode .theme-toggle:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--button-primary);
+  }
+
+  /* === Estilos para a imagem de fundo no modo escuro === */
+  .dark-mode .parallax-background {
+    background-image: url("src/Assets/LayoutImage1-dark.png"); /* Substitua pelo caminho da sua imagem para o modo escuro */
+  }
+
+  /* ... (Seu código existente do tema escuro) ... */
+
+  /* === Estilos para as imagens do Carrossel no modo escuro === */
+  .dark-mode .carousel-image-1 {
+    background-image: url("src/Assets/CarrosselPrincipal-dark.png") !important; /* Caminho da imagem para o modo escuro */
+    border: none !important;
+  }
+
+  .dark-mode .carousel-image-2 {
+    background-image: url("src/Assets/CarrosselPrincipal2-dark.png") !important; /* Caminho da imagem para o modo escuro */
+    border: none !important;
+  }
+
+  .dark-mode  .navbar {
+  background-image: url("src/Assets/FundoNavbar-dark.png") !important;
+}
+
+.dark-mode .feature-item::before {
+  background-image: url('./src/Assets/check-dark.png');
+}
+
+.dark-mode .footer {
+  background-image: url("src/Assets/Footer-dark.png");
+}
+
+.dark-mode .carousel-caption .caption-title {
+  color: var(--text-primary) !important; /* Usar a variável de texto principal (quase branco) */
+}
+
+.dark-mode .carousel-caption .caption-text {
+  color: var(--text-primary) !important; /* Usar a variável de texto principal (quase branco) */
+}
+
+/* Se você também tiver outros textos dentro do caption-content que precisam ser brancos */
+.dark-mode .carousel-caption .caption-content {
+  color: var(--text-primary) !important;
+}
+
+/* E, se o próprio carousel-caption precisar de um ajuste de fundo ou borda no dark mode */
+
+.dark-mode .subscription-card h5,
+.dark-mode .subscription-card h4,
+.dark-mode .subscription-card .titulo, /* Para o h5/h4 que você nomeou como .titulo */
+.dark-mode .subscription-card .subTitulo,
+.dark-mode .subscription-card .preco,
+.dark-mode .subscription-card ul li,
+.dark-mode .subscription-card .small,
+.dark-mode .subscription-card span { /* Adicionei span caso haja texto em spans */
+  color: var(--text-primary) !important;
+}
+
+.dark-mode .subscription-card:hover {
+  /* Use the new --shadow-light variable for the hover effect */
+  box-shadow: 0 12px 35px var(--shadow-light) !important;
+}
+
+/* Also, ensure the base shadow for the card matches dark mode aesthetics, if it isn't already */
+.dark-mode .subscription-card {
+    /* If you want a subtle shadow even without hover in dark mode */
+    box-shadow: 0 8px 20px var(--shadow) !important;
+}
+
+.dark-mode .card-header {
+  background-color: #636363 !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+.dark-mode .card-body {
+  background-color: #3b3b3b !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+.dark-mode .faq-answer-text {
+  color: #fff !important;
+}
+
+.dark-mode .form-control {
+  color: var(--text-primary) !important; /* Faz o texto digitado ficar branco */
+}
+
+.dark-mode .form-control::placeholder {
+  color: var(--text-muted) !important; /* Usa uma cor mais suave para o placeholder */
+  opacity: 1; /* Garante que a opacidade padrão do placeholder não esconda a cor */
+}
+
+/* Wrapper do conteúdo (o "card" branco) no dark mode */
+.dark-mode .content-wrapper {
+  background-color: var(--card-bg) !important; /* Usa a cor de fundo do card do tema escuro */
+  box-shadow: 0 8px 25px var(--shadow) !important; /* Ajusta a sombra para o tema escuro */
+}
+
+/* Título "Registre-se aqui!" no dark mode */
+.dark-mode .menu-title {
+  color: var(--text-primary) !important; /* Cor do título: branco */
+  border-bottom-color: var(--button-primary) !important; /* Cor da linha inferior: verde do tema */
+}
+
+/* Botões de registro (Apoiador e Aluno) */
+.dark-mode .menu-button {
+  box-shadow: 0 4px 15px var(--shadow) !important; /* Ajusta a sombra dos botões para o tema escuro */
+}
+
+/* Botão Apoiador no dark mode */
+.dark-mode .apoiador {
+  background-color: var(--button-primary) !important; /* Cor de fundo principal do botão Apoiador */
+}
+
+.dark-mode .apoiador:hover {/* Imagem de fundo no hover para dark mode */
+  box-shadow: 0 8px 25px var(--shadow-light) !important; /* Sombra mais clara no hover */
+}
+
+/* Botão Aluno no dark mode */
+.dark-mode .aluno {
+  background-color: #D33649 !important; /* Uma cor de botão que contraste, como a vermelha do tema ou uma nova */
+}
+
+.dark-mode .aluno:hover {
+   /* Imagem de fundo no hover para dark mode */
+  box-shadow: 0 8px 25px rgba(255, 111, 97, 0.3) !important; /* Ajuste a sombra para combinar com o vermelho do dark mode */
+}
+
+.dark-mode .menu-login,
+.dark-mode .menu-professor-link {
+  color: var(--text-primary) !important; /* <--- Isso faz o texto principal ficar branco */
+}
+
+.dark-mode .menu-login a,
+.dark-mode .menu-professor-link a {
+  color: var(--button-primary) !important; /* <--- Isso faz o texto dos LINKS (o "aqui") ficar VERDE do tema */
+  text-decoration: none; /* Garante que a decoração original não sobrescreva */
+}
+
+.dark-mode .menu-login a:hover,
+.dark-mode .menu-professor-link a:hover {
+  color: var(--button-primary-hover) !important; /* Cor do hover dos links */
+  text-decoration: underline; /* Adiciona sublinhado no hover */
+}
+
+/* Adaptações de responsividade para o fundo do menu */
+/* Container principal do formulário de registro no dark mode */
+.dark-mode .registro-container-rosa {
+  background-color: var(--card-bg) !important; /* Fundo do card/container */
+  box-shadow: 5px 5px 10px var(--shadow) !important; /* Sombra do card/container */
+}
+
+/* Header do formulário de registro no dark mode */
+.dark-mode .registro-header-rosa {
+  color: var(--text-primary) !important; /* Cor do texto no cabeçalho (se houver) */
+}
+
+/* Título principal do formulário (Cadastro do Responsável/Aluno) no dark mode */
+.dark-mode .text-center-rosa {
+  color: var(--text-primary) !important; /* Cor do título */
+}
+
+/* Linha separadora do título no dark mode */
+
+/* Labels dos campos de input no dark mode */
+.dark-mode .label-rosa {
+  color: var(--text-primary) !important; /* Cor das labels */
+}
+
+/* Inputs de texto, email, password, date no dark mode */
+.dark-mode .registro-form-rosa input[type="text"],
+.dark-mode .registro-form-rosa input[type="email"],
+.dark-mode .registro-form-rosa input[type="password"],
+.dark-mode .registro-form-rosa input[type="date"] {
+  background-color: var(--input-bg) !important; /* Cor de fundo dos inputs */
+  color: var(--text-primary) !important; /* Cor do texto digitado */
+  border: 2px solid var(--input-border) !important; /* Cor da borda dos inputs */
+}
+
+/* Placeholder dos inputs no dark mode */
+.dark-mode .registro-form-rosa input::placeholder,
+.dark-mode .textarea-rosa::placeholder {
+  color: var(--text-muted) !important; /* Cor do placeholder */
+  opacity: 1; /* Garante visibilidade */
+}
+
+/* Select (dropdown) no dark mode */
+.dark-mode .select-rosa {
+  background-color: var(--input-bg) !important; /* Fundo do select */
+  color: var(--text-primary) !important; /* Cor do texto selecionado */
+  border: 2px solid var(--input-border) !important; /* Borda do select */
+}
+
+/* Textarea no dark mode */
+.dark-mode .textarea-rosa {
+  background-color: var(--input-bg) !important; /* Fundo da textarea */
+  color: var(--text-primary) !important; /* Cor do texto digitado */
+  border: 2px solid var(--input-border) !important; /* Borda da textarea */
+}
+
+/* Botões de passo (1 e 2) no dark mode */
+
+
+
+
+/* Linha entre os passos no dark mode */
+
+
+/* Botão principal (Próximo/Registrar) no dark mode */
+
+/* Botão secundário (Voltar) no dark mode */
+
+
+/* Scrollbar do formulário no dark mode */
+.dark-mode .registro-form-rosa::-webkit-scrollbar-track {
+  background: var(--bg-secondary) !important;
+}
+
+
+
+/* Componente FileInput no dark mode */
+.dark-mode .file-input-wrapper {
+  border: 2px solid var(--input-border) !important; /* Borda do wrapper do file input */
+}
+
+
+
+
+
+.dark-mode .file-name-display {
+  color: var(--text-secondary) !important; /* Cor do texto do nome do arquivo selecionado */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.dark-mode .registro-container-azul {
+  background-color: var(--card-bg) !important; /* Fundo do card/container */
+  box-shadow: 5px 5px 10px var(--shadow) !important; /* Sombra do card/container */
+}
+
+/* Header do formulário de registro no dark mode */
+.dark-mode .registro-header-azul {
+  background-color: var(--button-primary) !important; /* Cor de fundo do cabeçalho: verde principal do tema */
+  color: var(--text-primary) !important; /* Cor do texto no cabeçalho: branco */
+}
+
+/* Título principal do formulário (Cadastro do Apoiador) no dark mode */
+.dark-mode .text-center-azul {
+  color: var(--text-primary) !important; /* Cor do título: branco */
+}
+
+/* Linha separadora do título no dark mode */
+.dark-mode .footer-line2-azul {
+  background-color: var(--border-color) !important; /* Cor da linha: neutra do dark mode */
+}
+
+/* Labels dos campos de input no dark mode */
+.dark-mode .label-azul {
+  color: var(--text-primary) !important; /* Cor das labels: branco */
+}
+.dark-mode .form-select{
+  background-color: var(--input-bg) !important; /* Cor de fundo do select */
+  color: var(--text-primary) !important; /* Cor do texto do select: branco */
+  border: 2px solid var(--input-border) !important; /* Cor da borda do select: neutra do dark mode */
+}
+/* Inputs de texto, email, password, date no dark mode */
+.dark-mode .registro-form-azul input[type="text"],
+.dark-mode .registro-form-azul input[type="email"],
+.dark-mode .registro-form-azul input[type="password"],
+.dark-mode .registro-form-azul input[type="date"] {
+  background-color: var(--input-bg) !important; /* Cor de fundo dos inputs */
+  color: var(--text-primary) !important; /* Cor do texto digitado: branco */
+  border: 2px solid var(--input-border) !important; /* Cor da borda dos inputs: neutra do dark mode */
+}
+
+/* Placeholder dos inputs no dark mode */
+.dark-mode .registro-form-azul input::placeholder {
+  color: var(--text-muted) !important; /* Cor do placeholder: cinza suave */
+  opacity: 1;
+}
+
+/* File input wrapper */
+.dark-mode .file-input-wrapper2 {
+  border: 2px solid var(--input-border) !important;
+}
+
+/* File input button */
+.dark-mode .file-input-button2 {
+  background-color: var(--button-primary) !important; /* Cor do botão "Escolher Arquivo" */
+  color: var(--text-primary) !important; /* Texto do botão */
+  box-shadow: -2px 2px 0px var(--button-primary-hover) !important; /* Sombra do botão */
+}
+.dark-mode .file-input-button2:hover {
+  background-color: var(--button-primary-hover) !important;
+}
+
+/* File name display */
+.dark-mode .file-name-display {
+  color: var(--text-secondary) !important;
+}
+
+/* Preview image border */
+.dark-mode .preview-image {
+  border: 2px solid var(--border-color) !important;
+}
+
+
+/* Botão principal (Registrar) no dark mode */
+.dark-mode .custom-button-azul {
+  background-color: var(--button-primary) !important; /* Cor de fundo do botão: verde principal do tema */
+  color: var(--text-primary) !important; /* Cor do texto do botão: branco */
+  box-shadow: -5px 5px 0px var(--button-primary-hover) !important; /* Sombra do botão */
+}
+.dark-mode .custom-button-azul:hover {
+  transform: scale(1.1);
+  background-color: var(--button-primary-hover) !important; /* Cor de hover */
+}
+
+/* Scrollbar do formulário no dark mode */
+.dark-mode .registro-form-azul::-webkit-scrollbar-track {
+  background: var(--bg-secondary) !important;
+}
+
+.dark-mode .registro-form-azul::-webkit-scrollbar-thumb {
+  background: var(--button-primary) !important;
+}
+
+.dark-mode .registro-form-azul::-webkit-scrollbar-thumb:hover {
+  background: var(--button-primary-hover) !important;
+}
+
+/* Checkbox */
+.dark-mode .custom-checkbox {
+  accent-color: var(--button-primary) !important; /* Cor do preenchimento do checkbox */
+  border: 1px solid var(--input-border) !important; /* Cor da borda do checkbox */
+}
+
+.dark-mode .custom-checkbox:checked {
+  accent-color: var(--button-primary) !important;
+  border-color: var(--button-primary) !important;
+}
+
+.dark-mode .custom-checkbox:focus {
+  outline-color: var(--button-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(10, 125, 126, 0.25) !important; /* Adapta a sombra de foco */
+}
+
+.dark-mode .notification-label {
+  color: var(--text-primary) !important; /* Cor do texto da label de notificação */
+}
+
+.dark-mode .form-control.border.bg-light{
+  background-color: var(--input-bg) !important; /* Cor de fundo dos inputs */
+  color: var(--text-primary) !important; /* Cor do texto digitado */
+  border: 2px solid var(--input-border) !important; /* Cor da borda dos inputs */
+}
+
+.dark-mode .table {
+  color: var(--text-primary) !important; /* Cor do texto da tabela (td e th) */
+  /* Remove qualquer background-color padrão que possa interferir */
+  background-color: transparent !important;
+}
+
+/* Cabeçalhos da tabela (th) */
+.dark-mode .table th {
+  color: var(--text-primary) !important; /* Cor do texto dos cabeçalhos */
+  background-color: var(--bg-secondary) !important; /* Fundo mais escuro para cabeçalhos */
+  border-top: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Células da tabela (td) */
+.dark-mode .table td {
+  color: var(--text-primary) !important; /* Cor do texto das células */
+  background-color: var(--bg-primary) !important; /* Fundo padrão das células, mais escuro */
+  border-top: 1px solid var(--border-color) !important; /* Borda superior das células */
+}
+
+/* Linhas zebradas (odd rows) no dark mode */
+.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--bg-secondary) !important; /* Fundo para linhas ímpares */
+}
+
+.dark-mode .min-h-screen.bg-gray-50 { /* ou body.dark-mode se o fundo for o body */
+  background-color: var(--bg-primary) !important;
+}
+
+/* Títulos principais (Escolha seu Plano, Método de Pagamento, Dados do Cartão) */
+.dark-mode .text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+/* Linha de destaque rosa no cabeçalho */
+.dark-mode .bg-pink-600 {
+  background-color: var(--button-primary) !important; /* Muda para a cor principal do tema dark */
+}
+
+/* Textos descritivos (subtítulos, descrições dos planos, avisos) */
+.dark-mode .text-gray-600,
+.dark-mode .text-gray-700,
+.dark-mode .text-gray-500,
+.dark-mode .text-sm.text-gray-500 {
+  color: var(--text-secondary) !important;
+}
+
+/* Alerta de Plano Atual */
+.dark-mode .bg-blue-100 {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+.dark-mode .text-blue-700 { /* Texto dentro do alerta */
+  color: var(--text-primary) !important;
+}
+
+/* Cards de seleção de plano */
+.dark-mode .border-gray-200.bg-white { /* Cards de plano não selecionados */
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+.dark-mode .hover\:shadow-lg:hover { /* Hover nos cards de plano */
+  box-shadow: 0 10px 15px -3px var(--shadow), 0 4px 6px -2px var(--shadow) !important;
+  border-color: var(--input-border) !important; /* Borda no hover */
+}
+
+/* Plano selecionado */
+.dark-mode .selected-plan-border-blue {
+  border-color: var(--button-primary) !important; /* Borda do plano selecionado */
+  box-shadow: 0 5px 10px -2px var(--shadow), 0 2px 4px -1px var(--shadow) !important;
+}
+.dark-mode .selected-plan-border-cyan {
+  border-color: var(--button-primary) !important; /* Borda do plano selecionado */
+  box-shadow: 0 5px 10px -2px var(--shadow), 0 2px 4px -1px var(--shadow) !important;
+}
+.dark-mode .border-green-500.bg-green-50 { /* Plano que o usuário já possui */
+  border-color: var(--button-primary) !important;
+  background-color: var(--bg-secondary) !important;
+  box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow) !important;
+}
+
+/* Títulos dos planos (Plano Semente, Melodia, etc.) */
+.dark-mode .text-xl.font-bold.text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+/* Preço dos planos */
+.dark-mode .text-pink-600 { /* Cor do preço (R$ XX/mês) */
+  color: var(--button-primary) !important; /* Mudar para a cor principal do tema dark */
+}
+
+/* Radio buttons */
+.dark-mode input[type="radio"] {
+  border-color: var(--text-secondary) !important; /* Borda do radio button */
+}
+.dark-mode input[type="radio"]:checked {
+  border-color: var(--button-primary) !important; /* Cor do radio button selecionado */
+  background-color: var(--button-primary) !important;
+}
+
+/* Cards de método de pagamento */
+.dark-mode .payment-method-card.border-gray-200.bg-white { /* Cards de método de pagamento não selecionados */
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+.dark-mode .payment-method-card:hover {
+  box-shadow: 0 4px 8px var(--shadow) !important;
+  border-color: var(--input-border) !important;
+}
+.dark-mode .payment-method-card.selected {
+  border-color: var(--button-primary) !important; /* Cor da borda do selecionado */
+  background-color: var(--bg-secondary) !important; /* Fundo do selecionado */
+  box-shadow: 0 4px 10px var(--shadow) !important;
+}
+
+/* Ícones dos métodos de pagamento */
+.dark-mode .payment-method-card .method-icon {
+  color: var(--text-secondary) !important; /* Cor dos ícones (CreditCard, Smartphone, FileText) */
+}
+
+/* Nome dos métodos de pagamento */
+.dark-mode .payment-method-card .method-name {
+  color: var(--text-primary) !important; /* Cor do nome do método (Cartão de Crédito, Pix) */
+}
+
+/* Inputs de dados do cartão */
+.dark-mode input[type="text"],
+.dark-mode input[type="email"],
+.dark-mode input[type="password"] { /* Genérico, mas pode ser necessário aqui */
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--input-border) !important;
+}
+.dark-mode input::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+/* Campos de input focados */
+.dark-mode .focus\:ring-2:focus {
+  --tw-ring-color: var(--button-primary) !important; /* Anel de foco */
+  box-shadow: 0 0 0 0.2rem rgba(var(--button-primary-rgb, 10, 125, 126), 0.25) !important;
+}
+
+/* Área do QR Code / Boleto */
+.dark-mode .w-48.h-48.bg-gray-100 {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Botão de Confirmação */
+.dark-mode .confirm-button {
+  background-color: var(--button-primary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 5px 15px var(--shadow) !important;
+}
+.dark-mode .confirm-button:hover {
+  background-color: var(--button-primary-hover) !important;
+  box-shadow: 0 8px 20px var(--shadow) !important;
+}
+.dark-mode .confirm-button:active {
+  background-color: var(--button-primary-hover) !important;
+  box-shadow: 0 3px 10px var(--shadow) !important;
+}
+
+
+.dark-mode .card p{
+  color: #bcbcbc !important; /* Cor do texto dentro dos cards */
+}
+
+
+.dark-mode .perfil-aluno-container {
+  background-color: var(--card-bg) !important; /* Fundo do container: cor de card do tema escuro */
+  box-shadow: 0 0 15px var(--shadow) !important; /* Sombra do container */
+}
+
+/* Conteúdo do perfil (onde os forms/dados ficam) no dark mode */
+.dark-mode .perfil-aluno-conteudo {
+  color: var(--text-primary) !important; /* Cor padrão do texto no conteúdo */
+}
+/* Efeito de blur no dark mode */
+.dark-mode .perfil-aluno-conteudo.blur-background {
+  /* Filtro de blur não precisa mudar, mas se a cor de fundo do blur mudar,
+     a opacidade da overlay deve ser suficiente */
+}
+
+/* Labels Azuis no dark mode */
+.dark-mode .label-azul {
+  color: var(--text-primary) !important; /* Cor das labels: branco */
+}
+
+/* Título da seção (page-title-text) no dark mode */
+.dark-mode .page-title-text {
+  color: var(--text-primary) !important; /* Cor do título: branco */
+}
+
+/* Estilos para o status de assinatura ativa no dark mode */
+.dark-mode .bg-assinatura-ativa {
+  background-color: var(--button-primary) !important; /* Verde principal do tema dark */
+  color: var(--text-primary) !important; /* Texto branco */
+}
+
+/* Botões Azuis (custom-button-azul6) no dark mode */
+.dark-mode .custom-button-azul6 {
+  background-color: var(--button-primary) !important; /* Verde principal do tema dark */
+  color: var(--text-primary) !important; /* Texto branco */
+  border-color: var(--button-primary) !important; /* Borda do botão */
+}
+.dark-mode .custom-button-azul6:hover {
+  background-color: var(--button-primary-hover) !important; /* Verde mais escuro no hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow) !important; /* Sombra adaptada */
+}
+.dark-mode .custom-button-azul6:disabled {
+  background-color: var(--text-muted) !important; /* Cor neutra para disabled */
+  color: var(--text-secondary) !important; /* Texto mais suave para disabled */
+}
+
+/* Botões Vermelhos (custom-button-vermelho) no dark mode */
+.dark-mode .custom-button-vermelho {
+  background-color: var(--rosa-dark) !important; /* Usa o rosa escuro do tema dark */
+  color: var(--text-primary) !important; /* Texto branco */
+  border-color: var(--rosa-dark) !important; /* Borda do botão */
+}
+.dark-mode .custom-button-vermelho:hover {
+  background-color: var(--rosa-dark-hover) !important; /* Rosa mais escuro no hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow) !important; /* Sombra adaptada */
+}
+.dark-mode .custom-button-vermelho:disabled {
+  background-color: var(--text-muted) !important; /* Cor neutra para disabled */
+  color: var(--text-secondary) !important; /* Texto mais suave para disabled */
+}
+
+/* Botões Outline Vermelhos (custom-button-outline-vermelho) no dark mode */
+.dark-mode .custom-button-outline-vermelho {
+  color: var(--rosa-dark-light) !important; /* Cor do texto: rosa claro do dark mode */
+  border-color: var(--rosa-dark-light) !important; /* Cor da borda: rosa claro do dark mode */
+  background-color: transparent !important;
+}
+.dark-mode .custom-button-outline-vermelho:hover {
+  background-color: var(--bg-secondary) !important; /* Fundo no hover: cinza escuro do tema */
+  color: var(--text-primary) !important; /* Texto branco no hover */
+  border-color: var(--rosa-dark-light) !important; /* Borda no hover: rosa claro do dark mode */
+  box-shadow: 0 4px 8px var(--shadow) !important; /* Sombra adaptada */
+}
+
+/* Cabeçalho Vermelho do Modal (registro-header-vermelho) no dark mode */
+.dark-mode .registro-header-vermelho {
+  background-color: var(--rosa-dark) !important; /* Fundo: rosa escuro do tema dark */
+  color: var(--text-primary) !important; /* Texto branco */
+}
+
+/* Elementos strong e b para texto em negrito no dark mode */
+.dark-mode b,
+.dark-mode strong {
+  color: var(--text-primary) !important; /* Garante que o negrito seja branco */
+}
+
+/* Scrollbar do registro-form-azul (se houver um no perfil) */
+/* Se os formulários de perfil também usam scrollbar, adicione estes: */
+.dark-mode .registro-form-azul::-webkit-scrollbar-track {
+  background: var(--bg-secondary) !important;
+}
+.dark-mode .registro-form-azul::-webkit-scrollbar-thumb {
+  background: var(--button-primary) !important;
+}
+.dark-mode .registro-form-azul::-webkit-scrollbar-thumb:hover {
+  background: var(--button-primary-hover) !important;
+}
+
+/* Outros elementos de formulário (inputs, selects, textareas) no dark mode (se não estiverem cobertos genericamente) */
+/* Se a página de perfil tiver inputs genéricos que não sejam "registro-form-azul input",
+   é bom ter uma regra mais abrangente aqui: */
+.dark-mode input[type="text"],
+.dark-mode input[type="email"],
+.dark-mode input[type="password"],
+.dark-mode input[type="date"],
+.dark-mode select,
+.dark-mode textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--input-border) !important;
+}
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+/* Específico para select - se precisar de ícone de seta customizado no dark mode */
+.dark-mode select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23F3F6F8%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E') !important; /* Ícone de seta branco */
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+}
+
+.dark-mode b, .dark-mode strong{
+  color: #182126 !important;
+}

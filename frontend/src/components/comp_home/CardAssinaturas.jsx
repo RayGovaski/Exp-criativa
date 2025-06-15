@@ -1,8 +1,8 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CardAssinaturas.css";
-import { Link, useNavigate } from "react-router-dom"; // Importe Link e useNavigate
-import { Button } from "react-bootstrap"; // Importe Button do react-bootstrap
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
 
 const plans = [
@@ -61,19 +61,19 @@ const plans = [
 ];
 
 const SubscriptionPlans = () => {
-  const { user, token } = useAuth(); // <--- Obtenha o estado de autenticação
-  const navigate = useNavigate(); // <--- Inicialize o hook de navegação
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    if (token && user) { // Ou apenas 'if (token)' se for suficiente para indicar que está logado
-      navigate("/assinaturas"); // Redireciona para a página de assinatura
+    if (token && user) {
+      navigate("/assinaturas");
     } else {
-      navigate("/menu-registro"); // Redireciona para a página de registro/login
+      navigate("/menu-registro");
     }
   };
 
   return (
-    <div id="assinaturas" className="container my-5">
+    <div id="assinaturas" className="container my-3">
       <div className="titulo-container">
         <h2 className="text-center mb-4 sobre-titulo3">Assinaturas</h2>
       </div>
@@ -88,10 +88,9 @@ const SubscriptionPlans = () => {
                 <h4 className="preco">{plan.price}</h4>
                 <ul className="list-unstyled flex-grow-1">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-start text-gray-700">
-                    <img src="./src/Assets/check.png" alt="Check" className="tamanho2" />
-                    <span className="font-medium">{feature}</span>
-                  </li>
+                    <li key={i} className="feature-item text-start text-gray-700">
+                      <span className="font-medium">{feature}</span>
+                    </li>
                   ))}
                 </ul>
                 <p className="small text-muted flex-grow-1">{plan.description}</p>
@@ -106,8 +105,6 @@ const SubscriptionPlans = () => {
           {token && user ? "Assine Seu Plano!" : "Cadastre-se e Assine Seu Plano!"}
         </Button>
       </div>
-
-
     </div>
   );
 };

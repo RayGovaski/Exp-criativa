@@ -8,7 +8,8 @@ const Carrossel = () => {
     return (
         <Carousel className="w-100 mx-auto" interval={3000} controls={true} indicators={true}>
             <Carousel.Item>
-                <img src="src/Assets/CarrosselPrincipal.png" className="d-block w-100" alt="Imagem 1" />
+                {/* Removed src and added a unique class for the image */}
+                <img className="d-block w-100 carousel-image-1" />
                 <Carousel.Caption>
                     <div className="caption-content">
                         <h2 className="caption-title">Transformando sonhos<br />em realidade através da cultura.</h2>
@@ -24,9 +25,9 @@ const Carrossel = () => {
                 </Carousel.Caption>
             </Carousel.Item>
 
-        
             <Carousel.Item>
-                <img src="src/Assets/CarrosselPrincipal2.png" className="d-block w-100" alt="Imagem 2" />
+                {/* Removed src and added a unique class for the image */}
+                <img className="d-block w-100 carousel-image-2" />
                 <Carousel.Caption>
                     <div className="caption-content">
                         <h2 className="caption-title">Junte-se à Nossa Aventura!</h2>

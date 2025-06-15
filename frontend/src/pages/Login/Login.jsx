@@ -1,8 +1,10 @@
+// src/pages/Login/Login.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Card, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { toast } from 'react-toastify'; // Importa a função toast
+import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext'; // Certifique-se que o caminho está correto
 import './Login.css';
 
 const Login = () => {
@@ -10,60 +12,68 @@ const Login = () => {
   const [senha, setSenha] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, isAuthenticated } = useAuth();
+  // Obtenha 'user' do contexto para decidir a navegação pós-login
+  const { login, isAuthenticated, user } = useAuth(); 
   const navigate = useNavigate();
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (isAuthenticated()) {
-      navigate('/perfil');
+  // Redireciona se já estiver logado (e a role estiver definida)
+ useEffect(() => {
+    if (isAuthenticated() && user) {
+        switch (user.role) {
+            case 'apoiador':
+                navigate('/perfil');
+                break;
+            case 'aluno':
+                navigate('/perfil-aluno');
+                break;
+            case 'professor':
+                navigate('/perfil-professor');
+                break;
+            case 'administrador': // Se tiver um perfil para ADM
+                navigate('/perfil-adm');
+                break;
+            default:
+                navigate('/'); // Fallback
+        }
     }
-  }, [isAuthenticated, navigate]);
+}, [isAuthenticated, navigate, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Ativa o spinner no botão
+    setIsLoading(true);
 
-    // --- 1. VALIDAÇÕES INICIAIS (antes de qualquer toast.info ou requisição) ---
-    // Validação de campos vazios
+    // Validações iniciais (mantidas)
     if (!email || !senha) {
       toast.error("Por favor, preencha todos os campos.");
-      setIsLoading(false); // Desativa o spinner imediatamente
-      return; // Para a execução
+      setIsLoading(false);
+      return;
     }
-
-    // Validação de formato de email (se type="text")
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error("Por favor, insira um endereço de e-mail válido.");
-      setIsLoading(false); // Desativa o spinner imediatamente
-      return; // Para a execução
+      setIsLoading(false);
+      return;
     }
 
-    // --- 2. TENTATIVA DE LOGIN E EXIBIÇÃO DO TOAST DE "ENTRANDO..." ---
-    // Só chegaremos aqui se as validações acima passarem.
-    // Agora é o momento certo para mostrar o "Entrando..."
-    toast.info("Entrando...", { autoClose: false, closeButton: false, toastId: 'loginProcess' }); // Usamos toastId para poder atualizá-lo/removê-lo
+    toast.info("Entrando...", { autoClose: false, closeButton: false, toastId: 'loginProcess' });
 
     try {
-      const result = await login(email, senha);
+      const result = await login(email, senha); // Chama a função login do contexto
 
-      // Remover o toast de "Entrando..." antes de mostrar o resultado
-      toast.dismiss('loginProcess'); // Remove a notificação "Entrando..."
+      toast.dismiss('loginProcess'); // Remove o toast "Entrando..."
 
       if (result.success) {
         toast.success("Login bem-sucedido!");
-        // A navegação pode ser controlada pelo useEffect, ou aqui com um pequeno delay se preferir
-        // setTimeout(() => navigate('/perfil'), 1000);
+        // A navegação real agora é tratada pelo useEffect acima, o que é mais limpo e reativo.
       } else {
         toast.error(result.error || 'Falha ao realizar login. Verifique suas credenciais.');
       }
     } catch (err) {
       console.error('Login error:', err);
-      toast.dismiss('loginProcess'); // Remover o toast de "Entrando..." em caso de erro de rede/servidor
+      toast.dismiss('loginProcess');
       toast.error('Ocorreu um erro durante o login. Tente novamente.');
     } finally {
-      setIsLoading(false); // Desativa o spinner sempre no final
+      setIsLoading(false);
     }
   };
 
@@ -76,12 +86,11 @@ const Login = () => {
           </div>
           <Card.Body className="p-4">
             <h3 className="text-center login-title mb-4">Seja bem-vindo de novo!</h3>
-
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formEmail" className="mb-3">
                 <Form.Label className="label-azul">Email</Form.Label>
                 <Form.Control
-                  type="text" // Mantido como 'text' para o toast lidar com a validação
+                  type="text"
                   placeholder="Digite seu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

@@ -1,0 +1,38 @@
+/* SalaAluno.css */
+
+/* Reusing general styles from DadosPessoais for consistency */
+.label-azul {
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+.aulas-table thead th {
+  background-color: #0A7D7E; /* Cor de cabeçalho da tabela */
+  color: white;
+  border-color: #086364; /* Borda mais escura para o cabeçalho */
+  font-weight: 600; /* Texto mais forte no cabeçalho */
+}
+
+.aulas-table tbody tr:nth-of-type(odd) {
+  background-color: #f8f8f8; /* Listra clara para linhas ímpares */
+}
+
+.aulas-table tbody tr:hover {
+  background-color: #e6f7f7; /* Efeito de hover na linha */
+  cursor: default; /* Mantém o cursor padrão */
+}
+
+.aulas-table {
+  border-radius: 8px; /* Cantos arredondados na tabela inteira */
+  overflow: hidden; /* Garante que os cantos arredondados sejam visíveis */
+}
+
+/* Ajustes para responsividade da tabela em telas menores */
+@media (max-width: 767px) {
+  .aulas-table {
+    font-size: 0.85rem; /* Fonte menor para caber em telas menores */
+  }
+  .aulas-table th, .aulas-table td {
+    padding: 0.6rem; /* Reduz o padding nas células */
+  }
+}

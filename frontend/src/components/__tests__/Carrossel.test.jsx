@@ -17,10 +17,15 @@ describe('Carrossel', () => {
         mockNavigate.mockClear();
     });
     
-    test('o Carrossel deve renderizar sem erros', () => {
+    test('o botão Inscreva-se deve levar para a página de registro', () => {
         render( <MemoryRouter><Carrossel/></MemoryRouter>);
-        const subtituloCarrossel = screen.getByRole('heading', { name: /Transformando sonhos/i });
-        expect(subtituloCarrossel).toBeInTheDocument();
+    
+        const botaoInscrevase = screen.getByRole('link', { name: /Inscreva-se/i });
+        const caminhoEsperado = '/menu-registro';
+        expect(botaoInscrevase).toHaveAttribute('href', caminhoEsperado);
+
+        expect(caminhoEsperado).not.toBe('');
+        expect(caminhoEsperado).not.toBeNull();
     });
 
     test('o botão "Quero Contribuir" deve navegar para a página de assinatura', () => {
@@ -29,7 +34,11 @@ describe('Carrossel', () => {
         fireEvent.click(botaoQueroContribuir);
 
         expect(mockNavigate).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith('/pages/compra-assinatura/assinaturapagamento')
+        const caminhoEsperado = '/pages/compra-assinatura/assinaturapagamento';
+        expect(mockNavigate).toHaveBeenCalledWith(caminhoEsperado);
+        
+        expect(caminhoEsperado).not.toBe('');
+        expect(caminhoEsperado).not.toBeNull();
     });
 });
 

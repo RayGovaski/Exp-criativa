@@ -1,61 +1,44 @@
-import React, { useState } from 'react';
-import { Card, Button, Table, Badge, Form, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Table, Badge, Form, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FaFileDownload, FaSearch } from 'react-icons/fa';
-import './ComprovantesPerfil.css';
+import axios from 'axios';
+import { useAuth } from '../../../context/AuthContext';
+import './ComprovantesPerfil.css'; // Certifique-se que este é o CSS correto
 
 const ComprovantesPerfil = () => {
+  const { user, token, isAuthenticated } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [doacaoSelecionada, setDoacaoSelecionada] = useState(null);
   const [filtro, setFiltro] = useState('');
-  
-  // Dados de exemplo de doações
-  const [doacoes] = useState([
-    {
-      id: 1,
-      causa: "Campanha Educação para Todos",
-      instituicao: "Instituto Educar",
-      valor: 50.00,
-      data: "10/04/2025",
-      status: "Concluída",
-      comprovante: true
-    },
-    {
-      id: 2,
-      causa: "Reflorestamento Mata Atlântica",
-      instituicao: "ONG Natureza Viva",
-      valor: 75.00,
-      data: "28/03/2025",
-      status: "Concluída",
-      comprovante: true
-    },
-    {
-      id: 3,
-      causa: "Assistência a Desabrigados",
-      instituicao: "Abrigo Solidário",
-      valor: 100.00,
-      data: "15/03/2025",
-      status: "Concluída",
-      comprovante: true
-    },
-    {
-      id: 4,
-      causa: "Campanha de Vacinação Animal",
-      instituicao: "Proteção Pet",
-      valor: 45.00,
-      data: "05/03/2025",
-      status: "Concluída",
-      comprovante: true
-    },
-    {
-      id: 5,
-      causa: "Reforma Biblioteca Comunitária",
-      instituicao: "Amigos da Leitura",
-      valor: 120.00,
-      data: "20/02/2025",
-      status: "Concluída",
-      comprovante: true
-    }
-  ]);
+  const [doacoes, setDoacoes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDonationHistory = async () => {
+      if (!isAuthenticated() || !user || user.role !== 'apoiador') {
+        setError("Acesso negado. Esta seção é exclusiva para apoiadores logados.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get('http://localhost:8000/apoiador/doacao/historico', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setDoacoes(response.data);
+      } catch (err) {
+        console.error("Erro ao buscar histórico de doações:", err);
+        setError("Falha ao carregar seu histórico de doações. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonationHistory();
+  }, [user, token, isAuthenticated]);
 
   const handleVerDetalhes = (doacao) => {
     setDoacaoSelecionada(doacao);
@@ -64,13 +47,33 @@ const ComprovantesPerfil = () => {
 
   const handleDownloadComprovante = (id) => {
     console.log(`Baixando comprovante da doação ${id}`);
-    // Aqui implementaria a lógica para download do comprovante
+    alert("Funcionalidade de download de comprovante ainda não implementada.");
   };
 
   const doacoesFiltradas = doacoes.filter(
-    doacao => doacao.causa.toLowerCase().includes(filtro.toLowerCase()) ||
-              doacao.instituicao.toLowerCase().includes(filtro.toLowerCase())
+    doacao => doacao.causa.toLowerCase().includes(filtro.toLowerCase())
+    // Removido 'instituicao' do filtro, pois não será exibida
+    // || doacao.instituicao.toLowerCase().includes(filtro.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <Card className="mb-4 shadow-sm p-4 text-center">
+        <Spinner animation="border" role="status" className="mb-3" />
+        <p>Carregando histórico de doações...</p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="mb-4 shadow-sm p-4">
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -94,7 +97,7 @@ const ComprovantesPerfil = () => {
             <thead className="table-light">
               <tr>
                 <th>Causa</th>
-                <th>Instituição</th>
+                {/* REMOVIDO: <th>Instituição</th> */} 
                 <th>Valor</th>
                 <th>Data</th>
                 <th>Status</th>
@@ -105,7 +108,7 @@ const ComprovantesPerfil = () => {
               {doacoesFiltradas.map((doacao) => (
                 <tr key={doacao.id}>
                   <td>{doacao.causa}</td>
-                  <td>{doacao.instituicao}</td>
+                  {/* REMOVIDO: <td>{doacao.instituicao}</td> */}
                   <td>R$ {doacao.valor.toFixed(2)}</td>
                   <td>{doacao.data}</td>
                   <td>
@@ -154,7 +157,7 @@ const ComprovantesPerfil = () => {
             <>
               <div className="mb-4 text-center">
                 <h5 className="label-azul mb-1">{doacaoSelecionada.causa}</h5>
-                <p className="text-muted">{doacaoSelecionada.instituicao}</p>
+                {/* REMOVIDO: <p className="text-muted">{doacaoSelecionada.instituicao}</p> */}
               </div>
 
               <div className="bg-light p-3 rounded mb-4">
@@ -175,21 +178,19 @@ const ComprovantesPerfil = () => {
                   </div>
                 </div>
                 <div className="row mb-2">
-                  <div className="col-5 fw-bold">Forma de pagamento:</div>
-                  <div className="col-7">Cartão de crédito •••• 4567</div>
+                    <div className="col-5 fw-bold">Forma de pagamento:</div>
+                    <div className="col-7">Cartão de crédito •••• 4567</div> {/* Simulado */}
                 </div>
                 <div className="row">
-                  <div className="col-5 fw-bold">ID da transação:</div>
-                  <div className="col-7">DOA{String(doacaoSelecionada.id).padStart(8, '0')}</div>
+                    <div className="col-5 fw-bold">ID da transação:</div>
+                    <div className="col-7">DOA{String(doacaoSelecionada.id).padStart(8, '0')}</div>
                 </div>
               </div>
 
               <div className="mb-2">
                 <h6 className="label-azul">Impacto da sua doação</h6>
                 <p className="mb-0 small">
-                  Sua contribuição ajudou diretamente a instituição {doacaoSelecionada.instituicao} a avançar em seus projetos. 
-                  Os recursos foram destinados para {doacaoSelecionada.causa.toLowerCase()}, beneficiando diretamente as pessoas 
-                  e comunidades atendidas.
+                  Sua contribuição ajudou diretamente a iniciativa "{doacaoSelecionada.causa}" que faz parte da Experiência Criativa. Os recursos foram destinados para {doacaoSelecionada.descricaoDetalhada ? doacaoSelecionada.descricaoDetalhada.toLowerCase() : 'os objetivos do projeto selecionado'}, beneficiando diretamente as pessoas e comunidades atendidas.
                 </p>
               </div>
             </>

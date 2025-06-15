@@ -1,0 +1,177 @@
+/* Sidebar-perfil-adm.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* --- General Sidebar Styling --- */
+.sidebar-perfil-adm {
+    width: 280px; /* Wider sidebar for admin */
+    background-color: #0A7D7E; /* Teal background */
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    color: white;
+    font-family: 'Fredoka', sans-serif;
+    position: sticky;
+    top: 0;
+    transition: all 0.3s ease;
+    z-index: 999; /* Ensure it's above content but below hamburger menu on mobile */
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0; /* Add some vertical padding */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow on the right */
+}
+
+/* Admin Profile Section within Sidebar */
+.profile-section-sidebar-adm {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Separator line */
+}
+
+.profile-section-sidebar-adm h5 {
+    font-weight: 600;
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.text-muted-custom-adm {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7); /* Lighter white for role text */
+}
+
+/* Sidebar Links */
+.sidebar-links-adm {
+    display: flex;
+    flex-direction: column;
+    padding: 0 15px; /* Horizontal padding for list items */
+}
+
+.sidebar-links-adm .list-group-item {
+    background-color: transparent;
+    border: none;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px; /* Rounded items */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-links-adm .list-group-item .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-links-adm .list-group-item:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.15); /* Light hover effect */
+    color: white;
+    cursor: pointer;
+}
+
+.sidebar-links-adm .list-group-item.active {
+    background-color: #076666; /* Darker teal for active item */
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Shadow for active item */
+}
+
+.sidebar-links-adm .list-group-item.active .nav-link {
+    color: white; /* Ensure text remains white when active */
+}
+
+.sidebar-item-adm .nav-link svg {
+    color: white; /* Icon color */
+}
+
+/* Specific style for delete account button */
+.sidebar-item-adm.delete-item-adm .nav-link {
+    color: #ffdddd; /* Lighter red for delete text */
+}
+
+.sidebar-item-adm.delete-item-adm:hover {
+    background-color: #b70000; /* Red background on hover */
+}
+
+
+/* --- Hamburger Menu for Mobile --- */
+.hamburger-menu-adm {
+    position: fixed;
+    top: 15px; /* Adjust as needed */
+    left: 15px; /* Adjust as needed */
+    z-index: 1001; /* Above sidebar and content */
+    background-color: #0A7D7E;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hamburger-button-adm {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Close Button inside Mobile Sidebar */
+.close-button-adm {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-right: 15px;
+}
+
+/* Overlay for Mobile */
+.sidebar-overlay-adm {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: 998; /* Below sidebar, above content */
+}
+
+/* --- Responsive Styles for Mobile --- */
+@media (max-width: 767px) {
+    .sidebar-perfil-adm {
+        position: fixed;
+        left: -280px; /* Hide sidebar by default */
+        width: 280px;
+        height: 100vh;
+        overflow-y: auto; /* Enable scrolling for long content */
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3); /* Shadow when open */
+    }
+
+    .sidebar-perfil-adm.mobile-open {
+        left: 0; /* Slide in when opened */
+    }
+
+    /* Hide the hamburger button when the sidebar is open */
+    .sidebar-perfil-adm.mobile-open ~ .hamburger-menu-adm {
+        display: none;
+    }
+}
+
+/* Tablet and Desktop adjustments */
+@media (min-width: 768px) {
+    .sidebar-perfil-adm {
+        position: sticky; /* Keep sidebar static on desktop */
+        top: 0;
+        height: 100vh; /* Ensure full height on desktop */
+        left: 0 !important; /* Override mobile 'left' property */
+        transform: translateX(0) !important; /* Ensure it's always visible */
+    }
+
+    .hamburger-menu-adm {
+        display: none !important; /* Hide hamburger on desktop */
+    }
+}

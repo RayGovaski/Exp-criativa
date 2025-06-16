@@ -494,3 +494,69 @@
     transform: scale(1);
   }
 }
+
+/* No seu Navbar.css */
+
+/* Estilos para o botão de logout no dropdown principal (já existem, apenas para referência) */
+.dropdown-item-custom.logout-button {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px; /* Ajuste o padding para combinar com os links */
+    color: #ffffff; /* Cor padrão do texto de dropdown */
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dropdown-item-custom.logout-button:hover {
+    background-color: #81b8a5;
+    color: #ffffff;
+}
+
+.dropdown-item-custom.logout-button.dark {
+    color: #e0e0e0;
+}
+
+.dropdown-item-custom.logout-button.dark:hover {
+    background-color: #404040;
+    color: #ffffff;
+}
+
+/* --- NOVOS/AJUSTADOS ESTILOS PARA O BOTÃO DE LOGOUT NO SIDEBAR --- */
+.sidebar-item .logout-button { /* Alvo o botão Sair dentro de um item do sidebar */
+    background: none; /* Remove qualquer fundo padrão de botão */
+    border: none; /* Remove qualquer borda padrão de botão */
+    width: 100%; /* Garante que o botão ocupe toda a largura do item */
+    text-align: left; /* Alinha o texto à esquerda */
+    padding: 12px 20px; /* Usa o mesmo padding de .sidebar-link */
+    color: #fff; /* Cor do texto padrão do sidebar */
+    text-decoration: none; /* Remove sublinhado se houver */
+    font-weight: 500; /* Mesma fonte weight de .sidebar-link */
+    cursor: pointer;
+    transition: background-color 0.2s; /* Mesma transição */
+    font-family: 'Fredoka', sans-serif; /* Garante a mesma fonte */
+}
+
+.sidebar-item .logout-button:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Mesma cor de hover de .sidebar-link */
+    color: #fff;
+}
+
+/* Se você tiver um tema escuro para o sidebar (atualmente não vi no seu CSS, mas é uma boa prática) */
+/*
+.sidebar.dark .sidebar-item .logout-button {
+    color: #e0e0e0;
+}
+.sidebar.dark .sidebar-item .logout-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+*/
+
+/* Opcional: Remova o padding do item da lista se o botão já tiver todo o padding */
+.sidebar-item {
+    margin-bottom: 5px;
+    /* padding: 0; */ /* Descomente se o botão já preenche todo o espaço desejado */
+}

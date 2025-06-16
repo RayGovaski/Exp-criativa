@@ -8,6 +8,7 @@ import apoiadorRoutes from './routes/apoiadorRoutes.js';
 import alunoRoutes from './routes/alunoRoutes.js';
 import doacaoRoutes from './routes/doacaoRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import 'dotenv/config';
 // Load environment variables
 dotenv.config();
 

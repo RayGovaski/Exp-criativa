@@ -5,7 +5,7 @@
 .sidebar-perfil-adm {
     width: 280px; /* Wider sidebar for admin */
     background-color: #0A7D7E; /* Teal background */
-    height: 100; /* Ensure it takes full viewport height */
+    height: 100vh; /* Ensure it takes full viewport height */
     color: white;
     font-family: 'Fredoka', sans-serif;
     position: sticky;
@@ -146,7 +146,7 @@
         position: fixed;
         left: -280px; /* Hide sidebar by default */
         width: 280px;
-        height: 100vh;
+        height: 100%;
         overflow-y: auto; /* Enable scrolling for long content */
         box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3); /* Shadow when open */
     }
@@ -166,7 +166,7 @@
     .sidebar-perfil-adm {
         position: sticky; /* Keep sidebar static on desktop */
         top: 0;
-        height: 100vh; /* Ensure full height on desktop */
+        height: 200vh; /* Ensure full height on desktop */
         left: 0 !important; /* Override mobile 'left' property */
         transform: translateX(0) !important; /* Ensure it's always visible */
     }

@@ -107,7 +107,7 @@ const DoacoesPagamento = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await axios.post('http://localhost:8000/doacoes/doar-valor', donationPayload, { headers });
+            const response = await axios.post('http://localhost:8000/doacoes/processar', donationPayload, { headers });
 
             alert(response.data.message);
             navigate('/doar'); 

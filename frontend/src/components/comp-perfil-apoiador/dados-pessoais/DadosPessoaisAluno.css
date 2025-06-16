@@ -1,0 +1,190 @@
+/* DadosPessoaisAluno.css */
+
+/* Reutilizando e ajustando estilos gerais do PerfilAluno.css para consistência */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+/* Estilos para o container da imagem de perfil do aluno */
+.profile-image-container-aluno {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para a imagem de perfil do aluno */
+.profile-image-aluno {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Estilo para o input de arquivo personalizado (label do botão Escolher Foto) */
+.custom-file-input label {
+  cursor: pointer;
+  color: #0A7D7E; /* Cor do tema */
+  border-color: #0A7D7E; /* Cor do tema */
+  transition: all 0.2s;
+  background-color: transparent; /* Garante que não tenha fundo */
+  padding: 8px 16px; /* Padding padrão */
+  font-weight: 500; /* Peso da fonte */
+  border-radius: 5px; /* Cantos arredondados */
+}
+
+.custom-file-input label:hover {
+  background-color: #f0f9f9; /* Fundo muito leve no hover */
+  color: #076666; /* Cor do texto mais escura no hover */
+  border-color: #076666; /* Borda mais escura no hover */
+}
+
+.custom-file-input label:active {
+  background-color: #e6f7f7 !important; /* Fundo ainda mais escuro no active */
+  color: #064B4C !important;
+  border-color: #064B4C !important;
+}
+
+
+/* Estilos para os botões reutilizáveis (custom-button-azul5) */
+/* Se esta classe for usada apenas aqui, mantenha-a. Se for global, mova para PerfilAluno.css */
+.custom-button-azul5 {
+  background-color: #0A7D7E;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-family: 'Fredoka', sans-serif!important;
+  color: white;
+  border-radius: 5px;
+}
+
+.custom-button-azul5:hover {
+  background-color: #076666;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-azul5:disabled {
+  background-color: #a0d4d4; /* Cor mais clara para desabilitado */
+  transform: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilos para botões outline (custom-button-outline) */
+/* Se esta classe for global, mova para PerfilAluno.css */
+.custom-button-outline {
+  color: #0A7D7E;
+  border-color: #0A7D7E;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.custom-button-outline:hover {
+  background-color: #f0f9f9;
+  color: #076666;
+  border-color: #076666;
+  transform: translateY(-2px);
+}
+
+.custom-button-outline:active {
+  background-color: #e6f7f7 !important;
+  color: #064B4C !important;
+  border-color: #064B4C !important;
+}
+
+
+/* Estilos para os rótulos de campos (label-azul) */
+/* Esta classe deve preferencialmente vir de um CSS mais global (ex: PerfilAluno.css) */
+.label-azul {
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+/* Estilos para o cabeçalho do modal (registro-header-azul) */
+/* Esta classe deve preferencialmente vir de um CSS mais global (ex: PerfilAluno.css) */
+.registro-header-azul {
+  background-color: #076666; /* Cor do tema um pouco mais escura */
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Estilos para o modal de atualização */
+.modal-atualizar .modal-content {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-atualizar .form-control:focus {
+  border-color: #0A7D7E;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+/* Estilo para os radio buttons */
+.radio-custom-azul .form-check-input:checked {
+  background-color: #0A7D7E;
+  border-color: #0A7D7E;
+}
+
+.radio-custom-azul .form-check-input:focus {
+  border-color: #0A7D7E;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+
+/* Estilos para a nova seção de Dados do Responsável */
+.dados-responsavel-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra suave */
+    background-color: #f8f8f8 !important; /* Um fundo levemente diferente para destacar */
+    padding: 20px; /* Padding interno */
+}
+
+.dados-responsavel-section .form-control {
+    background-color: #ffffff !important; /* Fundo branco para os campos de texto dentro desta seção */
+    border-color: #e5e7eb; /* Borda mais clara */
+    color: #334155; /* Cor do texto dentro dos campos */
+}
+
+/* Estilos gerais para os campos de texto exibidos */
+.form-control.border.bg-light {
+    background-color: #f0f0f0 !important; /* Um cinza bem clarinho para os campos de exibição */
+    border-color: #e0e0e0 !important; /* Borda mais clara */
+    color: #334155; /* Cor do texto */
+    font-weight: 500; /* Levemente mais forte */
+}
+
+
+/* Responsividade */
+@media (max-width: 767px) {
+  /* Ajustes para a imagem de perfil em mobile */
+  .profile-image-container-aluno {
+    margin-bottom: 20px;
+  }
+
+  .custom-file-input {
+    margin-bottom: 15px;
+  }
+
+  /* Ajustes para os botões em mobile */
+  .custom-button-azul5 {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  /* Garante que os botões "Sair" e "Atualizar Dados" não se espremam */
+  .text-end.mt-4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+}

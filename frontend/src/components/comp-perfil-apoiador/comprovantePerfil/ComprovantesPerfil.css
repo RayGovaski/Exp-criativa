@@ -1,0 +1,92 @@
+/* Cores principais */
+:root {
+  --cor-principal: #0A7D7E;
+  --cor-principal-hover: #086a6b;
+  --cor-principal-active: #065758;
+  --cor-texto-claro: #ffffff;
+  --cor-borda: #d9d9d9;
+}
+
+/* Estilo para os badges de status */
+.custom-badge {
+  background-color: var(--cor-principal) !important;
+  color: var(--cor-texto-claro) !important;
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+  border-radius: 0.25rem;
+}
+
+/* Estilo para o botão "Detalhes" */
+.btn-detalhes {
+  color: var(--cor-principal) !important;
+  background-color: transparent !important;
+  border-color: var(--cor-principal) !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-detalhes:hover {
+  color: var(--cor-texto-claro) !important;
+  background-color: var(--cor-principal) !important;
+  border-color: var(--cor-principal) !important;
+}
+
+.btn-detalhes:active, 
+.btn-detalhes:focus {
+  color: var(--cor-texto-claro) !important;
+  background-color: var(--cor-principal-active) !important;
+  border-color: var(--cor-principal-active) !important;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25) !important;
+}
+
+/* Estilo para o botão "Fechar" no modal */
+.btn-fechar {
+  color: var(--cor-principal) !important;
+  background-color: transparent !important;
+  border-color: var(--cor-principal) !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-fechar:hover {
+  color: var(--cor-texto-claro) !important;
+  background-color: var(--cor-principal) !important;
+  border-color: var(--cor-principal) !important;
+}
+
+.btn-fechar:active,
+.btn-fechar:focus {
+  color: var(--cor-texto-claro) !important;
+  background-color: var(--cor-principal-active) !important;
+  border-color: var(--cor-principal-active) !important;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25) !important;
+}
+
+/* Ícone de busca */
+.search-icon {
+  right: 12px;
+  color: var(--cor-principal);
+}
+
+/* Estilos adicionais para o botão de comprovante (caso precise modificar) */
+.custom-button-azul {
+  background-color: var(--cor-principal) !important;
+  border-color: var(--cor-principal) !important;
+  color: var(--cor-texto-claro) !important;
+}
+
+.custom-button-azul:hover {
+  background-color: var(--cor-principal-hover) !important;
+  border-color: var(--cor-principal-hover) !important;
+}
+
+.custom-button-azul:active,
+.custom-button-azul:focus {
+  background-color: var(--cor-principal-active) !important;
+  border-color: var(--cor-principal-active) !important;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25) !important;
+}
+
+th{
+ font-weight: 600;
+}

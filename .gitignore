@@ -1,0 +1,33 @@
+# Ignora a pasta node_modules em qualquer nível (na raiz e subdiretórios)
+node_modules/
+
+# Ignora logs de npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignora a pasta de cobertura de testes gerada pelo Jest
+coverage/
+
+# Ignora arquivos de cache do Jest/Babel
+.jest/
+.babel_cache/
+.cache/
+
+# Ignora arquivos específicos de sistemas operacionais
+.DS_Store # macOS
+Thumbs.db # Windows
+
+# Ignora arquivos de ambiente (se você tiver .env na raiz ou em subprojetos)
+.env
+.env.local
+.env.*.local
+
+# Ignora arquivos de build de projetos frontend (Vite/React)
+dist/      # Pasta de build padrão do Vite
+build/     # Outra pasta de build comum (CRA)
+
+# Ignora o package-lock.json e yarn.lock apenas se você não quiser versioná-los
+# (mas é ALTAMENTE recomendado versionar para garantir builds reprodutíveis)
+# package-lock.json
+# yarn.lock

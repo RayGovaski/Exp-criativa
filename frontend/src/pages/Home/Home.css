@@ -1,0 +1,14 @@
+.home-container {
+  position: relative;
+}
+
+.cards-container {
+  position: relative;
+  margin-top: -40px;  
+  z-index: 10;  
+}
+
+.carrossel-container {
+  position: relative;
+  z-index: 1; 
+}

@@ -1,0 +1,129 @@
+
+.fundo-carrossel {
+  background-image: url('src/Assets/FundoCarrosselCriancas.png'); /* caminho da imagem */
+  background-size: cover  ;     
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem; /* para respiro nas laterais em telas menores */
+  font-family: 'Fredoka', sans-serif;
+}
+
+@media (max-width: 1150px) {
+  .fundo-carrossel {
+    background-image: url('src/Assets/FundoCarrosselCriancasMedio.png');
+  }
+}
+
+@media (max-width: 880px) {
+  .fundo-carrossel {
+    background-image: url('src/Assets/FundoCarrosselCriancasMedioMenor.png');
+  }
+}
+
+@media (max-width: 660px) {
+  .fundo-carrossel {
+    background-image: url('src/Assets/FundoCarrosselCriancasMenor.png');
+  }
+  
+  .container-carrossel {
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.container-carrossel {
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.titulo-carrossel {
+  color: #0f766e;
+  font-weight: 600;
+  font-size: 2rem;
+  margin-bottom: 0rem;
+}
+
+.subtitulo-carrossel {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0rem;
+
+}
+
+.subtitulo-carrossel1 {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0rem;
+  margin-top: 0.40rem;
+
+}
+
+.divisoria {
+  width: 260px;
+  height: 4px;
+  background-color: #6ab6a0;
+  margin: 0 auto;
+}
+
+@media (max-width: 400px) {
+  .divisoria {
+    width: 45vw;
+    height: 4px;
+    background-color: #6ab6a0;
+    margin: 0 auto;
+  }
+}
+
+.foto-crianca {
+  width: 12rem;
+  height: 12rem;
+  object-fit: cover;
+  margin-bottom: 0.25rem;
+}
+
+.nome-crianca {
+  font-weight: 700;
+  color: #0f766e;
+  font-size: 1.5rem;
+  margin-bottom: 0rem;
+}
+
+.idade-crianca {
+  font-weight: 600;
+  color: #6ab6a0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.descricao-crianca {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.paginacao-carrossel button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  margin: 0 4px;
+  background-color: #ccc;
+  transition: background-color 0.3s ease;
+}
+
+.paginacao-carrossel button.active {
+  background-color: #009688;
+}

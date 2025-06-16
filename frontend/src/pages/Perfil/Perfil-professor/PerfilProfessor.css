@@ -1,0 +1,134 @@
+/* PerfilProfessor.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.perfil-professor-bg {
+  min-height: 100vh;
+  background-image: url("src/Assets/FundoMenuRegistro.png"); /* Pode usar uma imagem específica para professor */
+  background-size: cover;
+  background-position: center;
+  font-family: 'Fredoka', sans-serif;
+  display: flex;
+}
+
+.perfil-professor-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.perfil-professor-conteudo {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.perfil-professor-conteudo.blur-background {
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+/* Classes globais reutilizáveis */
+.label-azul {
+  color: #0A7D7E;
+  font-weight: 500;
+}
+
+.custom-button-azul6 {
+  background-color: #0A7D7E;
+  border: none;
+  transition: all 0.2s;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: white;
+  border-radius: 5px;
+}
+
+.custom-button-azul6:hover {
+  background-color: #076666;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button-azul6:disabled {
+  background-color: #a0d4d4;
+  transform: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.custom-button-outline {
+  color: #0A7D7E;
+  border-color: #0A7D7E;
+  background-color: transparent;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.custom-button-outline:hover {
+  background-color: #f0f9f9;
+  color: #076666;
+  border-color: #076666;
+}
+
+.registro-header-azul {
+  background-color: #076666;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  padding-top: 20px;
+  border-radius: 5px 5px 0 0;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  padding-left: 0px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.page-title-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155;
+}
+
+b, strong {
+  font-weight: 600;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1100px) {
+  .perfil-professor-bg {
+    background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png");
+  }
+}
+
+@media (max-width: 767px) {
+  .perfil-professor-container {
+    flex-direction: column;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .perfil-professor-conteudo {
+    padding: 20px 15px;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .perfil-professor-bg {
+    background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+  }
+
+  .perfil-professor-conteudo {
+    padding: 15px 10px;
+  }
+}

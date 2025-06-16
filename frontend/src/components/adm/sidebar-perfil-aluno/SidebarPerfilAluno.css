@@ -1,0 +1,124 @@
+/* SidebarPerfilAluno.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.sidebar-perfil-aluno {
+  width: 220px; /* Same width as supporter sidebar */
+  background-color: #0A7D7E; /* Main theme color */
+  height: 100; /* Use 100vh for full viewport height */
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  position: sticky; /* Sticky for desktop */
+  top: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex; /* Ensure flex for vertical alignment */
+  flex-direction: column; /* Stack links vertically */
+}
+
+.sidebar-links-aluno {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+.sidebar-perfil-aluno a {
+  color: white;
+  text-decoration: none;
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-perfil-aluno a:hover {
+  background-color: #076666; /* Darker shade on hover */
+}
+
+.sidebar-perfil-aluno a.active {
+  background-color: #076666; /* Darker shade for active link */
+  font-weight: 500;
+}
+
+/* Hamburger Menu for Mobile */
+.hamburger-menu-aluno {
+  position: fixed; /* Fixed position */
+  top: 80px; /* Same top position as supporter */
+  left: 5%; /* Same left percentage */
+  padding: 10px;
+  z-index: 4; /* Higher z-index than sidebar and other elements */
+}
+
+.hamburger-button-aluno {
+  background-color: #0A7D7E; /* Main theme color */
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer; /* Add pointer cursor */
+}
+
+/* Close Button inside Mobile Sidebar (when open) */
+.close-button-aluno {
+  background: transparent;
+  color: white; /* White color for close button */
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  /* To align it to the right within the mobile sidebar */
+  align-self: flex-end; 
+  margin-right: 15px; /* Add some margin from the right edge */
+}
+
+/* Overlay for Mobile */
+.sidebar-overlay-aluno {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 899; /* Keeps it below the hamburger button */
+}
+
+/* Responsive Styles for Mobile */
+@media (max-width: 767px) {
+  .sidebar-perfil-aluno {
+    position: fixed;
+    left: -250px; /* Hidden by default */
+    width: 250px; /* Full width for mobile sidebar */
+    height: 100vh;
+    overflow-y: auto;
+    /* Remove box-shadow property here to match the desktop style from the supporter sidebar */
+  }
+  
+  .sidebar-perfil-aluno.mobile-open {
+    left: 0; /* Slide in when open */
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3); /* Add shadow only when open on mobile */
+  }
+  
+  /* The .perfil-container and .blur-background classes are likely in your PerfilAluno.css or a global CSS */
+  /* If not, you might need to add them there if they are shared across components */
+  /* .perfil-container {
+    flex-direction: column;
+  } */
+  
+  /* .blur-background {
+    filter: blur(3px);
+    pointer-events: none;
+  } */
+}
+
+/* Hide hamburger menu when sidebar is open on mobile */
+.sidebar-perfil-aluno.mobile-open ~ .hamburger-menu-aluno {
+  display: none;
+}

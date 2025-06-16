@@ -1,0 +1,217 @@
+/* RegistroProfessor.css */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.registro-professor-fundo {
+  background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka', sans-serif;
+  padding: 20px 0;
+}
+
+.registro-professor-container {
+  max-width: 900px;
+  width: 100%;
+}
+
+.registro-professor-card {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.registro-professor-header {
+  background-color: #0A7D7E;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 3px solid #76B5A0;
+}
+
+.registro-professor-title {
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+/* Estilos para os rótulos dos formulários */
+.form-label {
+  color: #334155;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+/* Estilos para campos de input e select */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 10px 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0A7D7E;
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25);
+}
+
+/* Títulos de seção dentro do formulário */
+.form-section-title {
+  color: #0A7D7E;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #76B5A0;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+/* Estilos para a pré-visualização da foto */
+.foto-preview-container {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #0A7D7E;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.foto-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Estilos para o botão de upload de foto e currículo */
+.upload-button, .upload-curriculo-button { /* Ambas as classes usarão o mesmo estilo base */
+  background-color: #0A7D7E;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  font-weight: 600;
+  display: inline-flex; /* Para alinhamento de ícone, se adicionar um */
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaço entre texto e ícone */
+}
+
+.upload-button:hover, .upload-curriculo-button:hover {
+  background-color: #076666;
+  transform: translateY(-2px);
+}
+
+/* NOVO: Estilos para o estado :active e :focus de upload-button e upload-curriculo-button */
+.upload-button:active, .upload-curriculo-button:active,
+.upload-button:focus, .upload-curriculo-button:focus { /* Adicionado :focus também */
+  background-color: #064B4C !important; /* Verde BEM mais escuro ao clicar/focar */
+  transform: translateY(0) !important; /* Remove o levantamento */
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25) !important; /* Sombra de foco verde */
+  border-color: #064B4C !important; /* Garante que a borda também mude se existir */
+  outline: none !important; /* Remove o contorno padrão do navegador */
+}
+
+/* Estilos para o botão de submissão */
+.custom-submit-button {
+  background-color: #0A7D7E;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.custom-submit-button:hover {
+  background-color: #076666;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* NOVO: Estilos para o estado :active e :focus de custom-submit-button */
+.custom-submit-button:active,
+.custom-submit-button:focus { /* Adicionado :focus também */
+  background-color: #064B4C !important; /* Verde BEM mais escuro ao clicar/focar */
+  transform: translateY(0) !important; /* Remove o levantamento */
+  box-shadow: 0 0 0 0.25rem rgba(10, 125, 126, 0.25) !important; /* Sombra de foco verde */
+  border-color: #064B4C !important; /* Garante que a borda também mude se existir */
+  outline: none !important; /* Remove o contorno padrão do navegador */
+}
+
+
+.custom-submit-button:disabled {
+  background-color: #a0d4d4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Alertas */
+.alert {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 992px) {
+  .registro-professor-container {
+    max-width: 700px;
+  }
+  .registro-professor-card {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .registro-professor-fundo {
+    background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+    padding: 15px 0;
+  }
+  .registro-professor-container {
+    max-width: 95%;
+  }
+  .registro-professor-card {
+    padding: 20px;
+  }
+  .registro-professor-title {
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
+  }
+  .form-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+  .upload-button, .upload-curriculo-button, .custom-submit-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .registro-professor-fundo {
+    background-image: url("src/Assets/FundoMenuRegistroCelular.png");
+    padding: 10px 0;
+  }
+  .registro-professor-card {
+    padding: 15px;
+  }
+  .registro-professor-title {
+    font-size: clamp(1.2rem, 7vw, 2rem);
+  }
+  .form-section-title {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+  .foto-preview-container {
+    width: 120px;
+    height: 120px;
+  }
+}

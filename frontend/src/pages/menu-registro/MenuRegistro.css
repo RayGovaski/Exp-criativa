@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+.fundo-menu {
+  background-image: url("src/Assets/FundoMenuRegistro.png"); /* Imagem de fundo padrão */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  background: none;
+  font-family: 'Fredoka', sans-serif;
+  padding: 20px 0;
+}
+
+.content-wrapper {
+  background-color: #ffffff; /* Fundo do wrapper padrão */
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.menu-title {
+  font-size: clamp(24px, 4vw, 48px);
+  font-weight: 600;
+  color: #0A7D7E; /* Cor do título padrão */
+  margin-bottom: 30px;
+  border-bottom: 3px solid #76B5A0; /* Cor da linha inferior padrão */
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.menu-text {
+  font-weight: 600;
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: white; /* Cor do texto do botão padrão */
+}
+
+.menu-options {
+  display: flex;
+  gap: 30px;
+  margin: 30px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.menu-button {
+  min-width: 200px;
+  width: 100%;
+  max-width: 280px;
+  height: 140px;
+  border: none;
+  border-radius: 15px;
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-weight: bold;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.apoiador {
+  background-color: #0A7D7E; /* Cor de fundo do botão Apoiador padrão */
+}
+
+.aluno {
+  background-color: #FF6F61; /* Cor de fundo do botão Aluno padrão */
+}
+
+/* Efeito hover dos botões */
+.apoiador:hover {
+  background-color: #0A7D7E; /* Mantém a cor de fundo */
+  background-image: url("src/Assets/ImagemRegistroApoiador.png"); /* Imagem de fundo no hover Apoiador */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(10, 125, 126, 0.3);
+}
+
+.aluno:hover {
+  background-color: #FF6F61; /* Mantém a cor de fundo */
+  background-image: url("src/Assets/ImagemRegistroAluno.png"); /* Imagem de fundo no hover Aluno */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(255, 111, 97, 0.3);
+}
+
+.menu-button:hover .menu-icon,
+.menu-button:hover span {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.menu-icon {
+  width: clamp(40px, 8vw, 60px);
+  height: clamp(40px, 8vw, 60px);
+  margin-bottom: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.menu-button span {
+  transition: opacity 0.3s ease;
+}
+
+.menu-login,
+.menu-professor-link {
+  margin-top: 25px; /* Ajustado para consistência */
+  font-size: clamp(14px, 2.5vw, 18px);
+  color: #0A7D7E; /* Cor do texto padrão */
+}
+
+.menu-login a,
+.menu-professor-link a {
+  font-weight: bold;
+  color: #0A7D7E; /* Cor do link padrão */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.menu-login a:hover,
+.menu-professor-link a:hover {
+  text-decoration: underline;
+  color: #076566; /* Cor do hover do link padrão */
+}
+
+/* Resposividade (mantida como está) */
+@media (max-width: 1024px) {
+  .content-wrapper { padding: 30px 25px; margin: 0 20px; }
+  .menu-options { gap: 20px; }
+  .menu-button { min-width: 180px; max-width: 250px; height: 120px; }
+}
+
+@media (max-width: 768px) {
+  .fundo-menu { background-image: url("src/Assets/FundoMenuRegistroCelularMedio.png"); padding: 15px; }
+  .content-wrapper { padding: 25px 20px; margin: 0 10px; border-radius: 15px; }
+  .menu-options { flex-direction: column; gap: 20px; align-items: center; }
+  .menu-button { width: 100%; max-width: 300px; min-width: 250px; height: 100px; }
+}
+
+@media (max-width: 600px) {
+  .fundo-menu { background-image: url("src/Assets/FundoMenuRegistroCelular.png"); padding: 10px; }
+  .menu-container { padding: 10px 0; min-height: calc(100vh - 20px); }
+  .content-wrapper { padding: 20px 15px; margin: 0 5px; border-radius: 12px; }
+  .menu-button { min-width: 200px; max-width: 280px; height: 90px; }
+  .menu-options { margin: 20px 0; gap: 15px; }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper { padding: 15px 10px; }
+  .menu-button { min-width: 180px; max-width: 250px; height: 80px; }
+  .menu-icon { margin-bottom: 5px; }
+}
+
+@media (max-width: 360px) {
+  .menu-button { min-width: 160px; max-width: 220px; height: 75px; }
+}

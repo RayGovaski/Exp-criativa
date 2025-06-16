@@ -1,0 +1,324 @@
+/* Other Carrossel.css styles */
+
+.carousel-image-1 {
+  background-image: url("src/Assets/CarrosselPrincipal.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  /* You might need to set a min-height or height for the img to be visible */
+  min-height: 400px; /* Adjust as needed */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.carousel-image-2 {
+  background-image: url("src/Assets/CarrosselPrincipal2.png") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  min-height: 400px; /* Adjust as needed */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.carousel img {
+  height: 500px;
+  object-fit: cover;
+  width: 100%;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: block;
+}
+
+.carousel-caption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 85%;
+  max-width: 600px;
+  font-family: 'Fredoka', sans-serif;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.caption-content {
+  width: 100%;
+  padding: 15px;
+}
+
+.caption-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.caption-text {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.custom-button-azul3,
+.custom-button-rosa3 {
+  width: 180px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.custom-button-azul3 {
+  background-color: #76B5A0;
+  box-shadow: -3px 3px 0px #0A7D7E;
+}
+
+.custom-button-rosa3 {
+  background-color: #FF6B6B;
+  box-shadow: -3px 3px 0px #D9534F;
+}
+
+.custom-button-azul3:hover,
+.custom-button-rosa3:hover {
+  transform: scale(1.05);
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 12px;   
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ccc;
+  border: none;
+  margin: 0 5px;
+  margin-bottom: 15px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.carousel-indicators .active:nth-child(1) {
+  background-color: #0A7D7E;
+}
+
+.carousel-indicators .active:nth-child(2) {
+  background-color: #D9534F;
+}
+
+@media (min-width: 1650px) {
+  .carousel img {
+    height: 700px;
+  }
+
+  .carousel-caption {
+    width: 70%;
+    max-width: 800px;
+    padding: 30px;
+  }
+
+  .caption-title {
+    font-size: 42px;
+  }
+
+  .caption-text {
+    font-size: 22px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 200px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .carousel-caption {
+    width: 80%;
+    max-width: 650px;
+  }
+
+  .caption-title {
+    font-size: 30px;
+  }
+
+  .caption-text {
+    font-size: 17px;
+  }
+  
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 180px;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel img {
+    height: 450px;
+  }
+
+  .carousel-caption {
+    width: 85%;
+    max-width: 550px;
+  }
+
+  .caption-title {
+    font-size: 28px;
+  }
+
+  .caption-text {
+    font-size: 16px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 170px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel img {
+    height: 400px;
+  }
+
+  .carousel-caption {
+    width: 90%;
+    max-width: 500px;
+    padding: 15px;
+  }
+
+  .caption-title {
+    font-size: 24px;
+  }
+
+  .caption-text {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 160px;
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel img {
+    height: 350px;
+  }
+
+  .carousel-caption {
+    width: 95%;
+    max-width: 400px;
+    padding: 10px;
+  }
+
+  .caption-content {
+    padding: 10px;
+  }
+
+  .caption-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .caption-text {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .buttons-container {
+    gap: 10px;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 150px;
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel img {
+    height: 320px;
+  }
+
+  .carousel-caption {
+    width: 95%;
+    padding: 8px;
+  }
+
+  .caption-content {
+    padding: 6px;
+  }
+
+  .caption-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .caption-text {
+    font-size: 12px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 160px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .carousel img {
+    height: 280px;
+  }
+  
+  .caption-title {
+    font-size: 16px;
+  }
+  
+  .caption-text {
+    font-size: 11px;
+  }
+  
+  .custom-button-azul3,
+  .custom-button-rosa3 {
+    width: 140px;
+    font-size: 12px;
+  }
+}
+
+a{
+  text-decoration: none;
+}

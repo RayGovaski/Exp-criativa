@@ -4,8 +4,6 @@ import db from '../config/database.js';
 import fs from 'fs';
 
 export const get4Doacoes = (req, res) => {
-    // ✅ CONSULTA CORRIGIDA ✅
-    // Trocamos 'imagem_path' por '(imagem IS NOT NULL) AS tem_imagem'
     const q = `
         SELECT 
             id, nome AS titulo, descricao, valor_meta AS valorMeta, arrecadado,
@@ -81,15 +79,22 @@ export const getAllDoacoesFull = (req, res) => {
     });
 };
 
-// --- Função getDoacaoById com o nome da coluna corrigido ---
 export const getDoacaoById = (req, res) => {
     const { id } = req.params;
-     // --- CORREÇÃO: Trocado 'imagem_path' por 'imagem' ---
     const q = `
-        SELECT 
-            id, nome AS titulo, descricao, imagem, valor_meta AS valorMeta, arrecadado,
+        SELECT
+            id,
+            nome AS titulo,
+            descricao,
+            imagem,
+            valor_meta AS valorMeta,
+            arrecadado,
             ROUND((arrecadado / valor_meta) * 100) AS porcentagem,
-            status, data_inicio AS dataInicio, data_fim AS dataFim, prioridade 
+            status,
+            data_inicio AS dataInicio,
+            data_fim AS dataFim,
+            categoria, -- <--- ADDED: Ensure 'categoria' is selected
+            prioridade
         FROM Doacao
         WHERE id = ?;
     `;
@@ -102,9 +107,10 @@ export const getDoacaoById = (req, res) => {
         if (data.length === 0) {
             return res.status(404).json({ error: "Doação não encontrada." });
         }
-        return res.status(200).json(data[0]);
+        res.status(200).json(data[0]);
     });
 };
+
 
 // --- Sua função createDoacao existente ---
 export const createDoacao = (req, res) => {
@@ -161,86 +167,68 @@ export const createDoacao = (req, res) => {
 };
 
 export const processDonation = (req, res) => {
-    const { doacaoId, valorDoado, customerName, customerEmail, customerPhone } = req.body;
-    const userIdFromToken = req.user ? req.user.id : null; // ID do usuário logado
-    const userRoleFromToken = req.user ? req.user.role : null; // ROLE do usuário logado
+    // Adicionado formaPagamento ao destructuring de req.body
+    const { doacaoId, valorDoado, customerName, customerEmail, customerPhone, formaPagamento } = req.body; 
+    const userIdFromToken = req.user ? req.user.id : null; 
+    const userRoleFromToken = req.user ? req.user.role : null; 
 
-    if (!doacaoId || !valorDoado || parseFloat(valorDoado) <= 0) {
-        console.error("ERRO [processDonation]: Dados inválidos fornecidos.");
-        return res.status(400).json({ error: "Dados inválidos: ID da doação e valor doado são obrigatórios e positivos." });
+    console.log(`DEBUG [processDonation-BE]: Requisição. UserID (token): ${userIdFromToken}, Role (token): ${userRoleFromToken}`);
+    console.log(`DEBUG [processDonation-BE]: DoacaoID: ${doacaoId}, ValorDoado: ${valorDoado}, FormaPagamento: ${formaPagamento}`);
+
+    if (!doacaoId || !valorDoado || parseFloat(valorDoado) <= 0 || !formaPagamento) { // formaPagamento agora é obrigatório
+        console.error("ERRO [processDonation]: Dados inválidos ou faltando (formaPagamento).");
+        return res.status(400).json({ error: "Dados inválidos: ID da doação, valor doado e forma de pagamento são obrigatórios e positivos." });
     }
 
     const valorNumerico = parseFloat(valorDoado);
 
-    // VALIDAÇÃO CRÍTICA: Se o usuário está logado, ele DEVE ser um Apoiador para registrar a doação em seu nome.
-    // Doações podem ser feitas por VISITANTES (sem token), ou por APOIADORES (com token).
-    // Outras roles (aluno, professor, adm) não devem poder registrar doações em seu nome na tabela Apoiador_Doacao.
-    let finalApoiadorIdToRegister = null; // ID a ser usado na Apoiador_Doacao
-
-    if (userIdFromToken) { // Se há um usuário logado
-        if (userRoleFromToken === 'apoiador') {
-            finalApoiadorIdToRegister = userIdFromToken; // OK, é um apoiador
-        } else {
-            // Se logado, mas NÃO É apoiador, a doação não será vinculada a um apoiador_id
-            console.warn(`AVISO [processDonation]: Usuário logado (ID: ${userIdFromToken}, Role: ${userRoleFromToken}) tentou doar. Doação não será registrada em Apoiador_Doacao.`);
-            // A doação principal (tabela Doacao) ainda pode ser atualizada, mas não em Apoiador_Doacao.
-        }
+    let finalApoiadorIdToRegister = null; 
+    if (userIdFromToken && userRoleFromToken === 'apoiador') {
+        finalApoiadorIdToRegister = userIdFromToken; 
+    } else if (userIdFromToken && userRoleFromToken !== 'apoiador') {
+        console.warn(`AVISO [processDonation]: Usuário logado (ID: ${userIdFromToken}, Role: ${userRoleFromToken}) tentou doar. Doação não será registrada em Apoiador_Doacao.`);
+    } else {
+        console.log('DEBUG [processDonation]: Usuário não logado (visitante). Doação não será vinculada a apoiador_id.');
     }
-    // Se não está logado (userIdFromToken é null), finalApoiadorIdToRegister permanece null (doação de visitante)
-
 
     // 1. Buscar dados atuais da doação
     const getDoacaoQuery = 'SELECT id, nome, valor_meta, arrecadado, status FROM Doacao WHERE id = ?';
     db.query(getDoacaoQuery, [doacaoId], (err, doacaoData) => {
-        if (err) {
-            console.error("ERRO [processDonation]: Erro ao buscar doação para processar:", err);
-            return res.status(500).json({ error: "Erro no banco de dados ao buscar doação.", details: err.message });
-        }
-
-        if (doacaoData.length === 0) {
-            console.error("ERRO [processDonation]: Doação com ID " + doacaoId + " não encontrada.");
-            return res.status(404).json({ error: "Doação não encontrada." });
-        }
+        // ... (erro e 404 handling) ...
 
         const currentDoacao = doacaoData[0];
         const novoArrecadado = currentDoacao.arrecadado + valorNumerico;
-        let novoStatus = currentDoacao.status;
+        let novoStatus = currentDoacao.status; // Começa com o status atual
 
+        // AQUI ESTÁ A LÓGICA CHAVE:
         if (novoArrecadado >= currentDoacao.valor_meta) {
-            novoStatus = 'Concluída';
+            novoStatus = 'Concluída'; // <--- ESTE É ONDE O STATUS É ATUALIZADO
         }
 
         // 2. Atualizar a doação na tabela 'Doacao' (arrecadado e status)
         const updateDoacaoQuery = `
             UPDATE Doacao
-            SET arrecadado = ?, status = ?
+            SET arrecadado = ?, status = ? -- <--- STATUS É ATUALIZADO NO DB AQUI
             WHERE id = ?;
         `;
         db.query(updateDoacaoQuery, [novoArrecadado, novoStatus, doacaoId], (err, result) => {
-            if (err) {
-                console.error("ERRO [processDonation]: Erro ao atualizar arrecadado da doação:", err);
-                return res.status(500).json({ error: "Erro no banco de dados ao atualizar doação.", details: err.message });
-            }
+            if (err) { /* ... */ }
 
             // 3. Registrar a doação em Apoiador_Doacao APENAS se houver um finalApoiadorIdToRegister válido
             if (finalApoiadorIdToRegister) { 
+                // --- AJUSTE AQUI: ADICIONAR forma_pagamento NO INSERT ---
                 const insertApoiadorDoacaoQuery = `
-                    INSERT INTO Apoiador_Doacao (apoiador_id, doacao_id, valor_doado, data_doacao)
-                    VALUES (?, ?, ?, NOW());
+                    INSERT INTO Apoiador_Doacao (apoiador_id, doacao_id, valor_doado, data_doacao, forma_pagamento)
+                    VALUES (?, ?, ?, NOW(), ?);
                 `;
-                db.query(insertApoiadorDoacaoQuery, [finalApoiadorIdToRegister, doacaoId, valorNumerico], (err, resultApoiadorDoacao) => {
-                    if (err) {
-                        console.error("ERRO [processDonation]: Erro ao registrar doação em Apoiador_Doacao:", err);
-                        console.warn("AVISO [processDonation]: Doação principal processada, mas falha ao registrar para o apoiador logado.");
-                        // Não retorna erro 500, pois a doação principal foi bem-sucedida.
-                    }
+                db.query(insertApoiadorDoacaoQuery, [finalApoiadorIdToRegister, doacaoId, valorNumerico, formaPagamento], (err, resultApoiadorDoacao) => {
+                    if (err) { /* ... */ }
                     res.status(200).json({ 
                         message: `Doação de R$ ${valorNumerico.toFixed(2).replace('.', ',')} para "${currentDoacao.nome}" processada!`,
                         doacaoAtualizada: { id: currentDoacao.id, arrecadado: novoArrecadado, status: novoStatus }
                     });
                 });
             } else {
-                // Doação de visitante ou usuário logado que não é apoiador
                 res.status(200).json({ 
                     message: `Doação de R$ ${valorNumerico.toFixed(2).replace('.', ',')} para "${currentDoacao.nome}" processada (visitante ou não-apoiador)!`,
                     doacaoAtualizada: { id: currentDoacao.id, arrecadado: novoArrecadado, status: novoStatus }

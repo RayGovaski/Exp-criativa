@@ -1,18 +1,33 @@
 import React from 'react';
-import { FaUser, FaUsers, FaBars, FaTimes } from 'react-icons/fa'; // FaUsers para turmas
+// ✅ CORREÇÃO 1: Adicionado FaSignOutAlt à lista de ícones importados
+import { FaUser, FaUsers, FaBars, FaTimes, FaSignOutAlt } from 'react-icons/fa';
 import './SidebarPerfilProfessor.css';
+// ✅ CORREÇÃO 2: Importado o useAuth para obter a função de logout
+import { useAuth } from '../../../context/AuthContext'; // Verifique se este caminho está correto
 
 const SidebarPerfilProfessor = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggleMobileMenu }) => {
+  
+  // ✅ CORREÇÃO 3: Chamado o hook useAuth para pegar a função logout
+  const { logout } = useAuth();
+
   const handleNavigation = (section) => {
     setSecaoAtiva(section);
-    if (window.innerWidth < 768) { // Fechar menu apenas em dispositivos móveis
+    if (window.innerWidth < 768) {
       toggleMobileMenu();
     }
   };
 
+  const handleLogoutClick = () => {
+    console.log('DEBUG [SidebarPerfilProfessor]: Botão "Sair" clicado.');
+    if (window.innerWidth < 768) {
+      toggleMobileMenu();
+    }
+    logout(); // Agora a função logout está definida
+  };
+
   return (
     <>
-      {/* Botão de Hambúrguer - apenas visível em dispositivos móveis */}
+      {/* Botão de Hambúrguer */}
       <div className="hamburger-menu-professor d-md-none">
         <button
           className="hamburger-button-professor"
@@ -23,7 +38,7 @@ const SidebarPerfilProfessor = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggl
         </button>
       </div>
 
-      {/* Sidebar - sempre visível em desktop, condicionalmente visível em mobile */}
+      {/* Sidebar */}
       <div className={`sidebar-perfil-professor ${isMobileOpen ? 'mobile-open' : ''}`}>
         <div className="d-flex d-md-none justify-content-end w-100 p-2">
           <button className="close-button-professor" onClick={toggleMobileMenu}>
@@ -51,10 +66,16 @@ const SidebarPerfilProfessor = ({ setSecaoAtiva, secaoAtiva, isMobileOpen, toggl
           >
             <FaUsers /> Turmas / Chamada
           </a>
+          <a
+             className="sidebar-logout-button-aluno" // Mantive a classe, você pode renomear se quiser
+             onClick={handleLogoutClick}
+          >
+            <FaSignOutAlt /> Sair
+          </a>
         </div>
       </div>
 
-      {/* Overlay para fechar o menu ao clicar fora (apenas visível em mobile quando o menu está aberto) */}
+      {/* Overlay */}
       {isMobileOpen && (
         <div className="sidebar-overlay-professor d-md-none" onClick={toggleMobileMenu}></div>
       )}

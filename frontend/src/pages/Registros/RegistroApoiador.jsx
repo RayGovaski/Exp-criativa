@@ -169,11 +169,11 @@ const RegistroApoiador = () => {
                     </div>
                     <div className="mb-2">
                         <label className="label-azul">CPF:</label>
-                        <input type="text" onChange={handleChange} name="cpf" value={apoiador.cpf} placeholder="000.000.000-00" />
+                        <input type="text" onChange={handleChange} name="cpf" value={apoiador.cpf} placeholder="000.000.000-00" required/>
                     </div>
                     <div className="mb-2">
                         <label className="label-azul">Data de nascimento:</label>
-                        <input type="date" onChange={handleChange} name="data_nascimento" value={apoiador.data_nascimento} />
+                        <input type="date" onChange={handleChange} name="data_nascimento" value={apoiador.data_nascimento } />
                     </div>
                     <div className="mb-2">
                         <label className="label-azul">Telefone:</label>

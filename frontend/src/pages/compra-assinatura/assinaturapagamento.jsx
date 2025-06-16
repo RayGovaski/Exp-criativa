@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Smartphone, FileText, Building } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Importe para redirecionamento
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
-import axios from 'axios'; // Importe o axios para fazer requisições HTTP
+import axios from 'axios';
 import "./AssinaturaPagamento.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Modal, Button } from 'react-bootstrap'; // Importe Modal e Button do react-bootstrap
 
 const plans = [
     {
         id: 'semente',
-        dbId: 1, // <--- Adicione o ID correspondente no seu banco de dados
+        dbId: 1,
         title: "Plano Semente",
         subtitle: "(Toda ajuda faz a diferença!)",
         price: "R$ 20/mês",
@@ -18,7 +21,7 @@ const plans = [
     },
     {
         id: 'melodia',
-        dbId: 2, // <--- Adicione o ID correspondente
+        dbId: 2,
         title: "Plano Melodia",
         subtitle: "(Dando voz ao futuro!)",
         price: "R$ 50/mês",
@@ -28,7 +31,7 @@ const plans = [
     },
     {
         id: 'palco',
-        dbId: 3, // <--- Adicione o ID correspondente
+        dbId: 3,
         title: "Plano Palco",
         subtitle: "(A arte que muda vidas!)",
         price: "R$ 100/mês",
@@ -38,7 +41,7 @@ const plans = [
     },
     {
         id: 'estrela',
-        dbId: 4, // <--- Adicione o ID correspondente
+        dbId: 4,
         title: "Plano Estrela",
         subtitle: "(Transformando futuros!)",
         price: "R$ 200/mês",
@@ -61,14 +64,17 @@ const AssinaturaPagamento = () => {
     const { user, token } = useAuth();
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
-    const [cardData, setCardData] = useState({ // Renomeado para refletir que são apenas dados de cartão
+    const [cardData, setCardData] = useState({
         cardNumber: '',
         cardName: '',
         cardExpiry: '',
         cardCvv: ''
     });
 
-    // Proteção de rota: redireciona se não houver token
+    const [showModalTrocaPlano, setShowModalTrocaPlano] = useState(false); // Novo estado para o modal de troca de plano
+    const [planToChangeTo, setPlanToChangeTo] = useState(null); // Estado para guardar o plano para o qual o usuário quer mudar
+
+
     useEffect(() => {
         const fetchCurrentSubscription = async () => {
             if (!token) {
@@ -76,8 +82,7 @@ const AssinaturaPagamento = () => {
                 return;
             }
             try {
-                // Busque o perfil para saber o plano atual do usuário
-                const response = await axios.get('http://localhost:8000/apoiador/profile', {
+                const response = await axios.get('http://localhost:8000/apoiador/perfil', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -85,103 +90,126 @@ const AssinaturaPagamento = () => {
                 if (response.data && response.data.plano_nome) {
                     setCurrentSubscription(response.data);
                 } else {
-                    setCurrentSubscription(null); // Nenhuma assinatura ativa
+                    setCurrentSubscription(null);
                 }
             } catch (err) {
                 console.error("Erro ao buscar plano atual:", err);
-                setCurrentSubscription(null); // Em caso de erro, assumir que não tem plano ou mostrar erro
+                setCurrentSubscription(null);
             }
         };
         fetchCurrentSubscription();
-    }, [token, navigate]); // Dependências: token e navigate
+    }, [token, navigate]);
 
     const handleCardInputChange = (field, value) => {
         setCardData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleSubscribe = async () => {
-        if (!selectedPlan || !selectedPayment) {
-            alert('Por favor, selecione um plano e método de pagamento.');
-            return;
-        }
+    const handleConfirmarTrocaPlano = async () => {
+        setShowModalTrocaPlano(false); // Fecha o modal
+        // Agora, sim, prossegue com a assinatura
+        // A lógica de `handleSubscribe` para a requisição axios é movida para uma nova função `executeSubscription`
+        // para evitar duplicação ou chamadas erradas.
+        await executeSubscription(planToChangeTo);
+    };
 
-        if (!user || !user.id) {
-            alert('Erro: ID do apoiador não encontrado. Por favor, faça login novamente.');
-            navigate('/login');
-            return;
-        }
-
-        const plan = plans.find(p => p.id === selectedPlan);
-        if (!plan) { // Checagem adicional, caso o ID não seja encontrado
-            alert('Plano selecionado inválido.');
-            return;
-        }
-        const payment = paymentMethods.find(p => p.id === selectedPayment);
-
-        // Validação básica para cartão (se selecionado)
-        if ((selectedPayment === 'credit' || selectedPayment === 'debit') && 
-            (!cardData.cardNumber || !cardData.cardName || !cardData.cardExpiry || !cardData.cardCvv)) {
-            alert('Por favor, preencha todos os dados do cartão.');
-            return;
-        }
-
-        // --- Lógica de verificação do plano atual no frontend antes de enviar a requisição ---
-        if (currentSubscription && currentSubscription.plano_nome) {
-            if (currentSubscription.plano_nome === plan.title) {
-                alert(`Você já está atualmente no plano ${plan.title}.`);
-                return; // Não envia a requisição se for o mesmo plano
-            } else {
-                // Se for um plano diferente, o backend vai fazer a atualização
-                const confirmChange = window.confirm(
-                    `Você já possui o plano ${currentSubscription.plano_nome}. Deseja trocar para o plano ${plan.title}?`
-                );
-                if (!confirmChange) {
-                    return; // Usuário cancelou a troca
-                }
-            }
-        }
-        // --- Fim da lógica de verificação no frontend ---
-
-
+    // Função que realmente faz a requisição de assinatura/troca de plano
+    const executeSubscription = async (plan) => {
         try {
             const response = await axios.post('http://localhost:8000/apoiador/assinar-plano', {
                 apoiadorId: user.id,
-                planoId: plan.dbId, // Certifique-se de que plan.dbId está sendo usado
+                planoId: plan.dbId,
+                formaPagamento: selectedPayment, // Adicionado para enviar ao backend
+                ...(selectedPayment === 'credit' || selectedPayment === 'debit' ? {
+                    cardNumber: cardData.cardNumber,
+                    cardName: cardData.cardName,
+                    cardExpiry: cardData.cardExpiry,
+                    cardCvv: cardData.cardCvv
+                } : {}),
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-            // A mensagem de sucesso agora virá do backend, que dirá se foi nova assinatura ou troca
-            alert(response.data.message);
-            // Atualize o plano atual no frontend após sucesso
+            toast.success(response.data.message);
             setCurrentSubscription({ ...currentSubscription, plano_nome: plan.title, plano_preco: plan.numericPrice, data_adesao: new Date().toISOString() });
-            navigate('/perfil'); // Redireciona para a página de gerenciamento/detalhes
+            navigate('/perfil');
         } catch (error) {
             console.error("Erro ao assinar plano:", error);
             let errorMessage = "Ocorreu um erro ao processar sua assinatura.";
             if (error.response && error.response.data && error.response.data.error) {
                 errorMessage = error.response.data.error;
             }
-            alert(errorMessage);
+            toast.error(errorMessage);
         }
+    };
+
+
+    const handleSubscribe = async () => {
+        if (!selectedPlan || !selectedPayment) {
+            toast.error('Por favor, selecione um plano e método de pagamento.');
+            return;
+        }
+
+        if (!user || !user.id) {
+            toast.error('Erro: ID do apoiador não encontrado. Por favor, faça login novamente.');
+            navigate('/login');
+            return;
+        }
+
+        const plan = plans.find(p => p.id === selectedPlan);
+        if (!plan) {
+            toast.error('Plano selecionado inválido.');
+            return;
+        }
+
+        if ((selectedPayment === 'credit' || selectedPayment === 'debit') &&
+            (!cardData.cardNumber || !cardData.cardName || !cardData.cardExpiry || !cardData.cardCvv)) {
+            toast.error('Por favor, preencha todos os dados do cartão.');
+            return;
+        }
+
+        // Lógica de verificação do plano atual
+        if (currentSubscription && currentSubscription.plano_nome) {
+            if (currentSubscription.plano_nome === plan.title) {
+                toast.info(`Você já está atualmente no plano ${plan.title}.`);
+                return;
+            } else {
+                // Ao invés de window.confirm, abrimos o modal
+                setPlanToChangeTo(plan); // Salva o plano para o qual queremos mudar
+                setShowModalTrocaPlano(true); // Abre o modal de confirmação
+                return; // Importante: retorna aqui para esperar a interação com o modal
+            }
+        }
+        
+        // Se não tem assinatura ativa, ou se já confirmou a troca pelo modal,
+        // prossegue com a assinatura.
+        await executeSubscription(plan);
     };
 
     const selectedPlanData = plans.find(p => p.id === selectedPlan);
 
-    // Se o usuário não estiver autenticado, mostre um indicador de carregamento ou redirecione
     if (!token) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex items-center justify-content-center bg-gray-50">
                 <p className="text-lg text-gray-700">Carregando ou redirecionando para o login...</p>
             </div>
         );
     }
-    
-    // Renderiza a página de assinatura
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <div className="max-w-6xl mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -202,7 +230,6 @@ const AssinaturaPagamento = () => {
                     </div>
                 )}
 
-
                 {/* Plans Selection */}
                 <div className="mb-12">
                     <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
@@ -212,12 +239,11 @@ const AssinaturaPagamento = () => {
                         {plans.map((plan) => (
                             <div
                                 key={plan.id}
-                                // Adiciona um estilo visual se este for o plano atual do usuário
                                 className={`relative border-2 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
                                     selectedPlan === plan.id
                                         ? `${plan.highlightColor} shadow-lg transform scale-105`
                                         : currentSubscription && currentSubscription.plano_nome === plan.title
-                                            ? 'border-green-500 bg-green-50 shadow-md' // Estilo para o plano atual
+                                            ? 'border-green-500 bg-green-50 shadow-md'
                                             : 'border-gray-200 bg-white'
                                 }`}
                                 onClick={() => setSelectedPlan(plan.id)}
@@ -402,6 +428,41 @@ const AssinaturaPagamento = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal para confirmar troca de plano - NOVO MODAL */}
+            <Modal show={showModalTrocaPlano} onHide={() => setShowModalTrocaPlano(false)} centered>
+                <div className="registro-header-azul"> {/* Reutilizando a classe de estilo do cabeçalho */}
+                    <Modal.Title className="text-white">Confirmar Troca de Plano</Modal.Title>
+                </div>
+                <Modal.Body className="py-4">
+                    {planToChangeTo && currentSubscription && (
+                        <p className="mb-4">
+                            Tem certeza que deseja **trocar** do plano **{currentSubscription.plano_nome}** para o plano **{planToChangeTo.title} ({planToChangeTo.price})**?
+                        </p>
+                    )}
+                    <p className="mb-3">Ao confirmar a troca:</p>
+                    <ul>
+                        <li>Seu novo plano será ativado imediatamente.</li>
+                        <li>O valor do novo plano será cobrado na sua próxima fatura.</li>
+                        <li>Você terá acesso aos benefícios do novo plano imediatamente.</li>
+                    </ul>
+                </Modal.Body>
+                <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
+                    <Button
+                        variant="outline-secondary"
+                        onClick={() => setShowModalTrocaPlano(false)}
+                        className="custom-button-outline px-4"
+                    >
+                        Voltar
+                    </Button>
+                    <Button
+                        onClick={handleConfirmarTrocaPlano}
+                        className="custom-button-azul px-4"
+                    >
+                        Confirmar Troca
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

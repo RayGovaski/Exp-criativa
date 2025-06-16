@@ -34,7 +34,6 @@ const GerenciarAssinatura = () => {
           return;
         }
 
-        // Alterado para a rota /apoiador/profile
         const response = await fetch('http://localhost:8000/apoiador/perfil', {
           headers: {
             'Authorization': `Bearer ${token}`

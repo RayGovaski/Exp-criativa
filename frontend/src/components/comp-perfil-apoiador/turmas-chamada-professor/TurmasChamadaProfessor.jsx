@@ -1,187 +1,204 @@
-import React, { useState } from 'react';
-import { Card, Table, Button, Form, Alert, Modal } from 'react-bootstrap';
-import { FaEdit, FaCheckCircle, FaTimesCircle, FaCalendarAlt } from 'react-icons/fa'; // Ícones
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, Table, Button, Form, Alert, Modal, Spinner } from 'react-bootstrap';
+import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from 'react-icons/fa';
+import { useAuth } from '../../../context/AuthContext';
+import axios from 'axios';
 import './TurmasChamadaProfessor.css';
 
-// Dados mockados de turmas e alunos para cada turma
-const turmasMock = [
-  {
-    id: 1,
-    nome: 'Turma A - 3º Ano Fundamental',
-    materia: 'Matemática',
-    horario: 'Seg/Qua 08:00 - 10:00',
-    sala: 'Sala 101',
-    alunos: [
-      { id: 101, nome: 'Lucas Pires', presente: false },
-      { id: 102, nome: 'Sofia Almeida', presente: false },
-      { id: 103, nome: 'Miguel Costa', presente: false },
-    ],
-  },
-  {
-    id: 2,
-    nome: 'Turma B - 5º Ano Fundamental',
-    materia: 'Português',
-    horario: 'Ter/Qui 14:00 - 16:00',
-    sala: 'Sala 203',
-    alunos: [
-      { id: 201, nome: 'Isabela Santos', presente: false },
-      { id: 202, nome: 'Gabriel Rocha', presente: false },
-    ],
-  },
-];
-
 const TurmasChamadaProfessor = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [turmas, setTurmas] = useState(turmasMock);
-  const [turmaSelecionada, setTurmaSelecionada] = useState(null);
-  const [dataChamada, setDataChamada] = useState('');
-  const [showChamadaModal, setShowChamadaModal] = useState(false);
-  const [chamadaFeita, setChamadaFeita] = useState(false); // Para indicar se a chamada foi salva
+    const { token } = useAuth();
+    const [turmas, setTurmas] = useState([]);
+    const [turmaSelecionada, setTurmaSelecionada] = useState(null);
+    const [alunosDaTurma, setAlunosDaTurma] = useState([]);
+    const [dataChamada, setDataChamada] = useState('');
+    const [showChamadaModal, setShowChamadaModal] = useState(false);
 
-  const handleAbrirChamadaModal = (turma) => {
-    setTurmaSelecionada(turma);
-    setDataChamada(new Date().toISOString().split('T')[0]); // Data atual como padrão
-    setShowChamadaModal(true);
-    setChamadaFeita(false); // Reseta o status da chamada
-  };
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [modalLoading, setModalLoading] = useState(false);
 
-  const handleFecharChamadaModal = () => {
-    setShowChamadaModal(false);
-    setTurmaSelecionada(null);
-    // Opcional: reiniciar o estado 'presente' dos alunos da turma
-    // setTurmas(turmas.map(t => t.id === turmaSelecionada.id ? { ...t, alunos: t.alunos.map(a => ({...a, presente: false})) } : t));
-  };
+    useEffect(() => {
+        const fetchTurmas = async () => {
+            if (!token) return;
+            try {
+                const response = await axios.get('http://localhost:8000/professores/minhas-turmas', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setTurmas(response.data);
+            } catch (err) {
+                setError("Falha ao carregar suas turmas.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTurmas();
+    }, [token]);
 
-  const handleTogglePresenca = (alunoId) => {
-    if (turmaSelecionada) {
-      setTurmaSelecionada(prevTurma => ({
-        ...prevTurma,
-        alunos: prevTurma.alunos.map(aluno =>
-          aluno.id === alunoId ? { ...aluno, presente: !aluno.presente } : aluno
-        ),
-      }));
-    }
-  };
+    const fetchChamadaByDate = useCallback(async (turmaId, date) => {
+        setModalLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:8000/professores/chamada-por-data`, {
+                params: { turmaId: turmaId, data: date },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAlunosDaTurma(response.data);
+        } catch (err) {
+            console.error("Erro ao carregar chamada para a data selecionada:", err);
+            alert("Erro ao carregar chamada para esta data. Tentando carregar alunos da turma...");
+            await fetchAlunosDaTurma(turmaId);
+        } finally {
+            setModalLoading(false);
+        }
+    }, [token]);
 
-  const handleSalvarChamada = () => {
-    if (turmaSelecionada) {
-      console.log(`Chamada da Turma: ${turmaSelecionada.nome}, Data: ${dataChamada}`);
-      turmaSelecionada.alunos.forEach(aluno => {
-        console.log(`- Aluno: ${aluno.nome}, Presença: ${aluno.presente ? 'Presente' : 'Ausente'}`);
-      });
-      alert(`Chamada da turma ${turmaSelecionada.nome} para ${dataChamada} salva (simulado)!`);
-      setChamadaFeita(true); // Indica que a chamada foi salva
-      // Normalmente, aqui você enviaria os dados para o backend
-      // await axios.post('/api/salvar-chamada', { turmaId: turmaSelecionada.id, data: dataChamada, presencas: turmaSelecionada.alunos });
-      handleFecharChamadaModal(); // Fecha o modal após salvar
-    }
-  };
+    const fetchAlunosDaTurma = useCallback(async (turmaId) => {
+        setModalLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:8000/professores/turmas/${turmaId}/alunos`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const alunosComPresenca = response.data.map(aluno => ({ ...aluno, presente: true }));
+            setAlunosDaTurma(alunosComPresenca);
+        } catch (err) {
+            console.error("Erro ao carregar lista de alunos da turma:", err);
+            alert("Erro ao carregar lista de alunos.");
+            setAlunosDaTurma([]);
+        } finally {
+            setModalLoading(false);
+        }
+    }, [token]);
 
-  return (
-    <>
-      <Card className="mb-4 shadow-sm p-4">
-        <h4 className="label-azul mb-4">Minhas Turmas e Chamada</h4>
+    const handleAbrirChamadaModal = async (turma) => {
+        setTurmaSelecionada(turma);
+        setShowChamadaModal(true);
+        setModalLoading(true); // Start loading state for modal
 
-        {turmas.length > 0 ? (
-          <div className="row">
-            {turmas.map((turma) => (
-              <div key={turma.id} className="col-md-6 mb-4">
-                <Card className="h-100 turma-card">
-                  <Card.Body className="d-flex flex-column">
-                    <Card.Title className="label-azul mb-2 popopo">{turma.nome}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">Matéria: {turma.materia}</Card.Subtitle>
-                    <Card.Text>
-                      <strong>Horário:</strong> {turma.horario}
-                      <br />
-                      <strong>Sala:</strong> {turma.sala}
-                      <br />
-                      <strong>Alunos:</strong> {turma.alunos.length}
-                    </Card.Text>
-                    <Button
-                      className="custom-button-azul6 mt-3" // Reutilizando estilo de botão
-                      onClick={() => handleAbrirChamadaModal(turma)}
-                    >
-                      <FaCalendarAlt className="me-2" /> Fazer Chamada
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted text-center mt-3">Nenhuma turma atribuída no momento.</p>
-        )}
-      </Card>
+        const hoje = new Date();
+        const dataFormatada = hoje.toISOString().split('T')[0];
+        setDataChamada(dataFormatada);
 
-      {/* Modal de Chamada */}
-      <Modal show={showChamadaModal} onHide={handleFecharChamadaModal} centered className="modal-chamada">
-        <div className="registro-header-azul">
-          <Modal.Title className="text-white">Fazer Chamada - {turmaSelecionada?.nome}</Modal.Title>
-        </div>
-        <Modal.Body className="py-4">
-          <Form.Group className="mb-4">
-            <Form.Label className="label-azul fw-bold">Data da Chamada:</Form.Label>
-            <Form.Control
-              type="date"
-              value={dataChamada}
-              onChange={(e) => setDataChamada(e.target.value)}
-              readOnly={chamadaFeita} // Desabilita edição da data após salvar
-            />
-          </Form.Group>
+        await fetchChamadaByDate(turma.id, dataFormatada);
+    };
 
-          <h5 className="label-azul mb-3">Alunos:</h5>
-          {turmaSelecionada?.alunos.length > 0 ? (
-            <Table striped bordered hover className="chamada-table">
-              <thead>
-                <tr>
-                  <th>Nome do Aluno</th>
-                  <th className="text-center">Presença</th>
-                </tr>
-              </thead>
-              <tbody>
-                {turmaSelecionada.alunos.map((aluno) => (
-                  <tr key={aluno.id}>
-                    <td>{aluno.nome}</td>
-                    <td className="text-center">
-                      <Button
-                        variant={aluno.presente ? "success" : "danger"}
-                        onClick={() => handleTogglePresenca(aluno.id)}
-                        disabled={chamadaFeita} // Desabilita toggle após salvar
-                        className="btn-presenca-toggle"
-                      >
-                        {aluno.presente ? <FaCheckCircle /> : <FaTimesCircle />}
-                        {aluno.presente ? ' Presente' : ' Ausente'}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          ) : (
-            <p className="text-muted text-center">Nenhum aluno nesta turma.</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
-          <Button
-            variant="outline-secondary"
-            onClick={handleFecharChamadaModal}
-            className="custom-button-outline px-4"
-          >
-            {chamadaFeita ? 'Fechar' : 'Cancelar'}
-          </Button>
-          {!chamadaFeita && ( // Esconde o botão de salvar após a chamada ser feita
-            <Button
-              className="custom-button-azul6 px-4"
-              onClick={handleSalvarChamada}
-              disabled={!dataChamada} // Desabilita se a data não estiver preenchida
-            >
-              Salvar Chamada
-            </Button>
-          )}
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
+    const handleFecharChamadaModal = () => {
+        setShowChamadaModal(false);
+        setTurmaSelecionada(null);
+        setAlunosDaTurma([]);
+        setDataChamada('');
+    };
+
+    const handleTogglePresenca = (alunoId) => {
+        setAlunosDaTurma(prevAlunos =>
+            prevAlunos.map(aluno =>
+                aluno.id === alunoId ? { ...aluno, presente: !aluno.presente } : aluno
+            )
+        );
+    };
+
+    const handleChangeDataChamada = async (e) => {
+        const novaData = e.target.value;
+        setDataChamada(novaData);
+        if (turmaSelecionada && novaData) {
+            await fetchChamadaByDate(turmaSelecionada.id, novaData);
+        }
+    };
+
+    const handleSalvarChamada = async () => {
+        const payload = {
+            turmaId: turmaSelecionada.id,
+            dataChamada: dataChamada,
+            presencas: alunosDaTurma.map(a => ({ alunoId: a.id, presente: a.presente }))
+        };
+
+        try {
+            const response = await axios.post('http://localhost:8000/professores/chamada', payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            handleFecharChamadaModal();
+        } catch (err) {
+            alert(err.response?.data?.error || "Erro ao salvar chamada.");
+        }
+    };
+
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <Alert variant="danger">{error}</Alert>;
+
+    return (
+        <>
+            <Card className="mb-4 shadow-sm p-4">
+                <h4 className="label-azul mb-4">Minhas Turmas e Chamada</h4>
+                {turmas.length > 0 ? (
+                    <div className="row">
+                        {turmas.map((turma) => (
+                            <div key={turma.id} className="col-md-6 mb-4">
+                                <Card className="h-100 turma-card">
+                                    <Card.Body className="d-flex flex-column">
+                                        <Card.Title className="label-azul mb-2 popopo">{turma.nome}</Card.Title>
+                                        <Card.Text>
+                                            <strong>Horário:</strong> {turma.dia_da_semana} {turma.hora_inicio.substring(0, 5)} - {turma.hora_termino.substring(0, 5)}
+                                            <br />
+                                            <strong>Sala:</strong> {turma.sala}
+                                            <br />
+                                            <strong>Alunos:</strong> {turma.alunos_count}
+                                        </Card.Text>
+                                        <Button className="custom-button-azul6 mt-auto" onClick={() => handleAbrirChamadaModal(turma)}>
+                                            <FaCalendarAlt className="me-2" /> Fazer Chamada
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-muted text-center mt-3">Nenhuma turma atribuída a você no momento.</p>
+                )}
+            </Card>
+
+            <Modal show={showChamadaModal} onHide={handleFecharChamadaModal} size="lg" centered>
+                <div className="registro-header-azul"><Modal.Title className="text-white">Fazer Chamada - {turmaSelecionada?.nome}</Modal.Title></div>
+                <Modal.Body className="py-4">
+                    {modalLoading ? (
+                        <div className="text-center"><Spinner animation="border" /></div>
+                    ) : (
+                        <> {/* This Fragment wraps all sibling elements */}
+                            <Form.Group className="mb-4">
+                                <Form.Label className="label-azul fw-bold">Data da Chamada:</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={dataChamada}
+                                    onChange={handleChangeDataChamada}
+                                />
+                            </Form.Group>
+                            <h5 className="label-azul mb-3">Alunos:</h5>
+                            {alunosDaTurma.length > 0 ? (
+                                <Table striped bordered hover className="chamada-table">
+                                    <thead><tr><th>Nome do Aluno</th><th className="text-center">Presença</th></tr></thead>
+                                    <tbody>
+                                        {alunosDaTurma.map((aluno) => (
+                                            <tr key={aluno.id}>
+                                                <td>{aluno.nome}</td>
+                                                <td className="text-center">
+                                                    <Button variant={aluno.presente ? "success" : "danger"} onClick={() => handleTogglePresenca(aluno.id)} className="btn-presenca-toggle">
+                                                        {aluno.presente ? <><FaCheckCircle /> Presente</> : <><FaTimesCircle /> Ausente</>}
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            ) : (
+                                <p className="text-muted text-center">Nenhum aluno nesta turma.</p>
+                            )}
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
+                    <Button variant="outline-secondary" onClick={handleFecharChamadaModal} className="custom-button-outline px-4">Cancelar</Button>
+                    <Button className="custom-button-azul6 px-4" onClick={handleSalvarChamada} disabled={modalLoading || !dataChamada}>Salvar Chamada</Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    );
 };
 
 export default TurmasChamadaProfessor;

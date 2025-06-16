@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Form, Modal, Spinner, Alert } from 'react-bootstrap';
-import { FaFileDownload, FaSearch } from 'react-icons/fa';
+import { FaFileDownload, FaSearch } from 'react-icons/fa'; // Mantenha FaSearch, remova FaFileDownload
 import axios from 'axios';
 import { useAuth } from '../../../context/AuthContext';
-import './ComprovantesPerfil.css'; // Certifique-se que este é o CSS correto
+import './ComprovantesPerfil.css'; 
 
 const ComprovantesPerfil = () => {
   const { user, token, isAuthenticated } = useAuth();
@@ -25,7 +25,7 @@ const ComprovantesPerfil = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get('http://localhost:8000/apoiador/doacao/historico', {
+        const response = await axios.get('http://localhost:8000/apoiador/historico-doacoes', { 
           headers: { Authorization: `Bearer ${token}` }
         });
         setDoacoes(response.data);
@@ -46,10 +46,9 @@ const ComprovantesPerfil = () => {
   };
 
 
+
   const doacoesFiltradas = doacoes.filter(
     doacao => doacao.causa.toLowerCase().includes(filtro.toLowerCase())
-    // Removido 'instituicao' do filtro, pois não será exibida
-    // || doacao.instituicao.toLowerCase().includes(filtro.toLowerCase())
   );
 
   if (loading) {
@@ -93,25 +92,19 @@ const ComprovantesPerfil = () => {
             <thead className="table-light">
               <tr>
                 <th>Causa</th>
-                {/* REMOVIDO: <th>Instituição</th> */} 
                 <th>Valor</th>
                 <th>Data</th>
-                <th>Status</th>
-                <th>Ações</th>
+                {/* REMOVIDO: <th>Status</th> */} 
+                <th>Ações</th> {/* Mantenha o cabeçalho Ações se ainda tiver o botão Detalhes */}
               </tr>
             </thead>
             <tbody>
               {doacoesFiltradas.map((doacao) => (
                 <tr key={doacao.id}>
                   <td>{doacao.causa}</td>
-                  {/* REMOVIDO: <td>{doacao.instituicao}</td> */}
                   <td>R$ {doacao.valor.toFixed(2)}</td>
                   <td>{doacao.data}</td>
-                  <td>
-                    <Badge className="custom-badge">
-                      {doacao.status}
-                    </Badge>
-                  </td>
+                  {/* REMOVIDO: Célula de Status */}
                   <td className="d-flex gap-2">
                     <Button 
                       className="btn-detalhes"
@@ -120,7 +113,16 @@ const ComprovantesPerfil = () => {
                     >
                       Detalhes
                     </Button>
-                    
+                    {/* REMOVIDO: Botão de Comprovante */}
+                    {/* {doacao.comprovante && (
+                      <Button 
+                        className="custom-button-azul"
+                        size="sm"
+                        onClick={() => handleDownloadComprovante(doacao.id)}
+                      >
+                        <FaFileDownload className="me-1" /> Comprovante
+                      </Button>
+                    )} */}
                   </td>
                 </tr>
               ))}
@@ -145,7 +147,6 @@ const ComprovantesPerfil = () => {
             <>
               <div className="mb-4 text-center">
                 <h5 className="label-azul mb-1">{doacaoSelecionada.causa}</h5>
-                {/* REMOVIDO: <p className="text-muted">{doacaoSelecionada.instituicao}</p> */}
               </div>
 
               <div className="bg-light p-3 rounded mb-4">
@@ -158,20 +159,8 @@ const ComprovantesPerfil = () => {
                   <div className="col-7">{doacaoSelecionada.data}</div>
                 </div>
                 <div className="row mb-2">
-                  <div className="col-5 fw-bold">Status:</div>
-                  <div className="col-7">
-                    <Badge className="custom-badge">
-                      {doacaoSelecionada.status}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="row mb-2">
                     <div className="col-5 fw-bold">Forma de pagamento:</div>
-                    <div className="col-7">Cartão de crédito •••• 4567</div> {/* Simulado */}
-                </div>
-                <div className="row">
-                    <div className="col-5 fw-bold">ID da transação:</div>
-                    <div className="col-7">DOA{String(doacaoSelecionada.id).padStart(8, '0')}</div>
+                    <div className="col-7">{doacaoSelecionada.formaPagamento || 'Não Informado'}</div> 
                 </div>
               </div>
 
@@ -185,7 +174,6 @@ const ComprovantesPerfil = () => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
-         
           <Button 
             variant="outline-secondary" 
             onClick={() => setShowModal(false)} 

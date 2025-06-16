@@ -8,6 +8,7 @@ import apoiadorRoutes from './routes/apoiadorRoutes.js';
 import alunoRoutes from './routes/alunoRoutes.js';
 import doacaoRoutes from './routes/doacaoRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import professorRoutes from './routes/professorRoutes.js';
 import 'dotenv/config';
 // Load environment variables
 dotenv.config();
@@ -53,6 +54,7 @@ app.use('/apoiador', apoiadorRoutes);
 app.use('/aluno', alunoRoutes);
 app.use('/doacoes', doacaoRoutes);
 app.use('/administrador', adminRoutes); 
+app.use('/professores', professorRoutes)
 
 // Start server
 app.listen(PORT, () => {

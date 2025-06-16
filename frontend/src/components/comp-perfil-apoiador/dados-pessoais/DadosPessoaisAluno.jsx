@@ -4,6 +4,7 @@ import { Card, Image, Button, Modal, Form, Alert, Spinner } from 'react-bootstra
 import { useAuth } from '../../../context/AuthContext'; // Para obter user e token
 import axios from 'axios'; // Para fazer requisições HTTP
 import './DadosPessoaisAluno.css';
+import { toast } from 'react-toastify';
 
 const DadosPessoaisAluno = () => {
   const { user, token, logout } = useAuth(); // Obtenha user e token do AuthContext
@@ -79,17 +80,18 @@ const DadosPessoaisAluno = () => {
 
   // Function to get the profile image source
   const getProfileImageSrc = () => {
-    if (imagem) { // Mantém a pré-visualização de um novo upload
-      return imagem;
-    }
-    // Verifica se alunoData existe e se o campo 'foto' não está vazio/nulo
-    if (alunoData && alunoData.foto) { 
-      // Esta URL agora vai funcionar, pois criaremos a rota no backend
-      return `${ALUNO_PHOTO_BASE_URL}${alunoData.id}?t=${new Date().getTime()}`;
-    }
-    // Fallback para a imagem padrão
-    return 'https://placehold.co/150x150?text=Aluno';
-};
+        if (imagem) { // Pré-visualização de um novo upload (se uma imagem foi selecionada localmente)
+            return imagem;
+        }
+        // Se alunoData existe E o backend indica que há uma foto (alunoData.foto é true)
+        if (alunoData && alunoData.foto) {
+            // A URL aponta para a rota que serve a imagem BLOB
+            // Adiciona um timestamp para forçar o navegador a recarregar a imagem se ela mudou
+            return `${ALUNO_PHOTO_BASE_URL}${alunoData.id}?t=${new Date().getTime()}`;
+        }
+        // Fallback para a imagem padrão se não houver foto
+        return 'https://placehold.co/150x150?text=Aluno';
+    };
 
   // Function to handle form input changes
   const handleInputChange = (e) => {
@@ -120,41 +122,44 @@ const DadosPessoaisAluno = () => {
 
 
   const handleSalvarFoto = async () => {
-    if (!imagemFile) {
-      alert('Por favor, selecione uma foto primeiro.');
-      return;
-    }
+        if (!imagemFile) {
+            toast.info('Por favor, selecione uma foto primeiro.');
+            return;
+        }
 
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('foto', imagemFile); // 'foto' deve ser o nome do campo esperado pelo backend (multer)
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('foto', imagemFile); // 'foto' é o nome do campo esperado pelo Multer no backend
 
-    try {
-        const response = await axios.put('http://localhost:8000/aluno/update-foto', formData, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data'
+        try {
+            const response = await axios.put('http://localhost:8000/aluno/update-foto', formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data' // Essencial para FormData
+                }
+            });
+
+            if (response.status === 200) {
+                setImagem(null); // Limpa a pré-visualização local
+                setImagemFile(null); // Limpa o arquivo local
+
+                // IMPORTANTE: Atualiza o estado 'alunoData' para refletir que agora há uma foto
+                // setAlunoData(prevData => ({ ...prevData, foto_path: response.data.photoPath })); // REMOVA ESTA LINHA SE FOTO É LONGBLOB
+                // Em vez disso, atualize a propriedade 'foto' para true
+                setAlunoData(prevData => ({ ...prevData, foto: true })); // <--- CORREÇÃO AQUI
+                toast.success("Foto atualizada com sucesso!");
             }
-        });
-        
-        if (response.status === 200) {
-            setImagem(null); // Limpa a pré-visualização local
-            setImagemFile(null); // Limpa o arquivo local
-            // Atualiza os dados do aluno com o novo foto_path
-            setAlunoData(prevData => ({ ...prevData, foto_path: response.data.photoPath })); 
-            alert('Foto atualizada com sucesso!');
+        } catch (error) {
+            console.error("Erro ao atualizar foto do aluno:", error);
+            let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
+            if (error.response && error.response.data && error.response.data.error) {
+                errorMessage = error.response.data.error;
+            }
+            toast.error(errorMessage);
+        } finally {
+            setUploading(false);
         }
-    } catch (error) {
-        console.error("Erro ao atualizar foto do aluno:", error);
-        let errorMessage = "Falha ao atualizar foto. Por favor, tente novamente.";
-        if (error.response && error.response.data && error.response.data.error) {
-            errorMessage = error.response.data.error;
-        }
-        alert(errorMessage);
-    } finally {
-        setUploading(false);
-    }
-  };
+    };
 
 
   const handleSubmitAtualizacao = async () => {

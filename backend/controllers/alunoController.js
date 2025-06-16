@@ -122,72 +122,62 @@ export const createAluno = (req, res) => {
     });
 };
 
-
 export const getProfileAluno = (req, res) => {
     const userId = req.user.id;
-
     const q = `
-        SELECT 
-            a.id, a.cpf, a.nome, a.sexo, a.data_nascimento, a.email, 
-            a.necessidades_especiais, a.foto, a.data_matricula,
-            r.id AS responsavel_id, r.nome AS responsavel_nome, r.cpf AS responsavel_cpf, 
-            r.sexo AS responsavel_sexo, r.data_nascimento AS responsavel_data_nascimento, 
-            r.telefone AS responsavel_telefone, r.email AS responsavel_email, 
-            r.grau_parentesco, r.renda_familiar,
-            e.logradouro, e.numero_residencia, e.cep, e.bairro, e.cidade, e.estado
+        SELECT
+            a.id, a.cpf, a.nome, a.sexo, a.data_nascimento, a.email,
+            a.necessidades_especiais, (a.foto IS NOT NULL) AS tem_foto,
+            r.nome AS responsavel_nome, r.cpf AS responsavel_cpf, r.telefone AS responsavel_telefone, -- Telefone do RESPONSÁVEL
+            r.email AS responsavel_email, r.grau_parentesco, r.profissao, r.renda_familiar,
+            e.logradouro AS endereco_logradouro, e.numero_residencia AS endereco_numero_residencia,
+            e.cep AS endereco_cep, e.cidade AS endereco_cidade, e.estado AS endereco_estado
         FROM Aluno a
         LEFT JOIN Responsavel r ON a.responsavel_id = r.id
-        LEFT JOIN Endereco e ON r.endereco_id = e.id
+        LEFT JOIN Endereco e ON r.endereco_id = e.id OR a.endereco_id = e.id
         WHERE a.id = ?;
     `;
-
     db.query(q, [userId], (err, data) => {
         if (err) {
-            console.error("ERRO [getProfileAluno]: Erro na consulta SQL:", err);
-            return res.status(500).json({ error: "Erro no banco de dados ao buscar perfil.", message: err.message });
+            console.error("Erro ao buscar perfil do aluno:", err);
+            return res.status(500).json({ error: "Erro no banco de dados ao buscar perfil.", message: err.sqlMessage });
         }
-
         if (data.length === 0) {
-            return res.status(404).json({ error: "Aluno não encontrado." });
+            return res.status(404).json({ error: "Aluno não encontrado" });
         }
 
-        const flatData = data[0];
-
-        // ✅ Lógica para montar o JSON aninhado que o frontend espera ✅
-        const profileData = {
-            id: flatData.id,
-            cpf: flatData.cpf,
-            nome: flatData.nome,
-            sexo: flatData.sexo,
-            data_nascimento: flatData.data_nascimento,
-            email: flatData.email,
-            necessidades_especiais: flatData.necessidades_especiais,
-            foto: flatData.foto, // Apenas informa que a foto existe (o frontend busca em outra rota)
-            data_matricula: flatData.data_matricula,
-            // Objeto do responsável
-            responsavel: flatData.responsavel_id ? {
-                id: flatData.responsavel_id,
-                nome: flatData.responsavel_nome,
-                cpf: flatData.responsavel_cpf,
-                sexo: flatData.responsavel_sexo,
-                data_nascimento: flatData.responsavel_data_nascimento,
-                telefone: flatData.responsavel_telefone,
-                email: flatData.responsavel_email,
-                grau_parentesco: flatData.grau_parentesco,
-                renda_familiar: flatData.renda_familiar,
-                // Objeto de endereço dentro do responsável
-                endereco: flatData.logradouro ? {
-                    logradouro: flatData.logradouro,
-                    numero_residencia: flatData.numero_residencia,
-                    cep: flatData.cep,
-                    bairro: flatData.bairro,
-                    cidade: flatData.cidade,
-                    estado: flatData.estado
-                } : null
+        const alunoProfile = data[0];
+        const responsavelData = {
+            nome: alunoProfile.responsavel_nome,
+            cpf: alunoProfile.responsavel_cpf,
+            telefone: alunoProfile.responsavel_telefone, // Este telefone é do RESPONSÁVEL
+            email: alunoProfile.responsavel_email,
+            grau_parentesco: alunoProfile.grau_parentesco,
+            profissao: alunoProfile.profissao,
+            renda_familiar: alunoProfile.renda_familiar,
+            endereco: alunoProfile.endereco_logradouro ? {
+                logradouro: alunoProfile.endereco_logradouro,
+                numero_residencia: alunoProfile.endereco_numero_residencia,
+                cep: alunoProfile.endereco_cep,
+                cidade: alunoProfile.endereco_cidade,
+                estado: alunoProfile.endereco_estado,
             } : null
         };
 
-        return res.status(200).json(profileData);
+        const finalAlunoData = {
+            id: alunoProfile.id,
+            cpf: alunoProfile.cpf,
+            nome: alunoProfile.nome,
+            sexo: alunoProfile.sexo,
+            data_nascimento: alunoProfile.data_nascimento,
+            email: alunoProfile.email,
+            // REMOVIDO: alunoProfile.telefone, pois não existe na tabela Aluno
+            necessidades_especiais: alunoProfile.necessidades_especiais,
+            foto: Boolean(alunoProfile.tem_foto),
+            responsavel: responsavelData.nome ? responsavelData : null
+        };
+
+        res.status(200).json(finalAlunoData);
     });
 };
 
@@ -362,7 +352,6 @@ export const inscreverAlunoTurma = (req, res) => {
     });
 };
 
-// --- NOVA FUNÇÃO: desinscreverAlunoTurma ---
 export const desinscreverAlunoTurma = (req, res) => {
     const alunoId = req.user.id; // Aluno logado
     const { turmaId } = req.body; // ID da turma para desinscrição
@@ -426,5 +415,30 @@ export const getAlunoTurmas = (req, res) => {
         
         console.log('DEBUG: Aulas inscritas retornadas:', formattedData);
         return res.status(200).json(formattedData);
+    });
+};
+
+export const updateAlunoFoto = (req, res) => { // OU `updatePhoto` como você tinha em apoiador
+    const alunoId = req.user.id; // ID do aluno logado
+
+    if (!req.file) {
+        return res.status(400).json({ error: "Nenhuma foto enviada." });
+    }
+
+    const fotoBuffer = req.file.buffer; // <--- ISSO É O CRÍTICO: Pegue o buffer da memória
+
+    // A coluna no banco de dados deve ser `foto` (do tipo LONGBLOB)
+    const q = "UPDATE Aluno SET foto = ? WHERE id = ?";
+
+    db.query(q, [fotoBuffer, alunoId], (err, result) => {
+        if (err) {
+            console.error("Erro ao atualizar foto do aluno no banco de dados:", err);
+            // err.sqlMessage pode ser útil para depuração
+            return res.status(500).json({ error: "Erro no banco de dados ao atualizar foto.", details: err.sqlMessage });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Aluno não encontrado." });
+        }
+        res.status(200).json({ message: "Foto atualizada com sucesso!" });
     });
 };

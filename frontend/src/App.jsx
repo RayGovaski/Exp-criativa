@@ -25,11 +25,12 @@ import PerfilProfessor from "./pages/Perfil/Perfil-professor/PerfilProfessor.jsx
 import RegistroProfessor from "./pages/Registros/RegistroProfessor.jsx";
 import GerenciarAssinatura from "./components/comp-perfil-apoiador/gerenciar-assinatura/GerenciarAssinatura.jsx"; 
 import PerfilADM from "./pages/Perfil/perfil-ADM/PerfilADM.jsx"; 
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
     // Definindo as roles permitidas para páginas que não podem ser acessadas por "aluno"
     // Ou seja, todos menos aluno.
-    const nonAlunoRoles = ['apoiador', 'professor', 'administrador']; 
+    const donationAllowedRoles = ['apoiador', 'administrador']; 
 
     return (
         <Router>
@@ -45,20 +46,13 @@ const App = () => {
                             <Route path="/registro-professor" element={<Layout><RegistroProfessor /></Layout>} />
                             <Route path="/menu-registro" element={<Layout><MenuRegistro /></Layout>} />
                             
-                            {/* Páginas de Doação:
-                               - São acessíveis a visitantes (não logados).
-                               - São acessíveis a apoiadores, professores, administradores.
-                               - NÃO são acessíveis a alunos logados.
-                               Para isso, usamos um truque: o ProtectedRoute para nonAlunoRoles,
-                               e para não-logados, ele permite acesso via 'allowedRoles' ser vazio.
-                            */}
                             <Route 
                                 path="/doar" 
-                                element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><PaginaDoacoes /></Layout></ProtectedRoute>} 
+                                element={<ProtectedRoute allowedRoles={donationAllowedRoles} publicIfUnauthenticated={true}><Layout><PaginaDoacoes /></Layout></ProtectedRoute>} 
                             />
                             <Route 
                                 path="/doar-pagamento" 
-                                element={<ProtectedRoute allowedRoles={nonAlunoRoles} publicIfUnauthenticated={true}><Layout><DoacoesPagamento /></Layout></ProtectedRoute>} 
+                                element={<ProtectedRoute allowedRoles={donationAllowedRoles} publicIfUnauthenticated={true}><Layout><DoacoesPagamento /></Layout></ProtectedRoute>} 
                             />
                             
                             {/* Rotas de Assinatura (APENAS PARA APOIADORES) */}
@@ -88,7 +82,10 @@ const App = () => {
                                 path="/perfil-adm" 
                                 element={<ProtectedRoute allowedRoles={['administrador']}><Layout><PerfilADM /></Layout></ProtectedRoute>} 
                             /> 
-                            
+                            <Route 
+                                path="/perfil-professor" 
+                                element={<ProtectedRoute allowedRoles={['professor']}><Layout><PerfilProfessor /></Layout></ProtectedRoute>} 
+                            />
                             {/* Rota de redirecionamento final se nenhuma rota casar (para o login) */}
                             <Route path="*" element={<Navigate to="/login" />} />
                         </Routes>

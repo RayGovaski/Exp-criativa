@@ -58,7 +58,7 @@ CREATE TABLE Professor (
     email VARCHAR(100) UNIQUE,
     senha VARCHAR(255),
     data_contratacao DATE,
-    salario DECIMAL(10,2), -- Salário mantido conforme o DDL que você mais usou
+    salario DECIMAL(10,2), 
     ativo BOOLEAN DEFAULT 1,
     endereco_id INT,
     FOREIGN KEY (endereco_id) REFERENCES Endereco(id) ON DELETE SET NULL
@@ -158,6 +158,7 @@ CREATE TABLE Apoiador_Doacao (
     doacao_id INT,
     valor_doado DECIMAL(10,2) NOT NULL DEFAULT 0,
     data_doacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    forma_pagamento ENUM('Credito', 'Debito', 'Pix', 'Boleto'),
     FOREIGN KEY (apoiador_id) REFERENCES Apoiador(id) ON DELETE CASCADE,
     FOREIGN KEY (doacao_id) REFERENCES Doacao(id) ON DELETE CASCADE
 );

@@ -9,21 +9,19 @@ const MateriasAluno = () => {
     const [materias, setMaterias] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showModalInscricao, setShowModalInscricao] = useState(false); // Renomeado para clareza
+    const [showModalDesinscricao, setShowModalDesinscricao] = useState(false); // NOVO ESTADO
     const [materiaSelecionada, setMateriaSelecionada] = useState(null);
+    const [materiaParaDesinscrever, setMateriaParaDesinscrever] = useState(null); // NOVO ESTADO
     const [confirmacaoTermos, setConfirmacaoTermos] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // A função para buscar matérias foi separada para ser reutilizável
     const fetchMaterias = async () => {
         if (!user || !token) {
             setError("Sessão expirada. Faça login novamente.");
             setLoading(false);
             return;
         }
-
-        // Não precisa setar loading aqui se for chamado de dentro de outra função
-        // setLoading(true); 
         setError(null);
         try {
             const response = await axios.get('http://localhost:8000/aluno/turmas-disponiveis', {
@@ -38,21 +36,30 @@ const MateriasAluno = () => {
         }
     };
 
-    // useEffect agora só roda na montagem ou quando o usuário muda
     useEffect(() => {
         setLoading(true);
         fetchMaterias();
     }, [user, token]);
 
-    const handleAbrirModal = (materia) => {
+    const handleAbrirModalInscricao = (materia) => {
         setMateriaSelecionada(materia);
         setConfirmacaoTermos(false);
-        setShowModal(true);
+        setShowModalInscricao(true);
     };
 
-    const handleFecharModal = () => {
-        setShowModal(false);
+    const handleFecharModalInscricao = () => {
+        setShowModalInscricao(false);
         setMateriaSelecionada(null);
+    };
+
+    const handleAbrirModalDesinscricao = (materia) => { // NOVA FUNÇÃO
+        setMateriaParaDesinscrever(materia);
+        setShowModalDesinscricao(true);
+    };
+
+    const handleFecharModalDesinscricao = () => { // NOVA FUNÇÃO
+        setShowModalDesinscricao(false);
+        setMateriaParaDesinscrever(null);
     };
 
     const handleConfirmarInscricao = async () => {
@@ -63,40 +70,44 @@ const MateriasAluno = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await axios.post('http://localhost:8000/aluno/inscrever-turma', 
+            const response = await axios.post('http://localhost:8000/aluno/inscrever-turma',
                 { turmaId: materiaSelecionada.id },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(response.data.message);
-            handleFecharModal();
+            handleFecharModalInscricao();
             fetchMaterias(); // Recarrega a lista após o sucesso
         } catch (err) {
             const errorMessage = err.response?.data?.error || "Falha na inscrição. Tente novamente.";
-            alert(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDesinscrever = async (materia) => {
-        if (!window.confirm(`Tem certeza que deseja se desinscrever da matéria "${materia.nome}"?`)) {
+    // NOVA FUNÇÃO: Lógica para desinscrever-se após a confirmação no modal
+    const handleConfirmarDesinscricao = async () => {
+        if (!materiaParaDesinscrever) {
+            alert("Nenhuma matéria selecionada para desinscrição.");
             return;
         }
 
         setIsSubmitting(true);
         try {
             const response = await axios.post('http://localhost:8000/aluno/desinscrever-turma',
-                { turmaId: materia.id },
+                { turmaId: materiaParaDesinscrever.id },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert(response.data.message);
-            fetchMaterias(); // Recarrega a lista após o sucesso
+            handleFecharModalDesinscricao(); 
+            fetchMaterias(); 
         } catch (err) {
             const errorMessage = err.response?.data?.error || "Falha ao desinscrever-se. Tente novamente.";
-            alert(errorMessage);
+            alert(errorMessage); // Use toast aqui se quiser substituir todos os alerts
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleDesinscrever = (materia) => {
+        handleAbrirModalDesinscricao(materia); 
     };
 
     if (loading) {
@@ -116,14 +127,14 @@ const MateriasAluno = () => {
                         materias.map((materia) => {
                             const vagasRestantes = materia.capacidade - materia.inscritos_count;
 
-                            return ( // ✅ O 'return' que estava faltando
+                            return (
                                 <div key={materia.id} className="col-md-6 mb-4">
                                     <Card className="h-100 materia-card">
                                         <Card.Body className="d-flex flex-column">
                                             <Card.Title className="label-azul mb-2 ml-0 pipipi">{materia.nome}</Card.Title>
                                             <Card.Subtitle className="mb-2 text-muted">Professor: {materia.professor_nome || 'Não Atribuído'}</Card.Subtitle>
                                             <Card.Text className="flex-grow-1">
-                                                {materia.descricao}
+                                                <strong>Descrição:</strong> {materia.descricao}
                                                 <br />
                                                 <strong>Data Início:</strong> {materia.dataInicio ? new Date(materia.dataInicio).toLocaleDateString('pt-BR') : 'N/A'}
                                                 <br />
@@ -135,15 +146,15 @@ const MateriasAluno = () => {
                                                 <br />
                                                 <strong>Vagas restantes:</strong> {vagasRestantes > 0 ? vagasRestantes : <span className="text-danger fw-bold">Lotado</span>}
                                             </Card.Text>
-                                            
+
                                             {materia.inscrito ? (
                                                 <Button className="custom-button-vermelho mt-3" onClick={() => handleDesinscrever(materia)} disabled={isSubmitting}>
                                                     {isSubmitting ? 'Aguarde...' : 'Desinscrever-se'}
                                                 </Button>
                                             ) : (
-                                                <Button 
+                                                <Button
                                                     className="custom-button-azul6 mt-3"
-                                                    onClick={() => handleAbrirModal(materia)}
+                                                    onClick={() => handleAbrirModalInscricao(materia)}
                                                     disabled={isSubmitting || vagasRestantes <= 0}
                                                 >
                                                     {vagasRestantes > 0 ? 'Inscrever-se' : 'Turma Lotada'}
@@ -160,7 +171,8 @@ const MateriasAluno = () => {
                 </div>
             </Card>
 
-            <Modal show={showModal} onHide={handleFecharModal} centered className="modal-inscricao">
+            {/* Modal para Confirmar Inscrição (seu modal existente) */}
+            <Modal show={showModalInscricao} onHide={handleFecharModalInscricao} centered className="modal-inscricao">
                 <div className="registro-header-azul">
                     <Modal.Title className="text-white">Confirmar Inscrição</Modal.Title>
                 </div>
@@ -170,11 +182,11 @@ const MateriasAluno = () => {
                             <p className="mb-3">Você está prestes a se inscrever na seguinte matéria:</p>
                             <h5 className="label-azul mb-3 pipipi">{materiaSelecionada.nome}</h5>
                             <p>
-                                <strong>Professor:</strong> {materiaSelecionada.professor_nome || 'Não Atribuído'}<br/>
-                                <strong>Início:</strong> {materiaSelecionada.dataInicio ? new Date(materiaSelecionada.dataInicio).toLocaleDateString('pt-BR') : 'N/A'}<br/>
-                                <strong>Horário:</strong> {materiaSelecionada.diaDaSemana} {materiaSelecionada.horaInicio} - {materiaSelecionada.horaTermino}<br/>
-                                <strong>Local:</strong> {materiaSelecionada.sala}<br/>
-                                <strong>Nível:</strong> {materiaSelecionada.nivel}<br/>
+                                <strong>Professor:</strong> {materiaSelecionada.professor_nome || 'Não Atribuído'}<br />
+                                <strong>Início:</strong> {materiaSelecionada.dataInicio ? new Date(materiaSelecionada.dataInicio).toLocaleDateString('pt-BR') : 'N/A'}<br />
+                                <strong>Horário:</strong> {materiaSelecionada.diaDaSemana} {materiaSelecionada.horaInicio} - {materiaSelecionada.horaTermino}<br />
+                                <strong>Local:</strong> {materiaSelecionada.sala}<br />
+                                <strong>Nível:</strong> {materiaSelecionada.nivel}<br />
                                 <strong>Vagas Totais:</strong> {materiaSelecionada.capacidade}
                             </p>
                             <p className="mt-4 text-muted">Ao confirmar, você será oficialmente matriculado(a) nesta turma.</p>
@@ -186,9 +198,35 @@ const MateriasAluno = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
-                    <Button variant="outline-secondary" onClick={handleFecharModal} className="custom-button-outline px-4">Cancelar</Button>
+                    <Button variant="outline-secondary" onClick={handleFecharModalInscricao} className="custom-button-outline px-4">Cancelar</Button>
                     <Button className="custom-button-azul6 px-4" onClick={handleConfirmarInscricao} disabled={!confirmacaoTermos || isSubmitting}>
                         {isSubmitting ? 'Confirmando...' : 'Confirmar Inscrição'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* NOVO MODAL para Confirmar Desinscrição */}
+            <Modal show={showModalDesinscricao} onHide={handleFecharModalDesinscricao} centered className="modal-desinscricao">
+                <div className="registro-header-vermelho"> {/* Usando a classe de cabeçalho vermelho para desinscrição */}
+                    <Modal.Title className="text-white">Confirmar Desinscrição</Modal.Title>
+                </div>
+                <Modal.Body className="py-4">
+                    {materiaParaDesinscrever && (
+                        <>
+                            <p className="mb-3">Tem certeza que deseja se desinscrever da matéria:</p>
+                            <h5 className="label-vermelho mb-3 pipipi">{materiaParaDesinscrever.nome}</h5> {/* Cor de destaque para o nome da matéria */}
+                            <p>
+                                Ao confirmar, sua matrícula nesta turma será cancelada.
+                                Você poderá se inscrever novamente se houver vagas disponíveis no futuro.
+                            </p>
+                            <p className="mt-4 text-muted">Esta ação não pode ser desfeita imediatamente.</p>
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="border-0 justify-content-center gap-3 pb-4">
+                    <Button variant="outline-secondary" onClick={handleFecharModalDesinscricao} className="custom-button-outline px-4">Voltar</Button>
+                    <Button className="custom-button-vermelho px-4" onClick={handleConfirmarDesinscricao} disabled={isSubmitting}>
+                        {isSubmitting ? 'Desinscrevendo...' : 'Confirmar Desinscrição'}
                     </Button>
                 </Modal.Footer>
             </Modal>

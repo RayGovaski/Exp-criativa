@@ -14,7 +14,36 @@
   display: flex;
   flex-direction: column;
 }
+/* Botão de Logout */
+.sidebar-logout-button-aluno {
+  background: transparent;
+  color: white;
+  border: none;
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: 'Fredoka', sans-serif;
+  width: 100%;
+  text-align: left;
+}
 
+.sidebar-logout-button-aluno:hover {
+  background-color: #d32f2f;
+}
+
+.sidebar-perfil-aluno.dark .sidebar-logout-button-aluno {
+  color: #e0e0e0;
+}
+
+.sidebar-perfil-aluno.dark .sidebar-logout-button-aluno:hover {
+  background-color: #d32f2f;
+}
 .sidebar-links-professor {
   display: flex;
   flex-direction: column;

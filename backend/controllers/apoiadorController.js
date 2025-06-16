@@ -29,14 +29,13 @@ export const createApoiador = async (req, res) => {
     try {
         const { nome, cpf, email, senha, data_nascimento, telefone, receberNotificacoes } = req.body;
         
-        // ✅ VALIDAÇÃO ADICIONADA PARA EVITAR CRASHES ✅
         if (!nome || !cpf || !email || !senha || !data_nascimento) {
-            return res.status(400).json({ error: "Campos obrigatórios faltando. Nome, CPF, Email, Senha e Data de Nascimento são necessários." });
+            return res.status(400).json({ error: "Campos obrigatórios faltando: Nome, CPF, Email, Senha e Data de Nascimento." });
         }
 
         const fotoBuffer = req.file ? req.file.buffer : null;
 
-        // Validações de formato (já existiam e estão corretas)
+        // Validações de formato
         if (!validateCPF(cpf)) return res.status(400).json({ error: "CPF inválido" });
         if (!validateEmail(email)) return res.status(400).json({ error: "Email inválido" });
 
@@ -44,7 +43,6 @@ export const createApoiador = async (req, res) => {
         const hashedPassword = await bcrypt.hash(senha, salt);
 
         const cleanCpf = cpf.replace(/\D/g, '');
-        // O telefone pode ser opcional, então verificamos se ele existe antes de limpar
         const cleanTelefone = telefone ? cleanPhone(telefone) : null;
         const formattedDate = formatDateToMySQL(data_nascimento);
         const notificacoesValue = receberNotificacoes ? 1 : 0;
@@ -56,14 +54,12 @@ export const createApoiador = async (req, res) => {
                 if (err.code === 'ER_DUP_ENTRY') {
                     return res.status(409).json({ error: "CPF ou Email já cadastrado." });
                 }
-                // Adiciona um log do erro do MySQL para facilitar a depuração
                 console.error("ERRO DE QUERY MYSQL em createApoiador:", err);
                 return res.status(500).json({ error: "Erro no banco de dados ao criar apoiador.", message: err.sqlMessage });
             }
             res.status(201).json({ id: data.insertId, message: "Apoiador cadastrado com sucesso!" });
         });
     } catch (error) {
-        // Este catch pega erros do bcrypt ou de outras partes síncronas/assíncronas
         console.error("ERRO GERAL em createApoiador:", error);
         res.status(500).json({ error: "Erro interno do servidor.", message: error.message });
     }
@@ -282,27 +278,19 @@ export const updatePhoto = (req, res) => {
 export const subscribeToPlan = (req, res) => {
     const { planoId } = req.body; 
     const userIdFromToken = req.user ? req.user.id : null; 
-    const userRoleFromToken = req.user ? req.user.role : null; // Obtenha a role do usuário logado
+    const userRoleFromToken = req.user ? req.user.role : null; 
 
-    // VALIDAÇÃO CRÍTICA: Apenas apoiadores podem assinar planos
     if (!userIdFromToken || userRoleFromToken !== 'apoiador') {
         console.warn(`AVISO [subscribeToPlan]: Acesso negado. Usuário logado (ID: ${userIdFromToken}, Role: ${userRoleFromToken}) tentou assinar plano.`);
         return res.status(403).json({ error: "Acesso negado. Somente apoiadores podem assinar planos." });
     }
     
-    // Se chegou aqui, é um apoiador logado. Use userIdFromToken para as operações.
     const apoiadorId = userIdFromToken; 
 
     if (!planoId) {
         return res.status(400).json({ error: "ID do plano é obrigatório." });
     }
 
-    // ... (restante da lógica de subscribeToPlan, que já usa apoiadorId) ...
-    // A lógica interna de verificação e atualização/inserção pode permanecer como está,
-    // pois agora sabemos que 'apoiadorId' é do apoiador logado e autorizado.
-    // Lembre-se de usar 'apoiadorId' em vez de 'userIdFromToken' dentro do resto da função.
-    
-    // 1. Verificar se o planoId existe na tabela Plano
     const checkPlanQuery = 'SELECT id, nome, preco FROM Plano WHERE id = ?';
     db.query(checkPlanQuery, [planoId], (err, planos) => {
         if (err) {
@@ -314,7 +302,6 @@ export const subscribeToPlan = (req, res) => {
         }
         const selectedPlanData = planos[0];
 
-        // 2. Verificar se o apoiador já possui uma assinatura ativa
         const checkSubscriptionQuery = 'SELECT * FROM Apoiador_Plano WHERE apoiadorId = ?';
         db.query(checkSubscriptionQuery, [apoiadorId], (err, existingSubscription) => {
             if (err) {
@@ -369,7 +356,6 @@ export const subscribeToPlan = (req, res) => {
 export const cancelSubscription = (req, res) => {
     const apoiadorId = req.user.id; // ID do apoiador vem do token de autenticação
 
-    // Query para deletar a entrada do apoiador na tabela Apoiador_Plano
     const q = 'DELETE FROM Apoiador_Plano WHERE apoiadorId = ?';
 
     db.query(q, [apoiadorId], (err, result) => {
@@ -379,7 +365,6 @@ export const cancelSubscription = (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            // Se nenhum registro foi afetado, significa que o apoiador não tinha uma assinatura ativa
             return res.status(404).json({ error: 'Nenhuma assinatura ativa encontrada para este apoiador.' });
         }
 
@@ -401,7 +386,6 @@ export const getPhoto = (req, res) => {
 
         const apoiador = result[0];
 
-        // First try to serve from file path
         if (apoiador.foto_path) {
             const fullPath = path.resolve(apoiador.foto_path);
             console.log('Trying to serve photo from:', fullPath);
@@ -413,7 +397,6 @@ export const getPhoto = (req, res) => {
             }
         }
 
-        // Fallback to blob data if file path doesn't work
         if (apoiador.foto) {
             res.writeHead(200, {
                 'Content-Type': 'image/jpeg',
@@ -452,21 +435,21 @@ export const getDoacaoById = (req, res) => {
         return res.status(200).json(data[0]);
     });
 };
-export const getApoiadorHistoricoDoacao = (req, res) => {
+export const getApoiadorDonationsHistory = (req, res) => {
     const apoiadorId = req.user.id; // ID do apoiador logado
 
+    // Query para selecionar histórico de doações, incluindo 'forma_pagamento'
     const q = `
         SELECT 
-            ad.id, -- ID do registro em Apoiador_Doacao (para a key no React)
-            d.id AS doacao_id, -- ID da Doacao (para detalhes)
-            d.nome AS causa, -- Usamos 'nome' da Doacao como 'causa'
+            ad.id, 
+            d.id AS doacao_id, 
+            d.nome AS causa, 
             ad.valor_doado AS valor, 
             ad.data_doacao AS data, 
-            d.status, -- Status da Doacao
-            d.descricao AS descricao_causa, -- Descrição da causa/doação
-            -- Para o comprovante, você pode ter um campo comprovante_path em Apoiador_Doacao
-            -- ou verificar se o status permite download. Por enquanto, vamos simular:
-            TRUE AS comprovante_disponivel -- Simula que comprovante está sempre disponível
+            d.status, -- Manter o status para o modal, mesmo que não na tabela principal
+            d.descricao AS descricao_causa, 
+            ad.forma_pagamento AS formaPagamento,
+            TRUE AS comprovante_disponivel 
         FROM Apoiador_Doacao ad
         JOIN Doacao d ON ad.doacao_id = d.id
         WHERE ad.apoiador_id = ?
@@ -475,25 +458,24 @@ export const getApoiadorHistoricoDoacao = (req, res) => {
 
     db.query(q, [apoiadorId], (err, data) => {
         if (err) {
-            console.error("Erro ao buscar histórico de doações do apoiador:", err);
+            console.error("ERRO [getApoiadorDonationsHistory-BE]: Erro ao buscar histórico de doações do apoiador:", err);
             return res.status(500).json({ error: "Erro no banco de dados ao buscar histórico de doações.", message: err.message });
         }
 
-        // Formatar os dados para o frontend
         const formattedData = data.map(record => ({
-            id: record.id, // ID do registro da doação individual
+            id: record.id, 
+            doacao_id: record.doacao_id, 
             causa: record.causa,
-            // 'instituicao' não existe no seu DB, remova do frontend ou coloque um valor fixo
-            instituicao: 'Experiência Criativa', // Exemplo: ou buscar de outra tabela se tiver
-            valor: record.valor,
-            data: new Date(record.data).toLocaleDateString('pt-BR'), // Formata para DD/MM/AAAA
-            status: record.status,
-            comprovante: record.comprovante_disponivel, // Usar o campo do DB ou TRUE
-            descricaoDetalhada: record.descricao_causa, // Para o modal
-            doacao_id: record.doacao_id // Guardar o ID da doação original para futuras consultas
+            instituicao: 'Experiência Criativa', 
+            valor: parseFloat(record.valor), 
+            data: new Date(record.data).toLocaleDateString('pt-BR'), 
+            status: record.status, 
+            comprovante: record.comprovante_disponivel, 
+            descricaoDetalhada: record.descricao_causa,
+            formaPagamento: record.formaPagamento 
         }));
         
-        console.log('DEBUG: Histórico de doações retornado:', formattedData);
+        console.log('DEBUG [getApoiadorDonationsHistory-BE]: Histórico de doações retornado:', formattedData);
         return res.status(200).json(formattedData);
     });
 };

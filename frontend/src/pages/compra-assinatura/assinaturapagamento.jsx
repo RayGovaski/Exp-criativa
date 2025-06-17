@@ -6,7 +6,7 @@ import axios from 'axios';
 import "./AssinaturaPagamento.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Modal, Button } from 'react-bootstrap'; // Importe Modal e Button do react-bootstrap
+import { Modal, Button, Spinner } from 'react-bootstrap'; // Importe Spinner também
 
 const plans = [
     {
@@ -51,7 +51,8 @@ const plans = [
     },
 ];
 
-const paymentMethods = [
+// O nome desta constante estava duplicado. Renomeado para evitar conflitos.
+const paymentMethodsList = [
     { id: 'credit', name: 'Cartão de Crédito', icon: CreditCard },
     { id: 'debit', name: 'Cartão de Débito', icon: CreditCard },
     { id: 'pix', name: 'Pix', icon: Smartphone },
@@ -70,9 +71,10 @@ const AssinaturaPagamento = () => {
         cardExpiry: '',
         cardCvv: ''
     });
+    const [isLoading, setIsLoading] = useState(false); // NOVO: Estado de loading
 
-    const [showModalTrocaPlano, setShowModalTrocaPlano] = useState(false); // Novo estado para o modal de troca de plano
-    const [planToChangeTo, setPlanToChangeTo] = useState(null); // Estado para guardar o plano para o qual o usuário quer mudar
+    const [showModalTrocaPlano, setShowModalTrocaPlano] = useState(false);
+    const [planToChangeTo, setPlanToChangeTo] = useState(null);
 
 
     useEffect(() => {
@@ -95,6 +97,7 @@ const AssinaturaPagamento = () => {
             } catch (err) {
                 console.error("Erro ao buscar plano atual:", err);
                 setCurrentSubscription(null);
+                // Pode adicionar um toast.error aqui também, se desejar notificar o usuário sobre falha na busca do plano atual.
             }
         };
         fetchCurrentSubscription();
@@ -106,19 +109,19 @@ const AssinaturaPagamento = () => {
 
     const handleConfirmarTrocaPlano = async () => {
         setShowModalTrocaPlano(false); // Fecha o modal
-        // Agora, sim, prossegue com a assinatura
-        // A lógica de `handleSubscribe` para a requisição axios é movida para uma nova função `executeSubscription`
-        // para evitar duplicação ou chamadas erradas.
-        await executeSubscription(planToChangeTo);
+        await executeSubscription(planToChangeTo); // Prossegue com a assinatura/troca de plano
     };
 
     // Função que realmente faz a requisição de assinatura/troca de plano
     const executeSubscription = async (plan) => {
+        setIsLoading(true); // Inicia o loading
+        toast.info("Processando sua assinatura...", { autoClose: false, closeButton: false, toastId: 'subscriptionProcess' });
+
         try {
             const response = await axios.post('http://localhost:8000/apoiador/assinar-plano', {
                 apoiadorId: user.id,
                 planoId: plan.dbId,
-                formaPagamento: selectedPayment, // Adicionado para enviar ao backend
+                formaPagamento: selectedPayment,
                 ...(selectedPayment === 'credit' || selectedPayment === 'debit' ? {
                     cardNumber: cardData.cardNumber,
                     cardName: cardData.cardName,
@@ -131,24 +134,43 @@ const AssinaturaPagamento = () => {
                 }
             });
 
-            toast.success(response.data.message);
+            toast.dismiss('subscriptionProcess'); // Remove o toast de processamento
+            toast.success(response.data.message || 'Assinatura realizada com sucesso!');
             setCurrentSubscription({ ...currentSubscription, plano_nome: plan.title, plano_preco: plan.numericPrice, data_adesao: new Date().toISOString() });
-            navigate('/perfil');
+
+            // Atrasar a navegação para que o toast seja visível
+            setTimeout(() => {
+                navigate('/perfil');
+            }, 6000); // 3 segundos para ler o toast
+
         } catch (error) {
             console.error("Erro ao assinar plano:", error);
-            let errorMessage = "Ocorreu um erro ao processar sua assinatura.";
-            if (error.response && error.response.data && error.response.data.error) {
-                errorMessage = error.response.data.error;
+            toast.dismiss('subscriptionProcess'); // Remove o toast de processamento
+
+            let errorMessage = "Ocorreu um erro ao processar sua assinatura. Tente novamente.";
+            if (error.response && error.response.data) {
+                if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                } else {
+                    errorMessage = `Erro do servidor: ${error.response.status} - ${error.response.statusText || 'Mensagem desconhecida'}`;
+                }
+            } else if (error.message) {
+                errorMessage = error.message;
             }
             toast.error(errorMessage);
+        } finally {
+            setIsLoading(false); // Finaliza o loading
         }
     };
 
 
     const handleSubscribe = async () => {
+        // Validações iniciais (frontend)
         if (!selectedPlan || !selectedPayment) {
             toast.error('Por favor, selecione um plano e método de pagamento.');
-            return;
+            return; // NÃO coloca isLoading(false) aqui porque o isLoading só é true ao chamar executeSubscription
         }
 
         if (!user || !user.id) {
@@ -164,25 +186,28 @@ const AssinaturaPagamento = () => {
         }
 
         if ((selectedPayment === 'credit' || selectedPayment === 'debit') &&
-            (!cardData.cardNumber || !cardData.cardName || !cardData.cardExpiry || !cardData.cardCvv)) {
+            (!cardData.cardNumber || cardData.cardNumber.trim() === '' ||
+             !cardData.cardName || cardData.cardName.trim() === '' ||
+             !cardData.cardExpiry || cardData.cardExpiry.trim() === '' ||
+             !cardData.cardCvv || cardData.cardCvv.trim() === '')) {
             toast.error('Por favor, preencha todos os dados do cartão.');
             return;
         }
 
-        // Lógica de verificação do plano atual
+        // Lógica de verificação do plano atual para o modal de troca
         if (currentSubscription && currentSubscription.plano_nome) {
             if (currentSubscription.plano_nome === plan.title) {
                 toast.info(`Você já está atualmente no plano ${plan.title}.`);
                 return;
             } else {
-                // Ao invés de window.confirm, abrimos o modal
                 setPlanToChangeTo(plan); // Salva o plano para o qual queremos mudar
                 setShowModalTrocaPlano(true); // Abre o modal de confirmação
                 return; // Importante: retorna aqui para esperar a interação com o modal
             }
         }
         
-        // Se não tem assinatura ativa, ou se já confirmou a troca pelo modal,
+        // Se não tem assinatura ativa (primeira assinatura), ou se a troca foi confirmada via modal
+        // (executeSubscription é chamado por handleConfirmarTrocaPlano),
         // prossegue com a assinatura.
         await executeSubscription(plan);
     };
@@ -246,7 +271,7 @@ const AssinaturaPagamento = () => {
                                             ? 'border-green-500 bg-green-50 shadow-md'
                                             : 'border-gray-200 bg-white'
                                 }`}
-                                onClick={() => setSelectedPlan(plan.id)}
+                                onClick={() => !isLoading && setSelectedPlan(plan.id)} // Desabilita clique durante loading
                             >
                                 {/* Radio Button */}
                                 <div className="absolute top-4 right-4">
@@ -255,8 +280,9 @@ const AssinaturaPagamento = () => {
                                         name="plan"
                                         value={plan.id}
                                         checked={selectedPlan === plan.id}
-                                        onChange={() => setSelectedPlan(plan.id)}
+                                        onChange={() => !isLoading && setSelectedPlan(plan.id)} // Desabilita alteração durante loading
                                         className="w-5 h-5 text-pink-600 cursor-pointer"
+                                        disabled={isLoading} // Desabilita o radio durante loading
                                     />
                                 </div>
 
@@ -289,7 +315,7 @@ const AssinaturaPagamento = () => {
                             Método de Pagamento
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                            {paymentMethods.map((method) => {
+                            {paymentMethodsList.map((method) => { // Usar paymentMethodsList
                                 const IconComponent = method.icon;
                                 return (
                                     <div
@@ -299,15 +325,16 @@ const AssinaturaPagamento = () => {
                                                 ? 'border-pink-600 bg-pink-50 shadow-md'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
                                         }`}
-                                        onClick={() => setSelectedPayment(method.id)}
+                                        onClick={() => !isLoading && setSelectedPayment(method.id)} // Desabilita clique durante loading
                                     >
                                         <input
                                             type="radio"
                                             name="payment"
                                             value={method.id}
                                             checked={selectedPayment === method.id}
-                                            onChange={() => setSelectedPayment(method.id)}
+                                            onChange={() => !isLoading && setSelectedPayment(method.id)} // Desabilita alteração durante loading
                                             className="w-4 h-4 text-pink-600 mb-2"
+                                            disabled={isLoading} // Desabilita o radio durante loading
                                         />
                                         <IconComponent className="w-8 h-8 mx-auto mb-2 text-gray-600" />
                                         <p className="text-sm font-medium text-gray-700">
@@ -337,6 +364,7 @@ const AssinaturaPagamento = () => {
                                     onChange={(e) => handleCardInputChange('cardNumber', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="0000 0000 0000 0000"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -350,6 +378,7 @@ const AssinaturaPagamento = () => {
                                     onChange={(e) => handleCardInputChange('cardName', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="Nome como no cartão"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -364,6 +393,7 @@ const AssinaturaPagamento = () => {
                                         onChange={(e) => handleCardInputChange('cardExpiry', e.target.value)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                         placeholder="MM/AA"
+                                        disabled={isLoading} // Desabilita input durante loading
                                     />
                                 </div>
 
@@ -377,6 +407,7 @@ const AssinaturaPagamento = () => {
                                         onChange={(e) => handleCardInputChange('cardCvv', e.target.value)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                         placeholder="000"
+                                        disabled={isLoading} // Desabilita input durante loading
                                     />
                                 </div>
                             </div>
@@ -418,8 +449,23 @@ const AssinaturaPagamento = () => {
                         <button
                             onClick={handleSubscribe}
                             className="confirm-button"
+                            disabled={isLoading} // Desabilita o botão durante o loading
                         >
-                            Confirmar Assinatura - {selectedPlanData?.price}
+                            {isLoading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="me-2"
+                                    />
+                                    Processando...
+                                </>
+                            ) : (
+                                `Confirmar Assinatura - ${selectedPlanData?.price}`
+                            )}
                         </button>
 
                         <p className="text-sm text-gray-500 mt-4">
@@ -429,9 +475,9 @@ const AssinaturaPagamento = () => {
                 )}
             </div>
 
-            {/* Modal para confirmar troca de plano - NOVO MODAL */}
+            {/* Modal para confirmar troca de plano */}
             <Modal show={showModalTrocaPlano} onHide={() => setShowModalTrocaPlano(false)} centered>
-                <div className="registro-header-azul"> {/* Reutilizando a classe de estilo do cabeçalho */}
+                <div className="registro-header-azul">
                     <Modal.Title className="text-white">Confirmar Troca de Plano</Modal.Title>
                 </div>
                 <Modal.Body className="py-4">
@@ -452,14 +498,30 @@ const AssinaturaPagamento = () => {
                         variant="outline-secondary"
                         onClick={() => setShowModalTrocaPlano(false)}
                         className="custom-button-outline px-4"
+                        disabled={isLoading} // Desabilita botões do modal durante loading
                     >
                         Voltar
                     </Button>
                     <Button
                         onClick={handleConfirmarTrocaPlano}
                         className="custom-button-azul px-4"
+                        disabled={isLoading} // Desabilita botões do modal durante loading
                     >
-                        Confirmar Troca
+                        {isLoading ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="me-2"
+                                />
+                                Confirmando...
+                            </>
+                        ) : (
+                            'Confirmar Troca'
+                        )}
                     </Button>
                 </Modal.Footer>
             </Modal>

@@ -37,9 +37,9 @@ router.use(verifyToken, isAdmin);
 // Rotas que NÃO precisam de upload de arquivo
 router.get('/perfil', getProfileAdministrador);
 router.get('/professores', getProfessorsList);
-router.post('/professores', createProfessor);
+router.post('/professor', createProfessor);
 router.get('/dashboard-stats', getAdminDashboardStats);
-router.post('/turmas', createTurma);
+router.post('/turma', createTurma);
 router.post('/doacao-card', uploadToMemory.single('imagem'), createDoacaoCard);
 
 

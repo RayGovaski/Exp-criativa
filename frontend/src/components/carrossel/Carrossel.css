@@ -16,9 +16,7 @@
   background-size: cover !important;
   background-position: center !important;
   min-height: 400px; /* Adjust as needed */
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  
 }
 
 .carousel img {

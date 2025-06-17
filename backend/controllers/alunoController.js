@@ -129,7 +129,7 @@ export const getProfileAluno = (req, res) => {
             a.id, a.cpf, a.nome, a.sexo, a.data_nascimento, a.email,
             a.necessidades_especiais, (a.foto IS NOT NULL) AS tem_foto,
             r.nome AS responsavel_nome, r.cpf AS responsavel_cpf, r.telefone AS responsavel_telefone, -- Telefone do RESPONSÁVEL
-            r.email AS responsavel_email, r.grau_parentesco, r.profissao, r.renda_familiar,
+            r.email AS responsavel_email, r.grau_parentesco, r.renda_familiar, -- 'r.profissao' REMOVIDO AQUI
             e.logradouro AS endereco_logradouro, e.numero_residencia AS endereco_numero_residencia,
             e.cep AS endereco_cep, e.cidade AS endereco_cidade, e.estado AS endereco_estado
         FROM Aluno a
@@ -153,7 +153,7 @@ export const getProfileAluno = (req, res) => {
             telefone: alunoProfile.responsavel_telefone, // Este telefone é do RESPONSÁVEL
             email: alunoProfile.responsavel_email,
             grau_parentesco: alunoProfile.grau_parentesco,
-            profissao: alunoProfile.profissao,
+            // profissao: alunoProfile.profissao, -- REMOVIDO AQUI
             renda_familiar: alunoProfile.renda_familiar,
             endereco: alunoProfile.endereco_logradouro ? {
                 logradouro: alunoProfile.endereco_logradouro,

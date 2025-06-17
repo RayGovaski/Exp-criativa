@@ -24,7 +24,7 @@ const alunoUpload = uploadToMemory.fields([
 ]);
 
 
-router.post('/register', alunoUpload, createAluno);
+router.post('/registro-aluno', alunoUpload, createAluno);
 router.get('/', getAlunos);
 router.get('/perfil', verifyToken, getProfileAluno);
 router.get('/foto/:id', getAlunoFoto);

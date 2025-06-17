@@ -6,6 +6,7 @@ class ErrorBoundary extends Component {
     this.state = { hasError: false };
   }
 
+  // eslint-disable-next-line no-unused-vars
   static getDerivedStateFromError(error) {
     // Atualiza o state para que a próxima renderização mostre a UI de fallback.
     return { hasError: true };
@@ -14,8 +15,8 @@ class ErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     // Você também pode registrar o erro em um serviço de relatórios de erro
     console.error("Erro capturado pelo Error Boundary:", error, errorInfo);
-    // Exemplo de envio para um serviço de monitoramento:
-    // logErrorToMyService(error, errorInfo);
+ 
+    
   }
 
   render() {

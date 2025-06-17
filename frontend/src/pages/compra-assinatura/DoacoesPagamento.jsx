@@ -5,8 +5,8 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import "./DoacoesPagamento.css";
 import { ProgressBar } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify'; // Importe ToastContainer e toast
-import 'react-toastify/dist/ReactToastify.css'; // Importe o CSS (idealmente, deve ser global)
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const paymentMethods = [
     { id: 'Credito', name: 'Cartão de Crédito', icon: CreditCard },
@@ -36,12 +36,14 @@ const DoacoesPagamento = () => {
     const [loadingProject, setLoadingProject] = useState(true);
     const [projectError, setProjectError] = useState(null);
     const [selectedProjectData, setSelectedProjectData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false); // Adicionado estado de loading
 
     useEffect(() => {
         const fetchProjectDetails = async () => {
             if (!preSelectedCauseId) {
                 setProjectError("Nenhum projeto de doação selecionado. Redirecionando...");
-                setTimeout(() => navigate('/doar'), 2000);
+                // Usando toast para esta mensagem também para consistência
+                toast.error("Nenhum projeto de doação selecionado. Redirecionando...", { autoClose: 6000, toastId: 'noProject' });
                 return;
             }
             try {
@@ -50,6 +52,7 @@ const DoacoesPagamento = () => {
             } catch (err) {
                 console.error("Erro ao buscar detalhes do projeto:", err);
                 setProjectError("Erro ao carregar detalhes do projeto. Tente novamente.");
+                toast.error("Erro ao carregar detalhes do projeto. Tente novamente.", { toastId: 'projectLoadError' });
             } finally {
                 setLoadingProject(false);
             }
@@ -76,24 +79,40 @@ const DoacoesPagamento = () => {
 
 
     const handleDonate = async () => {
+        setIsLoading(true); // Inicia o loading
+        toast.dismiss(); // Limpa toasts anteriores para evitar confusão
+
+        // Validações iniciais (frontend)
         if (!donationAmount || parseFloat(donationAmount) <= 0 || !preSelectedCauseId || !selectedPayment) {
             toast.error('Por favor, insira um valor de doação válido e selecione um método de pagamento.');
+            setIsLoading(false); // Para o loading em caso de erro
             return;
         }
 
         const valorNumerico = parseFloat(donationAmount);
 
-        if (!isAuthenticated() && (!customerData.name || !customerData.email || !customerData.phone)) {
-            toast.error('Por favor, preencha seus dados (Nome, Email, Telefone) para continuar.');
+        // Ajuste: Prefira verificar se customerData.name é uma string não vazia ou nula, etc.
+        // Se user está autenticado, não precisa de dados do formulário de cliente
+        // Caso contrário, todos os 3 campos são obrigatórios para não-autenticados
+        if (!isAuthenticated() && (!customerData.name || customerData.name.trim() === '' ||
+                                  !customerData.email || customerData.email.trim() === '' ||
+                                  !customerData.phone || customerData.phone.trim() === '')) {
+            toast.error('Por favor, preencha todos os seus dados (Nome, Email, Telefone) para continuar.');
+            setIsLoading(false);
             return;
         }
 
         if ((selectedPayment === 'Credito' || selectedPayment === 'Debito') &&
-            (!customerData.cardNumber || !customerData.cardName || !customerData.cardExpiry || !customerData.cardCvv)) {
+            (!customerData.cardNumber || customerData.cardNumber.trim() === '' ||
+             !customerData.cardName || customerData.cardName.trim() === '' ||
+             !customerData.cardExpiry || customerData.cardExpiry.trim() === '' ||
+             !customerData.cardCvv || customerData.cardCvv.trim() === '')) {
             toast.error('Por favor, preencha todos os dados do cartão.');
+            setIsLoading(false);
             return;
         }
 
+        toast.info("Processando sua doação...", { autoClose: false, closeButton: false, toastId: 'donationProcess' }); // Toast de processamento
 
         const donationPayload = {
             doacaoId: preSelectedCauseId,
@@ -118,23 +137,43 @@ const DoacoesPagamento = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
+            console.log("Enviando payload da doação:", donationPayload); // Log para depuração
             const response = await axios.post('http://localhost:8000/doacoes/processar', donationPayload, { headers });
+            console.log("Resposta da doação:", response.data); // Log para depuração
 
-            toast.success(response.data.message);
-            navigate('/doar');
+            toast.dismiss('donationProcess'); // Remove o toast de processamento
+            toast.success(response.data.message || 'Doação realizada com sucesso!');
+
+            // ✅ Atrasar a navegação para que o toast seja visível
+            setTimeout(() => {
+                navigate('/doar');
+            }, 6000); // 1.5 segundos para o usuário ver o toast
+
         } catch (error) {
             console.error("Erro ao processar doação:", error);
-            let errorMessage = "Ocorreu um erro ao processar sua doação.";
-            if (error.response && error.response.data && error.response.data.error) {
-                errorMessage = error.response.data.error;
+            toast.dismiss('donationProcess'); // Remove o toast de processamento
+
+            let errorMessage = "Ocorreu um erro ao processar sua doação. Tente novamente.";
+            if (error.response && error.response.data) {
+                // Tenta pegar a mensagem de erro mais específica do backend
+                if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                } else {
+                    errorMessage = `Erro do servidor: ${error.response.status} - ${error.response.statusText || 'Mensagem desconhecida'}`;
+                }
+            } else if (error.message) {
+                errorMessage = error.message; // Captura a mensagem do AxiosError
             }
             toast.error(errorMessage);
+        } finally {
+            setIsLoading(false); // Finaliza o loading, independentemente do sucesso ou erro
         }
     };
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
-            {/* O ToastContainer deve estar presente em seu aplicativo React para que os toasts apareçam */}
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
@@ -164,10 +203,9 @@ const DoacoesPagamento = () => {
                         <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                             Detalhes do Projeto
                         </h2>
-                        
+
                         <div className="mb-4">
                             <p><strong>Projeto:</strong> {selectedProjectData.titulo}</p>
-                            {/* Adicionado o prefixo "Descrição:" */}
                             <p><strong>Descrição:</strong> {selectedProjectData.descricao}</p>
                             <p><strong>Meta:</strong> R$ {selectedProjectData.valorMeta.toFixed(2).replace('.', ',')}</p>
                             <p><strong>Arrecadado:</strong> R$ {selectedProjectData.arrecadado.toFixed(2).replace('.', ',')}</p>
@@ -198,6 +236,7 @@ const DoacoesPagamento = () => {
                             onChange={handleDonationAmountChange}
                             className="w-64 px-4 py-3 border border-gray-300 rounded-lg text-3xl font-bold text-center focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                             placeholder="0,00"
+                            disabled={isLoading} // Desabilita input durante loading
                         />
                     </div>
                 </div>
@@ -217,7 +256,7 @@ const DoacoesPagamento = () => {
                                         className={`payment-method-card ${
                                             selectedPayment === method.id ? 'selected' : ''
                                         } relative`}
-                                        onClick={() => setSelectedPayment(method.id)}
+                                        onClick={() => !isLoading && setSelectedPayment(method.id)} // Desabilita clique durante loading
                                     >
                                         <IconComponent className="method-icon" />
                                         <p className="method-name">
@@ -248,6 +287,7 @@ const DoacoesPagamento = () => {
                                     onChange={(e) => handleInputChange('name', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="Seu nome completo"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -261,6 +301,7 @@ const DoacoesPagamento = () => {
                                     onChange={(e) => handleInputChange('email', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="seu@email.com"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -274,6 +315,7 @@ const DoacoesPagamento = () => {
                                     onChange={(e) => handleInputChange('phone', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="(11) 99999-9999"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
                         </div>
@@ -297,6 +339,7 @@ const DoacoesPagamento = () => {
                                     onChange={(e) => handleCardInputChange('cardNumber', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="0000 0000 0000 0000"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -310,6 +353,7 @@ const DoacoesPagamento = () => {
                                     onChange={(e) => handleCardInputChange('cardName', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                     placeholder="Nome como no cartão"
+                                    disabled={isLoading} // Desabilita input durante loading
                                 />
                             </div>
 
@@ -324,6 +368,7 @@ const DoacoesPagamento = () => {
                                         onChange={(e) => handleCardInputChange('cardExpiry', e.target.value)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                         placeholder="MM/AA"
+                                        disabled={isLoading} // Desabilita input durante loading
                                     />
                                 </div>
 
@@ -337,6 +382,7 @@ const DoacoesPagamento = () => {
                                         onChange={(e) => handleCardInputChange('cardCvv', e.target.value)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                                         placeholder="000"
+                                        disabled={isLoading} // Desabilita input durante loading
                                     />
                                 </div>
                             </div>
@@ -379,8 +425,17 @@ const DoacoesPagamento = () => {
                         <button
                             onClick={handleDonate}
                             className="confirm-button"
+                            disabled={isLoading} // Desabilita o botão durante o loading
                         >
-                            Confirmar Doação - R$ {parseFloat(donationAmount).toFixed(2).replace('.', ',')}
+                            {isLoading ? (
+                                <>
+                                    {/* Spinner de Bootstrap, certifique-se que o CSS do Bootstrap está carregado */}
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Processando...
+                                </>
+                            ) : (
+                                `Confirmar Doação - R$ ${parseFloat(donationAmount).toFixed(2).replace('.', ',')}`
+                            )}
                         </button>
 
                         <p className="text-sm text-gray-500 mt-4">

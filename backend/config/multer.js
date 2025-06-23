@@ -15,7 +15,7 @@ const memoryStorage = multer.memoryStorage();
 export const uploadToMemory = multer({
   storage: memoryStorage,
   fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // Limite de 5MB (opcional, mas recomendado)
+  limits: { fileSize: 5 * 1024 * 1024 } // Limite de 5MB
 });
 
 

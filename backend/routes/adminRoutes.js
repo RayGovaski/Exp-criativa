@@ -7,14 +7,9 @@ import {
     createProfessor,
     getAdminDashboardStats,
     createTurma
-    // Se o admin também cria doações, importe a função aqui
-    // createDoacaoCard 
 } from '../controllers/adminController.js';
 import { createDoacaoCard } from '../controllers/doacaoController.js';
-// ✅ CORREÇÃO: Importa 'uploadToMemory' do seu arquivo de configuração
-// Esta é a instância correta para salvar imagens como BLOB no banco de dados.
 import { uploadToMemory } from '../config/multer.js';
-
 import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -28,7 +23,6 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-// Aplica a verificação de token e de role de admin para todas as rotas deste arquivo
 router.use(verifyToken, isAdmin);
 
 

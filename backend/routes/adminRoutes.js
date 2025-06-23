@@ -25,10 +25,6 @@ const isAdmin = (req, res, next) => {
 
 router.use(verifyToken, isAdmin);
 
-
-// --- ROTAS DE ADMIN ---
-
-// Rotas que NÃO precisam de upload de arquivo
 router.get('/perfil', getProfileAdministrador);
 router.get('/professores', getProfessorsList);
 router.post('/professor', createProfessor);

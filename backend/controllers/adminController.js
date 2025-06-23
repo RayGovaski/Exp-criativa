@@ -167,7 +167,7 @@ export const createProfessor = (req, res) => {
     }); 
 }; 
 
-// --- FUNÇÃO CORRIGIDA ---
+
 export const getAdminDashboardStats = (req, res) => {
     if (!req.user || req.user.role !== 'administrador') {
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem acessar relatórios gerais." });
@@ -178,7 +178,7 @@ export const getAdminDashboardStats = (req, res) => {
 
     const stats = {};
     const errors = [];
-    const totalQueries = 4; // Total de consultas a serem executadas
+    const totalQueries = 4;
     let queriesCompleted = 0;
 
     // Função para ser chamada ao final de cada consulta
@@ -266,9 +266,7 @@ export const createTurma = (req, res) => {
             return res.status(500).json({ error: "Erro interno do servidor.", message: err.message }); 
         } 
 
-        // --- CORREÇÃO NA LÓGICA DE SOBREPOSIÇÃO ---
-        // Adicionado COALESCE para tratar corretamente turmas com datas nulas no banco de dados.
-        // COALESCE(coluna, valor_padrao) usa o valor_padrão se a coluna for nula.
+        
         const checkOverlapSql = `
             SELECT id, nome, dia_da_semana, hora_inicio, hora_termino, sala, data_inicio, data_termino
             FROM Turma

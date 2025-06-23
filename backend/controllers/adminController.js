@@ -283,10 +283,10 @@ export const createTurma = (req, res) => {
         db.query(checkOverlapSql, [ 
             sala,  
             dia_da_semana,  
-            hora_termino, // hora_termino_nova
-            hora_inicio,  // hora_inicio_nova
-            data_termino || '9999-12-31', // data_termino_nova (para comparação com data_inicio_existente)
-            data_inicio || '1000-01-01'   // data_inicio_nova (para comparação com data_termino_existente)
+            hora_termino, 
+            hora_inicio,  
+            data_termino || '9999-12-31',  
+            data_inicio || '1000-01-01'   
         ], function(err, overlapResults) { 
             if (err) { 
                 return db.rollback(function() {

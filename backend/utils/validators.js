@@ -20,11 +20,9 @@ export const formatDateToMySQL = (dateString) => {
     }
   
     // Tenta criar um objeto de Data.
-    // new Date('') ou new Date(null) criam objetos de data inválidos.
     const date = new Date(dateString);
   
     // Verifica se a data resultante é válida. 
-    // Se não for, isNaN(date.getTime()) será verdadeiro.
     if (isNaN(date.getTime())) {
         return null; // Retorna null para qualquer data inválida
     }
